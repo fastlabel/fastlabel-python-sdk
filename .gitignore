@@ -1,0 +1,8 @@
+/**/__pycache__
+/**/.pytest_cache
+/**/*.pem
+.DS_Store
+.pytest_cache
+dist
+build
+fastlabel.egg-info
