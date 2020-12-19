@@ -1,8 +1,11 @@
-import logging
 import os
 import requests
+from logging import getLogger
 from fastlabel.const import AnalysisType
 
+logger = getLogger(__name__)
+
+APP_BASE_URL = "https://app.fastlabel.ai/projects/"
 FASTLABEL_ENDPOINT = "https://api-fastlabel-production.web.app/api/v1/"
 
 class Client:
@@ -74,7 +77,7 @@ class Client:
             "predictions": predictions
         }
         self._postrequest(endpoint, payload=payload)
-        logging.info("")
+        logger.warn("Successfully uploaded! See " + APP_BASE_URL + project_id + "/modelAnalysis")
 
 
 class FastLabelException(Exception):
