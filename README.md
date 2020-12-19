@@ -3,8 +3,10 @@
 ## Installation
 
 ```bash
-$ pip install fastlabel
+$ pip install --upgrade fastlabel
 ```
+
+> Python version 3.8 or greater is required
 
 ## Usage
 
@@ -27,18 +29,17 @@ client = fastlabel.Client()
 
 ```python
 import fastlabel
-from fastlabel.const import AnalysisType
 
 # Initialize client
 client = fastlabel.Client()
 
 # Create predictions
-const predictions = [
+predictions = [
     {
-        fileKey="sample1.jpg",  # file name exists in project
-        labels=[
+        "fileKey": "sample1.jpg",  # file name exists in your project
+        "labels": [
             {
-                "value": "line_a",  # class value exists in project
+                "value": "line_a",  # class value exists in your project
                 "points": [
                     { "x": 10, "y": 10 },
                     { "x": 20, "y": 20 },
@@ -58,8 +59,8 @@ const predictions = [
 # Upload predictions
 client.upload_predictions(
     project_id="project_id",    # your fastlabel project id
-    analysis_type=AnalysisType.line,    # annotation type to be analyze
-    threshold=20,   # IoU percentage/pixel to analyze labels. (Ex: 0 - 100)
+    analysis_type="line",    # annotation type to be analyze ("bbox" or "line" are supported)
+    threshold=25,   # IoU percentage/pixel to analyze labels. (Ex: 0 - 100)
     predictions=predictions
 )
 ```
