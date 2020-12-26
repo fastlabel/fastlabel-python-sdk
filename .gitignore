@@ -6,3 +6,5 @@
 dist
 build
 fastlabel.egg-info
+test*.py
+annotation.json
