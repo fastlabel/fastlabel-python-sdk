@@ -23,6 +23,10 @@ import fastlabel
 client = fastlabel.Client()
 ```
 
+## Limitation
+
+API is allowed to call 5000 times per hour. If you create/delete a large size of tasks, please wait a second for every requests.
+
 ## Task
 
 ### Create Task
@@ -105,7 +109,7 @@ while True:
         break
 ```
 
-> Please wait seconds before sending another requests!
+> Please wait a second before sending another requests!
 
 ### Delete Task
 
@@ -185,7 +189,7 @@ predictions = [
 client.upload_predictions(
     project_id="YOUR_PROJECT_ID",    # your fastlabel project id
     analysis_type="bbox",    # annotation type to be analyze (Only "bbox" or "line" are supported)
-    threshold=80,   # IoU percentage/pixel distance to analyze labels. (Ex: 0 - 100)
+    threshold=80,   # IoU percentage/pixel distance to check labels are correct. (Ex: 0 - 100)
     predictions=predictions
 )
 ```
