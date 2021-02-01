@@ -7,7 +7,7 @@ from fastlabel.const import AnalysisType
 
 logger = getLogger(__name__)
 
-APP_BASE_URL = "https://app.fastlabel.ai/projects/"
+APP_BASE_URL = "https://prod.fastlabel.ai/projects/"
 FASTLABEL_ENDPOINT = "https://api-fastlabel-production.web.app/api/v1/"
 
 
