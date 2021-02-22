@@ -2,23 +2,23 @@ import os
 from logging import getLogger
 
 import requests
-
-from fastlabel.const import AnalysisType
+import base64
 
 logger = getLogger(__name__)
 
-APP_BASE_URL = "https://prod.fastlabel.ai/projects/"
-FASTLABEL_ENDPOINT = "https://api-fastlabel-production.web.app/api/v1/"
+# FASTLABEL_ENDPOINT = "https://api.fastlabel.ai/v1/"
+FASTLABEL_ENDPOINT = "http://localhost:4000/v1/"
 
 
 class Client:
 
-    api_key = None
+    access_token = None
 
     def __init__(self) -> None:
-        if not os.environ.get("FASTLABEL_API_KEY"):
-            raise ValueError("FASTLABEL_API_KEY is not configured.")
-        self.api_key = "Bearer " + os.environ.get("FASTLABEL_API_KEY")
+        if not os.environ.get("FASTLABEL_ACCESS_TOKEN"):
+            raise ValueError("FASTLABEL_ACCESS_TOKEN is not configured.")
+        self.access_token = "Bearer " + \
+            os.environ.get("FASTLABEL_ACCESS_TOKEN")
 
     def _getrequest(self, endpoint: str, params=None) -> dict:
         """Makes a get request to an endpoint.
@@ -29,19 +29,19 @@ class Client:
         params = params or {}
         headers = {
             "Content-Type": "application/json",
-            "Authorization": self.api_key,
+            "Authorization": self.access_token,
         }
-        r = requests.get(FASTLABEL_ENDPOINT + endpoint, headers=headers, params=params)
+        r = requests.get(FASTLABEL_ENDPOINT + endpoint,
+                         headers=headers, params=params)
 
         if r.status_code == 200:
             return r.json()
         else:
             try:
-                print(r.json())
-                error = r.json()["error"]
+                error = r.json()["message"]
             except ValueError:
                 error = r.text
-            if r.status_code == 400:
+            if str(r.status_code).startswith("4"):
                 raise FastLabelInvalidException(error, r.status_code)
             else:
                 raise FastLabelException(error, r.status_code)
@@ -55,20 +55,18 @@ class Client:
         params = params or {}
         headers = {
             "Content-Type": "application/json",
-            "Authorization": self.api_key,
+            "Authorization": self.access_token,
         }
         r = requests.delete(
             FASTLABEL_ENDPOINT + endpoint, headers=headers, params=params
         )
 
-        if r.status_code == 200:
-            return r.json()
-        else:
+        if r.status_code != 204:
             try:
-                error = r.json()["error"]
+                error = r.json()["message"]
             except ValueError:
                 error = r.text
-            if r.status_code == 400:
+            if str(r.status_code).startswith("4"):
                 raise FastLabelInvalidException(error, r.status_code)
             else:
                 raise FastLabelException(error, r.status_code)
@@ -82,43 +80,49 @@ class Client:
         payload = payload or {}
         headers = {
             "Content-Type": "application/json",
-            "Authorization": self.api_key,
+            "Authorization": self.access_token,
         }
-        r = requests.post(FASTLABEL_ENDPOINT + endpoint, json=payload, headers=headers)
+        r = requests.post(FASTLABEL_ENDPOINT + endpoint,
+                          json=payload, headers=headers)
+
+        print(r.json())
+        if r.status_code == 200:
+            return r.json()
+        else:
+            try:
+                error = r.json()["message"]
+            except ValueError:
+                error = r.text
+            if str(r.status_code).startswith("4"):
+                raise FastLabelInvalidException(error, r.status_code)
+            else:
+                raise FastLabelException(error, r.status_code)
+
+    def _putrequest(self, endpoint, payload=None):
+        """Makes a put request to an endpoint.
+        If an error occurs, assumes that endpoint returns JSON as:
+            { 'statusCode': XXX,
+              'error': 'I failed' }
+        """
+        payload = payload or {}
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": self.access_token,
+        }
+        r = requests.put(FASTLABEL_ENDPOINT + endpoint,
+                         json=payload, headers=headers)
 
         if r.status_code == 200:
             return r.json()
         else:
             try:
-                error = r.json()["error"]
+                error = r.json()["message"]
             except ValueError:
                 error = r.text
-            if r.status_code == 400:
+            if str(r.status_code).startswith("4"):
                 raise FastLabelInvalidException(error, r.status_code)
             else:
                 raise FastLabelException(error, r.status_code)
-
-    def upload_predictions(
-        self,
-        project_id: str,
-        analysis_type: AnalysisType,
-        threshold: int,
-        predictions: list,
-    ) -> None:
-        """
-        Upload predictions to analyze your model.
-        """
-        endpoint = "predictions/upload"
-        payload = {
-            "projectId": project_id,
-            "analysisType": analysis_type,
-            "threshold": threshold,
-            "predictions": predictions,
-        }
-        self._postrequest(endpoint, payload=payload)
-        logger.warn(
-            "Successfully uploaded! See " + APP_BASE_URL + project_id + "/modelAnalysis"
-        )
 
     def find_task(self, task_id: str) -> dict:
         """
@@ -129,34 +133,92 @@ class Client:
 
     def get_tasks(
         self,
-        project_id: str,
+        project: str,
         status: str = None,
-        review_status: str = None,
+        tags: list = [],
+        offset: int = None,
         limit: int = 100,
-        start_after: str = None,
     ) -> dict:
         """
         Returns a list of tasks.
 
         Returns up to 100 at a time, to get more, set task id of the last page passed back to startAfter param.
 
-        project_id is id of your project. (Required)
-        status can be 'registered', 'registered', 'submitted' or 'skipped'. (Optional)
-        review_status can be 'notReviewed', 'inProgress', 'accepted' or 'declined'. (Optional)
-        limit is the max number of results to display per page, (Optional)
-        start_after can be use to fetch the next page of tasks. (Optional)
+        project is slug of your project. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        tags is a list of tag to be set in advance. (Optional)
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
         """
-        endpoint = "tasks/"
-        params = {"projectId": project_id}
+        endpoint = "tasks"
+        params = {"project": project}
         if status:
             params["status"] = status
-        if review_status:
-            params["reviewStatus"] = review_status
+        if tags:
+            params["tags"] = tags
+        if offset:
+            params["offset"] = offset
         if limit:
             params["limit"] = limit
-        if start_after:
-            params["startAfter"] = start_after
         return self._getrequest(endpoint, params=params)
+
+    def create_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        annotations: list = [],
+        tags: list = [],
+    ) -> dict:
+        """
+        Create a single task.
+
+        project is slug of your project. (Required)
+        name is an unique identifier of task in your project. (Required)
+        file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        annotations is a list of annotation to be set in advance. (Optional)
+        tags is a list of tag to be set in advance. (Optional)
+        """
+        endpoint = "tasks"
+        if not self.__is_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are png, jpg, jpeg.", 422)
+        file = self.__base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if annotations:
+            payload["annotations"] = annotations
+        if tags:
+            payload["tags"] = tags
+        return self._postrequest(endpoint, payload=payload)
+
+    def update_task(
+        self,
+        task_id: str,
+        status: str = None,
+        annotations: list = [],
+        tags: list = [],
+    ) -> None:
+        """
+        Update a single task.
+
+        task_id is an id of the task. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        annotations is a list of annotation to be set. (Optional)
+        tags is a list of tag to be set. (Optional)
+        """
+        endpoint = "tasks/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if annotations:
+            payload["annotations"] = annotations
+        if tags:
+            payload["tags"] = tags
+        return self._putrequest(endpoint, payload=payload)
 
     def delete_task(self, task_id: str) -> None:
         """
@@ -165,34 +227,12 @@ class Client:
         endpoint = "tasks/" + task_id
         self._deleterequest(endpoint)
 
-    def create_image_task(
-        self,
-        project_id: str,
-        key: str,
-        url: str,
-        status: str = None,
-        review_status: str = None,
-        labels: list = [],
-    ) -> dict:
-        """
-        Create a single task for image project.
+    def __base64_encode(self, file_path: str) -> str:
+        with open(file_path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
 
-        project_id is id of your project.
-        key is an unique identifier of task in your project. (Required)
-        url is a link to get image data. (Required)
-        status can be 'registered', 'inProgress', 'submitted' or 'skipped'. (Optional)
-        review_status can be 'notReviewed', 'inProgress', 'accepted' or 'declined'. (Optional)
-        labels is a list of label to be set in advance. (Optional)
-        """
-        endpoint = "tasks/image"
-        payload = {"projectId": project_id, "key": key, "url": url}
-        if status:
-            payload["status"] = status
-        if review_status:
-            payload["review_status"] = review_status
-        if labels:
-            payload["labels"] = labels
-        return self._postrequest(endpoint, payload=payload)
+    def __is_supported_ext(self, file_path: str) -> bool:
+        return file_path.lower().endswith(('.png', '.jpg', '.jpeg'))
 
 
 class FastLabelException(Exception):
