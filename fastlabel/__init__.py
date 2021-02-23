@@ -84,7 +84,6 @@ class Client:
         r = requests.post(FASTLABEL_ENDPOINT + endpoint,
                           json=payload, headers=headers)
 
-        print(r.json())
         if r.status_code == 200:
             return r.json()
         else:
@@ -200,7 +199,7 @@ class Client:
         status: str = None,
         annotations: list = [],
         tags: list = [],
-    ) -> None:
+    ) -> dict:
         """
         Update a single task.
 
