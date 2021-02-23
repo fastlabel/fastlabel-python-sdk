@@ -6,8 +6,7 @@ import base64
 
 logger = getLogger(__name__)
 
-# FASTLABEL_ENDPOINT = "https://api.fastlabel.ai/v1/"
-FASTLABEL_ENDPOINT = "http://localhost:4000/v1/"
+FASTLABEL_ENDPOINT = "https://api.fastlabel.ai/v1/"
 
 
 class Client:
@@ -146,7 +145,7 @@ class Client:
 
         project is slug of your project. (Required)
         status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
-        tags is a list of tag to be set in advance. (Optional)
+        tags is a list of tag. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
         """
