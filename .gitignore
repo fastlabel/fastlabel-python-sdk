@@ -8,3 +8,6 @@ build
 fastlabel.egg-info
 test*.py
 annotation.json
+*.jpg
+*.jpeg
+*.png
