@@ -24,10 +24,10 @@ annotations = [{
     ]
 }]
 
-task = client.create_task(
+task_id = client.create_task(
     project=project,
     name=name,
     file_path=file_path,
     annotations=annotations
 )
-pprint(task)
+pprint(task_id)

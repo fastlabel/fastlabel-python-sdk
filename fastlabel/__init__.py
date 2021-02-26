@@ -136,11 +136,11 @@ class Client:
         tags: list = [],
         offset: int = None,
         limit: int = 100,
-    ) -> dict:
+    ) -> list:
         """
         Returns a list of tasks.
 
-        Returns up to 100 at a time, to get more, set task id of the last page passed back to startAfter param.
+        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
         status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
@@ -168,7 +168,7 @@ class Client:
         status: str = None,
         annotations: list = [],
         tags: list = [],
-    ) -> dict:
+    ) -> str:
         """
         Create a single task.
 
@@ -199,7 +199,7 @@ class Client:
         status: str = None,
         annotations: list = [],
         tags: list = [],
-    ) -> dict:
+    ) -> str:
         """
         Update a single task.
 
