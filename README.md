@@ -36,7 +36,7 @@ API is allowed to call 1000 times per 10 minutes. If you create/delete a large s
 - Create a new task.
 
 ```python
-task = client.create_task(
+task_id = client.create_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.jpg",
     file_path="./sample.jpg"
@@ -46,7 +46,7 @@ task = client.create_task(
 - Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
 
 ```python
-task = client.create_task(
+task_id = client.create_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.jpg",
     file_path="./sample.jpg",
@@ -75,7 +75,7 @@ task = client.create_task(
 - Update a single task status, tags, and annotations.
 
 ```python
-task = client.update_task(
+task_id = client.update_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     tags=["tag1", "tag2"],
