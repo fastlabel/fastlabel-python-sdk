@@ -1,4 +1,5 @@
 import os
+import glob
 from logging import getLogger
 
 import requests
@@ -129,6 +130,13 @@ class Client:
         endpoint = "tasks/" + task_id
         return self._getrequest(endpoint)
 
+    def find_multi_image_task(self, task_id: str) -> dict:
+        """
+        Find a signle multi image task.
+        """
+        endpoint = "tasks/multi/image/" + task_id
+        return self._getrequest(endpoint)
+
     def get_tasks(
         self,
         project: str,
@@ -140,7 +148,7 @@ class Client:
         """
         Returns a list of tasks.
 
-        Returns up to 100 at a time, to get more, set task id of the last page passed back to startAfter param.
+        Returns up to 100 at a time, to get more, set offset.
 
         project is slug of your project. (Required)
         status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
@@ -149,6 +157,37 @@ class Client:
         limit is the max number to fetch. (Optional)
         """
         endpoint = "tasks"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if tags:
+            params["tags"] = tags
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self._getrequest(endpoint, params=params)
+
+    def get_multi_image_tasks(
+        self,
+        project: str,
+        status: str = None,
+        tags: list = [],
+        offset: int = None,
+        limit: int = 100,
+    ) -> dict:
+        """
+        Returns a list of tasks.
+
+        Returns up to 100 at a time, to get more, set offset.
+
+        project is slug of your project. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        tags is a list of tag. (Optional)
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
+        """
+        endpoint = "tasks/multi/image"
         params = {"project": project}
         if status:
             params["status"] = status
@@ -188,6 +227,48 @@ class Client:
         if status:
             payload["status"] = status
         if annotations:
+            for annotation in annotations:
+                annotation["content"] = name
+            payload["annotations"] = annotations
+        if tags:
+            payload["tags"] = tags
+        return self._postrequest(endpoint, payload=payload)
+    
+    def create_multi_image_task(
+        self,
+        project: str,
+        name: str,
+        folder_path: str,
+        status: str = None,
+        annotations: list = [],
+        tags: list = [],
+    ) -> dict:
+        """
+        Create a single multi image task.
+
+        project is slug of your project. (Required)
+        name is an unique identifier of task in your project. (Required)
+        folder_path is a path to data folder. Files should be under the folder. Nested folder structure is not supported. Supported extensions of files are png, jpg, jpeg. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        annotations is a list of annotation to be set in advance. (Optional)
+        tags is a list of tag to be set in advance. (Optional)
+        """
+        endpoint = "tasks/multi/image"
+        file_paths = glob.glob(os.path.join(folder_path, "*"))
+        contents = []
+        for file_path in file_paths:
+            if not self.__is_supported_ext(file_path):
+                raise FastLabelInvalidException(
+                    "Supported extensions are png, jpg, jpeg.", 422)
+            file = self.__base64_encode(file_path)
+            contents.append({
+                "name": os.path.basename(file_path),
+                "file": file
+            })
+        payload = {"project": project, "name": name, "contents": contents}
+        if status:
+            payload["status"] = status
+        if annotations:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
@@ -197,7 +278,6 @@ class Client:
         self,
         task_id: str,
         status: str = None,
-        annotations: list = [],
         tags: list = [],
     ) -> dict:
         """
@@ -205,15 +285,12 @@ class Client:
 
         task_id is an id of the task. (Required)
         status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
-        annotations is a list of annotation to be set. (Optional)
         tags is a list of tag to be set. (Optional)
         """
         endpoint = "tasks/" + task_id
         payload = {}
         if status:
             payload["status"] = status
-        if annotations:
-            payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
         return self._putrequest(endpoint, payload=payload)
