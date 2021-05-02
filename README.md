@@ -27,11 +27,21 @@ client = fastlabel.Client()
 
 ## Limitation
 
-API is allowed to call 1000 times per 10 minutes. If you create/delete a large size of tasks, please wait a second for every requests.
+API is allowed to call 10000 times per 10 minutes. If you create/delete a large size of tasks, please wait a second for every requests.
 
 ## Task
 
-### Create Task
+### Image
+
+Supported following project types:
+
+- Bounding Box
+- Polygon
+- Keypoint
+- Line
+- Segmentation
+
+#### Create Task
 
 - Create a new task.
 
@@ -70,34 +80,19 @@ task_id = client.create_task(
 
 > Check [examples/create_task.py](/examples/create_task.py).
 
-### Update Task
+#### Update Task
 
-- Update a single task status, tags, and annotations.
+- Update a single task status and tags.
 
 ```python
 task_id = client.update_task(
     task_id="YOUR_TASK_ID",
     status="approved",
-    tags=["tag1", "tag2"],
-    annotations=[{
-        "value": "annotation-value",
-        "attributes": [
-            {
-                "key": "attribute-key",
-                "value": "attribute-value"
-            }
-        ],
-        "points": [
-            100,  # top-left x
-            100,  # top-left y
-            200,  # bottom-right x
-            200   # bottom-right y
-        ]
-    }]
+    tags=["tag1", "tag2"]
 )
 ```
 
-### Find Task
+#### Find Task
 
 - Find a single task.
 
@@ -105,7 +100,7 @@ task_id = client.update_task(
 task = client.find_task(task_id="YOUR_TASK_ID")
 ```
 
-### Get Tasks
+#### Get Tasks
 
 - Get tasks. (Up to 1000 tasks)
 
@@ -146,7 +141,7 @@ while True:
 
 > Please wait a second before sending another requests!
 
-### Delete Task
+#### Delete Task
 
 - Delete a single task.
 
@@ -154,7 +149,7 @@ while True:
 client.delete_task(task_id="YOUR_TASK_ID")
 ```
 
-### Task Response
+#### Task Response
 
 - Example of a single task object
 
@@ -177,6 +172,118 @@ client.delete_task(task_id="YOUR_TASK_ID")
                 200,  # bottom-right x
                 200   # bottom-right y
             ],
+            "title": "Cat",
+            "type": "bbox",
+            "value": "cat"
+        }
+    ],
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
+```
+
+### Multi Image
+
+Supported following project types:
+
+- Bounding Box
+- Polygon
+- Keypoint
+- Line
+- Segmentation
+
+#### Create Task
+
+- Create a new task.
+
+```python
+task = client.create_multi_image_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.jpg",
+    folder_path="./sample",
+    annotations=[{
+        "value": "annotation-value",
+        "attributes": [
+            {
+                "key": "attribute-key",
+                "value": "attribute-value"
+            }
+        ],
+        "points": [[[
+            100,
+            100,
+            300,
+            100,
+            300,
+            300,
+            100,
+            300,
+            100,
+            100
+        ]]] # clockwise rotation
+    }]
+)
+```
+
+#### Update Task
+
+- Same as image task.
+
+#### Find Task
+
+- Find a single task.
+
+```python
+task = client.find_multi_image_task(task_id="YOUR_TASK_ID")
+```
+
+#### Get Tasks
+
+- Get tasks.
+
+```python
+tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Delete Task
+
+- Same as image task.
+
+#### Task Response
+
+- Example of a single task object
+
+```python
+{
+    "id": "YOUR_TASK_ID",
+    "name": "cat.jpg",
+    "contents": [
+        {
+            "name": "content-name",
+            "url": "content-url",
+            "width": "content-width",
+            "height": "content-height",
+        }
+    ],
+    "status": "registered",
+    "tags": [],
+    "annotations": [
+        {
+            "content": "content-name"
+            "attributes": [],
+            "color": "#b36d18",
+            "points": [[[
+                100,
+                100,
+                300,
+                100,
+                300,
+                300,
+                100,
+                300,
+                100,
+                100
+            ]]]
             "title": "Cat",
             "type": "bbox",
             "value": "cat"
