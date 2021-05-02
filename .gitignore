@@ -11,3 +11,4 @@ annotation.json
 *.jpg
 *.jpeg
 *.png
+tests/
