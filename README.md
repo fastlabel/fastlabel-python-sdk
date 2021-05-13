@@ -199,7 +199,7 @@ Supported following project types:
 ```python
 task = client.create_multi_image_task(
     project="YOUR_PROJECT_SLUG",
-    name="sample.jpg",
+    name="sample",
     folder_path="./sample",
     annotations=[{
         "value": "annotation-value",
@@ -209,6 +209,7 @@ task = client.create_multi_image_task(
                 "value": "attribute-value"
             }
         ],
+        "content": "01.jpg",
         "points": [[[
             100,
             100,
