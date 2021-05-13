@@ -251,6 +251,10 @@ class Client:
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
+        if not os.path.isdir(folder_path):
+            raise FastLabelInvalidException(
+                "Folder does not exist.", 422)
+
         endpoint = "tasks/multi/image"
         file_paths = glob.glob(os.path.join(folder_path, "*"))
         contents = []
