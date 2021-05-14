@@ -61,6 +61,7 @@ task_id = client.create_task(
     name="sample.jpg",
     file_path="./sample.jpg",
     annotations=[{
+        "type": "bbox",
         "value": "annotation-value",
         "attributes": [
             {
@@ -202,6 +203,7 @@ task = client.create_multi_image_task(
     name="sample",
     folder_path="./sample",
     annotations=[{
+        "type": "segmentation",
         "value": "annotation-value",
         "attributes": [
             {
