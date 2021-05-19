@@ -9,6 +9,7 @@ project = "YOUR_PROJECT_SLUG"
 name = "YOUR_DATA_NAME"
 file_path = "YOUR_DATA_FILE_PATH"  # e.g.) ./cat.jpg
 annotations = [{
+    "type": "bbox",
     "value": "cat",
     "attributes": [
         {
