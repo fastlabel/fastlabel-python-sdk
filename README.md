@@ -297,6 +297,15 @@ tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
 }
 ```
 
+## Format
+
+- Get tasks and convert to [COCO format](https://cocodataset.org/#format-data) (supporting bbox or polygon annotation type).
+
+```python
+tasks = client.get_tasks(project="YOUR_PROJECT_SLUG")
+pprint(client.to_coco(tasks))
+```
+
 ## API Docs
 
 Check [this](https://api.fastlabel.ai/docs/) for further information.
