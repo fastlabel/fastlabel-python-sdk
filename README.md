@@ -164,7 +164,7 @@ client.delete_task(task_id="YOUR_TASK_ID")
     "annotations": [
         {
             "attributes": [
-                { "key": "kind", "name": "猫の種類", "type": "text", "value": "三毛猫" }
+                { "key": "kind", "name": "Kind", "type": "text", "value": "Scottish field" }
             ],
             "color": "#b36d18",
             "points": [
@@ -297,7 +297,9 @@ tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
 }
 ```
 
-## Format
+## Converter
+
+### COCO
 
 - Get tasks and convert to [COCO format](https://cocodataset.org/#format-data) (supporting bbox or polygon annotation type).
 
