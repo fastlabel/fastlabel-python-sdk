@@ -1,9 +1,13 @@
 import os
 import glob
+from enum import Enum
 from logging import getLogger
+from concurrent.futures import ThreadPoolExecutor
 
 import requests
 import base64
+import numpy as np
+import geojson
 
 logger = getLogger(__name__)
 
@@ -20,7 +24,7 @@ class Client:
         self.access_token = "Bearer " + \
             os.environ.get("FASTLABEL_ACCESS_TOKEN")
 
-    def _getrequest(self, endpoint: str, params=None) -> dict:
+    def __getrequest(self, endpoint: str, params=None) -> dict:
         """Makes a get request to an endpoint.
         If an error occurs, assumes that endpoint returns JSON as:
             { 'statusCode': XXX,
@@ -46,7 +50,7 @@ class Client:
             else:
                 raise FastLabelException(error, r.status_code)
 
-    def _deleterequest(self, endpoint: str, params=None) -> dict:
+    def __deleterequest(self, endpoint: str, params=None) -> dict:
         """Makes a delete request to an endpoint.
         If an error occurs, assumes that endpoint returns JSON as:
             { 'statusCode': XXX,
@@ -71,7 +75,7 @@ class Client:
             else:
                 raise FastLabelException(error, r.status_code)
 
-    def _postrequest(self, endpoint, payload=None):
+    def __postrequest(self, endpoint, payload=None):
         """Makes a post request to an endpoint.
         If an error occurs, assumes that endpoint returns JSON as:
             { 'statusCode': XXX,
@@ -97,7 +101,7 @@ class Client:
             else:
                 raise FastLabelException(error, r.status_code)
 
-    def _putrequest(self, endpoint, payload=None):
+    def __putrequest(self, endpoint, payload=None):
         """Makes a put request to an endpoint.
         If an error occurs, assumes that endpoint returns JSON as:
             { 'statusCode': XXX,
@@ -128,14 +132,14 @@ class Client:
         Find a signle task.
         """
         endpoint = "tasks/" + task_id
-        return self._getrequest(endpoint)
+        return self.__getrequest(endpoint)
 
     def find_multi_image_task(self, task_id: str) -> dict:
         """
         Find a signle multi image task.
         """
         endpoint = "tasks/multi/image/" + task_id
-        return self._getrequest(endpoint)
+        return self.__getrequest(endpoint)
 
     def get_tasks(
         self,
@@ -165,7 +169,7 @@ class Client:
             params["offset"] = offset
         if limit:
             params["limit"] = limit
-        return self._getrequest(endpoint, params=params)
+        return self.__getrequest(endpoint, params=params)
 
     def get_multi_image_tasks(
         self,
@@ -198,7 +202,7 @@ class Client:
             params["offset"] = offset
         if limit:
             params["limit"] = limit
-        return self._getrequest(endpoint, params=params)
+        return self.__getrequest(endpoint, params=params)
 
     def create_task(
         self,
@@ -233,8 +237,8 @@ class Client:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
-        return self._postrequest(endpoint, payload=payload)
-    
+        return self.__postrequest(endpoint, payload=payload)
+
     def create_multi_image_task(
         self,
         project: str,
@@ -277,7 +281,7 @@ class Client:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
-        return self._postrequest(endpoint, payload=payload)
+        return self.__postrequest(endpoint, payload=payload)
 
     def update_task(
         self,
@@ -298,14 +302,54 @@ class Client:
             payload["status"] = status
         if tags:
             payload["tags"] = tags
-        return self._putrequest(endpoint, payload=payload)
+        return self.__putrequest(endpoint, payload=payload)
 
     def delete_task(self, task_id: str) -> None:
         """
         Delete a single task.
         """
         endpoint = "tasks/" + task_id
-        self._deleterequest(endpoint)
+        self.__deleterequest(endpoint)
+
+    def to_coco(self, tasks: list) -> dict:
+        # Get categories
+        categories = self.__get_categories(tasks)
+
+        # Get images and annotations
+        images = []
+        annotations = []
+        annotation_id = 0
+        image_id = 0
+        for task in tasks:
+            if task["height"] == 0 or task["width"] == 0:
+                continue
+
+            image_id += 1
+            image = {
+                "file_name": task["name"],
+                "height": task["height"],
+                "width": task["width"],
+                "id": image_id,
+            }
+            images.append(image)
+
+            data = [{"annotation": annotation, "categories": categories,
+                     "image": image} for annotation in task["annotations"]]
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                results = executor.map(self.__to_annotation, data)
+
+            for result in results:
+                annotation_id += 1
+                if not result:
+                    continue
+                result["id"] = annotation_id
+                annotations.append(result)
+
+        return {
+            "images": images,
+            "categories": categories,
+            "annotations": annotations,
+        }
 
     def __base64_encode(self, file_path: str) -> str:
         with open(file_path, "rb") as f:
@@ -313,6 +357,100 @@ class Client:
 
     def __is_supported_ext(self, file_path: str) -> bool:
         return file_path.lower().endswith(('.png', '.jpg', '.jpeg'))
+
+    def __get_categories(self, tasks: list) -> list:
+        values = []
+        for task in tasks:
+            for annotation in task["annotations"]:
+                if annotation["type"] != AnnotationType.bbox.value and annotation["type"] != AnnotationType.polygon.value:
+                    continue
+                values.append(annotation["value"])
+        values = list(set(values))
+
+        categories = []
+        for index, value in enumerate(values):
+            category = {
+                "supercategory": value,
+                "id": index + 1,
+                "name": value
+            }
+            categories.append(category)
+        return categories
+
+    def __to_annotation(self, data: dict) -> dict:
+        annotation = data["annotation"]
+        categories = data["categories"]
+        image = data["image"]
+        points = annotation["points"]
+        annotation_type = annotation["type"]
+        annotation_id = 0
+
+        if annotation_type != AnnotationType.bbox.value and annotation_type != AnnotationType.polygon.value:
+            return None
+        if not points or len(points) == 0:
+            return None
+        if annotation_type == AnnotationType.bbox.value and (int(points[0]) == int(points[2]) or int(points[1]) == int(points[3])):
+            return None
+
+        category = self.__get_category_by_name(categories, annotation["value"])
+
+        return self.__get_annotation(
+            annotation_id, points, category["id"], image, annotation_type)
+
+    def __get_category_by_name(self, categories: list, name: str) -> str:
+        category = [
+            category for category in categories if category["name"] == name][0]
+        return category
+
+    def __get_annotation(self, id_: int, points: list, category_id: int, image: dict, annotation_type: str) -> dict:
+        annotation = {}
+        annotation["segmentation"] = [points]
+        annotation["iscrowd"] = 0
+        annotation["area"] = self.__calc_area(annotation_type, points)
+        annotation["image_id"] = image["id"]
+        annotation["bbox"] = self.__to_bbox(points)
+        annotation["category_id"] = category_id
+        annotation["id"] = id_
+        return annotation
+
+    def __to_bbox(self, points: list) -> list:
+        points_splitted = [points[idx:idx + 2]
+                           for idx in range(0, len(points), 2)]
+        polygon_geo = geojson.Polygon(points_splitted)
+        coords = np.array(list(geojson.utils.coords(polygon_geo)))
+        left_top_x = coords[:, 0].min()
+        left_top_y = coords[:, 1].min()
+        right_bottom_x = coords[:, 0].max()
+        right_bottom_y = coords[:, 1].max()
+
+        return [
+            left_top_x,  # x
+            left_top_y,  # y
+            right_bottom_x - left_top_x,  # width
+            right_bottom_y - left_top_y,  # height
+        ]
+
+    def __calc_area(self, annotation_type: str, points: list) -> float:
+        area = 0
+        if annotation_type == AnnotationType.bbox.value:
+            width = points[0] - points[2]
+            height = points[1] - points[3]
+            area = width * height
+        elif annotation_type == AnnotationType.polygon.value:
+            x = points[0::2]
+            y = points[1::2]
+            area = 0.5 * np.abs(np.dot(x, np.roll(y, 1)) -
+                                np.dot(y, np.roll(x, 1)))
+        return area
+
+
+class AnnotationType(Enum):
+    bbox = "bbox"
+    polygon = "polygon"
+    keypoint = "keypoint"
+    classification = "classification"
+    line = "line"
+    segmentation = "segmentation"
 
 
 class FastLabelException(Exception):
