@@ -19,7 +19,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
 ## Installation
 
 ```bash
-$ pip install --upgrade fastlabel
+pip install --upgrade fastlabel
 ```
 
 > Python version 3.7 or greater is required
