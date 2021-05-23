@@ -2,6 +2,19 @@
 
 _If you are using FastLabel prototype, please install version 0.2.2._
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+    - [Limitation](#limitation)
+- [Task](#task)
+    - [Image](#image)
+    - [Image Classification](#image-classification)
+    - [Multi Image](#multi-image)
+    - [Video](#multi-image)
+- [Converter](#converter)
+    - [COCO](#coco)   
+
 ## Installation
 
 ```bash
@@ -25,7 +38,7 @@ import fastlabel
 client = fastlabel.Client()
 ```
 
-## Limitation
+### Limitation
 
 API is allowed to call 10000 times per 10 minutes. If you create/delete a large size of tasks, please wait a second for every requests.
 
