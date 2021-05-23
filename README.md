@@ -11,7 +11,8 @@ _If you are using FastLabel prototype, please install version 0.2.2._
     - [Image](#image)
     - [Image Classification](#image-classification)
     - [Multi Image](#multi-image)
-    - [Video](#multi-image)
+    - [Video](#video)
+    - [Common](#common)
 - [Converter](#converter)
     - [COCO](#coco)   
 
