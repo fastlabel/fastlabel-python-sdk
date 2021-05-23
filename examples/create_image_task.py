@@ -25,7 +25,7 @@ annotations = [{
     ]
 }]
 
-task_id = client.create_task(
+task_id = client.create_image_task(
     project=project,
     name=name,
     file_path=file_path,
