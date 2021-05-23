@@ -127,21 +127,35 @@ class Client:
             else:
                 raise FastLabelException(error, r.status_code)
 
-    def find_task(self, task_id: str) -> dict:
+    def find_image_task(self, task_id: str) -> dict:
         """
-        Find a signle task.
+        Find a signle image task.
         """
-        endpoint = "tasks/" + task_id
+        endpoint = "tasks/image/" + task_id
+        return self.__getrequest(endpoint)
+
+    def find_image_classification_task(self, task_id: str) -> dict:
+        """
+        Find a signle image classification task.
+        """
+        endpoint = "tasks/image/classification/" + task_id
         return self.__getrequest(endpoint)
 
     def find_multi_image_task(self, task_id: str) -> dict:
         """
         Find a signle multi image task.
         """
-        endpoint = "tasks/multi/image/" + task_id
+        endpoint = "tasks/multi-image/" + task_id
         return self.__getrequest(endpoint)
 
-    def get_tasks(
+    def find_video_task(self, task_id: str) -> dict:
+        """
+        Find a signle video task.
+        """
+        endpoint = "tasks/video/" + task_id
+        return self.__getrequest(endpoint)
+
+    def get_image_tasks(
         self,
         project: str,
         status: str = None,
@@ -150,7 +164,7 @@ class Client:
         limit: int = 100,
     ) -> list:
         """
-        Returns a list of tasks.
+        Returns a list of image tasks.
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
@@ -159,7 +173,37 @@ class Client:
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
         """
-        endpoint = "tasks"
+        endpoint = "tasks/image"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if tags:
+            params["tags"] = tags
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.__getrequest(endpoint, params=params)
+
+    def get_image_classification_tasks(
+        self,
+        project: str,
+        status: str = None,
+        tags: list = [],
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of image classification tasks.
+        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+
+        project is slug of your project. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        tags is a list of tag. (Optional)
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
+        """
+        endpoint = "tasks/image/classification"
         params = {"project": project}
         if status:
             params["status"] = status
@@ -180,7 +224,7 @@ class Client:
         limit: int = 10,
     ) -> dict:
         """
-        Returns a list of tasks.
+        Returns a list of multi image tasks.
         Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
@@ -192,7 +236,7 @@ class Client:
         if limit > 10:
             raise FastLabelInvalidException(
                 "Limit must be less than or equal to 10.", 422)
-        endpoint = "tasks/multi/image"
+        endpoint = "tasks/multi-image"
         params = {"project": project}
         if status:
             params["status"] = status
@@ -204,7 +248,40 @@ class Client:
             params["limit"] = limit
         return self.__getrequest(endpoint, params=params)
 
-    def create_task(
+    def get_video_tasks(
+        self,
+        project: str,
+        status: str = None,
+        tags: list = [],
+        offset: int = None,
+        limit: int = 10,
+    ) -> dict:
+        """
+        Returns a list of video tasks.
+        Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
+
+        project is slug of your project. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        tags is a list of tag. (Optional)
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
+        """
+        if limit > 10:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 10.", 422)
+        endpoint = "tasks/video"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if tags:
+            params["tags"] = tags
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.__getrequest(endpoint, params=params)
+
+    def create_image_task(
         self,
         project: str,
         name: str,
@@ -214,7 +291,7 @@ class Client:
         tags: list = [],
     ) -> str:
         """
-        Create a single task.
+        Create a single image task.
 
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
@@ -223,8 +300,8 @@ class Client:
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
-        endpoint = "tasks"
-        if not self.__is_supported_ext(file_path):
+        endpoint = "tasks/image"
+        if not self.__is_image_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are png, jpg, jpeg.", 422)
         file = self.__base64_encode(file_path)
@@ -239,6 +316,39 @@ class Client:
             payload["tags"] = tags
         return self.__postrequest(endpoint, payload=payload)
 
+    def create_image_classification_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        attributes: list = [],
+        tags: list = [],
+    ) -> str:
+        """
+        Create a single image classification task.
+
+        project is slug of your project. (Required)
+        name is an unique identifier of task in your project. (Required)
+        file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        attributes is a list of attribute to be set in advance. (Optional)
+        tags is a list of tag to be set in advance. (Optional)
+        """
+        endpoint = "tasks/image/classification"
+        if not self.__is_image_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are png, jpg, jpeg.", 422)
+        file = self.__base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if attributes:
+            payload["attributes"] = attributes
+        if tags:
+            payload["tags"] = tags
+        return self.__postrequest(endpoint, payload=payload)
+
     def create_multi_image_task(
         self,
         project: str,
@@ -247,7 +357,7 @@ class Client:
         status: str = None,
         annotations: list = [],
         tags: list = [],
-    ) -> dict:
+    ) -> str:
         """
         Create a single multi image task.
 
@@ -262,11 +372,11 @@ class Client:
             raise FastLabelInvalidException(
                 "Folder does not exist.", 422)
 
-        endpoint = "tasks/multi/image"
+        endpoint = "tasks/multi-image"
         file_paths = glob.glob(os.path.join(folder_path, "*"))
         contents = []
         for file_path in file_paths:
-            if not self.__is_supported_ext(file_path):
+            if not self.__is_image_supported_ext(file_path):
                 raise FastLabelInvalidException(
                     "Supported extensions are png, jpg, jpeg.", 422)
             file = self.__base64_encode(file_path)
@@ -279,6 +389,35 @@ class Client:
             payload["status"] = status
         if annotations:
             payload["annotations"] = annotations
+        if tags:
+            payload["tags"] = tags
+        return self.__postrequest(endpoint, payload=payload)
+
+    def create_video_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        tags: list = [],
+    ) -> str:
+        """
+        Create a single video task.
+
+        project is slug of your project. (Required)
+        name is an unique identifier of task in your project. (Required)
+        file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        tags is a list of tag to be set in advance. (Optional)
+        """
+        endpoint = "tasks/video"
+        if not self.__is_video_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are mp4.", 422)
+        file = self.__base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
         if tags:
             payload["tags"] = tags
         return self.__postrequest(endpoint, payload=payload)
@@ -355,8 +494,11 @@ class Client:
         with open(file_path, "rb") as f:
             return base64.b64encode(f.read()).decode()
 
-    def __is_supported_ext(self, file_path: str) -> bool:
+    def __is_image_supported_ext(self, file_path: str) -> bool:
         return file_path.lower().endswith(('.png', '.jpg', '.jpeg'))
+
+    def __is_video_supported_ext(self, file_path: str) -> bool:
+        return file_path.lower().endswith(('.mp4'))
 
     def __get_categories(self, tasks: list) -> list:
         values = []
