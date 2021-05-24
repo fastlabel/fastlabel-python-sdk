@@ -1,150 +1,58 @@
 import os
 import glob
-from enum import Enum
 from logging import getLogger
-from concurrent.futures import ThreadPoolExecutor
 
-import requests
-import base64
-import numpy as np
-import geojson
+from .exceptions import FastLabelInvalidException
+from .api import Api
+from fastlabel import converters, utils
 
 logger = getLogger(__name__)
-
-# FASTLABEL_ENDPOINT = "https://api.fastlabel.ai/v1/"
-
-FASTLABEL_ENDPOINT = "http://localhost:4000/v1/"
-# export FASTLABEL_ACCESS_TOKEN=OTc3MGUxODgtZDU5My00NWFlLWJlNzAtYjY1NDI3NzhmNWM1
 
 
 class Client:
 
-    access_token = None
+    api = None
 
-    def __init__(self) -> None:
-        if not os.environ.get("FASTLABEL_ACCESS_TOKEN"):
-            raise ValueError("FASTLABEL_ACCESS_TOKEN is not configured.")
-        self.access_token = "Bearer " + \
-            os.environ.get("FASTLABEL_ACCESS_TOKEN")
+    def __init__(self):
+        self.api = Api()
 
-    def __getrequest(self, endpoint: str, params=None) -> dict:
-        """Makes a get request to an endpoint.
-        If an error occurs, assumes that endpoint returns JSON as:
-            { 'statusCode': XXX,
-              'error': 'I failed' }
+    # Task Find
+
+    def find_image_task(self, task_id: str) -> dict:
         """
-        params = params or {}
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": self.access_token,
-        }
-        r = requests.get(FASTLABEL_ENDPOINT + endpoint,
-                         headers=headers, params=params)
-
-        if r.status_code == 200:
-            return r.json()
-        else:
-            try:
-                error = r.json()["message"]
-            except ValueError:
-                error = r.text
-            if str(r.status_code).startswith("4"):
-                raise FastLabelInvalidException(error, r.status_code)
-            else:
-                raise FastLabelException(error, r.status_code)
-
-    def __deleterequest(self, endpoint: str, params=None) -> dict:
-        """Makes a delete request to an endpoint.
-        If an error occurs, assumes that endpoint returns JSON as:
-            { 'statusCode': XXX,
-              'error': 'I failed' }
+        Find a signle image task.
         """
-        params = params or {}
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": self.access_token,
-        }
-        r = requests.delete(
-            FASTLABEL_ENDPOINT + endpoint, headers=headers, params=params
-        )
+        endpoint = "tasks/image/" + task_id
+        return self.api.get_request(endpoint)
 
-        if r.status_code != 204:
-            try:
-                error = r.json()["message"]
-            except ValueError:
-                error = r.text
-            if str(r.status_code).startswith("4"):
-                raise FastLabelInvalidException(error, r.status_code)
-            else:
-                raise FastLabelException(error, r.status_code)
-
-    def __postrequest(self, endpoint, payload=None):
-        """Makes a post request to an endpoint.
-        If an error occurs, assumes that endpoint returns JSON as:
-            { 'statusCode': XXX,
-              'error': 'I failed' }
+    def find_image_task_by_name(self, project: str, task_name: str) -> dict:
         """
-        payload = payload or {}
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": self.access_token,
-        }
-        r = requests.post(FASTLABEL_ENDPOINT + endpoint,
-                          json=payload, headers=headers)
-
-        if r.status_code == 200:
-            return r.json()
-        else:
-            try:
-                error = r.json()["message"]
-            except ValueError:
-                error = r.text
-            if str(r.status_code).startswith("4"):
-                raise FastLabelInvalidException(error, r.status_code)
-            else:
-                raise FastLabelException(error, r.status_code)
-
-    def __putrequest(self, endpoint, payload=None):
-        """Makes a put request to an endpoint.
-        If an error occurs, assumes that endpoint returns JSON as:
-            { 'statusCode': XXX,
-              'error': 'I failed' }
-        """
-        payload = payload or {}
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": self.access_token,
-        }
-        r = requests.put(FASTLABEL_ENDPOINT + endpoint,
-                         json=payload, headers=headers)
-
-        if r.status_code == 200:
-            return r.json()
-        else:
-            try:
-                error = r.json()["message"]
-            except ValueError:
-                error = r.text
-            if str(r.status_code).startswith("4"):
-                raise FastLabelInvalidException(error, r.status_code)
-            else:
-                raise FastLabelException(error, r.status_code)
-
-    def find_task(self, task_id: str) -> dict:
-        """
-        Find a signle task.
-        """
-        endpoint = "tasks/" + task_id
-        return self.__getrequest(endpoint)
-
-    def find_task_by_name(self, project: str, task_name: str) -> dict:
-        """
-        Find a signle task by name.
+        Find a signle image task by name.
 
         project is slug of your project. (Required)
         task_name is a task name. (Required)
         """
-        tasks = self.get_tasks(project=project, task_name=task_name)
+        tasks = self.get_image_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
+    def find_image_classification_task(self, task_id: str) -> dict:
+        """
+        Find a signle image classification task.
+        """
+        endpoint = "tasks/image/classification/" + task_id
+        return self.api.get_request(endpoint)
+
+    def find_image_classification_task_by_name(self, project: str, task_name: str) -> dict:
+        """
+        Find a signle image classification task by name.
+
+        project is slug of your project. (Required)
+        task_name is a task name. (Required)
+        """
+        tasks = self.get_image_classification_tasks(
+            project=project, task_name=task_name)
         if not tasks:
             return None
         return tasks[0]
@@ -153,8 +61,8 @@ class Client:
         """
         Find a signle multi image task.
         """
-        endpoint = "tasks/multi/image/" + task_id
-        return self.__getrequest(endpoint)
+        endpoint = "tasks/multi-image/" + task_id
+        return self.api.get_request(endpoint)
 
     def find_multi_image_task_by_name(self, project: str, task_name: str) -> dict:
         """
@@ -169,7 +77,29 @@ class Client:
             return None
         return tasks[0]
 
-    def get_tasks(
+    def find_video_task(self, task_id: str) -> dict:
+        """
+        Find a signle video task.
+        """
+        endpoint = "tasks/video/" + task_id
+        return self.api.get_request(endpoint)
+
+    def find_video_task_by_name(self, project: str, task_name: str) -> dict:
+        """
+        Find a signle video task by name.
+
+        project is slug of your project. (Required)
+        task_name is a task name. (Required)
+        """
+        tasks = self.get_video_tasks(
+            project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
+    # Task Get
+
+    def get_image_tasks(
         self,
         project: str,
         status: str = None,
@@ -179,7 +109,7 @@ class Client:
         limit: int = 100,
     ) -> list:
         """
-        Returns a list of tasks.
+        Returns a list of image tasks.
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
@@ -192,7 +122,7 @@ class Client:
         if limit > 1000:
             raise FastLabelInvalidException(
                 "Limit must be less than or equal to 1000.", 422)
-        endpoint = "tasks"
+        endpoint = "tasks/image"
         params = {"project": project}
         if status:
             params["status"] = status
@@ -204,7 +134,40 @@ class Client:
             params["offset"] = offset
         if limit:
             params["limit"] = limit
-        return self.__getrequest(endpoint, params=params)
+        return self.api.get_request(endpoint, params=params)
+
+    def get_image_classification_tasks(
+        self,
+        project: str,
+        status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of image classification tasks.
+        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+
+        project is slug of your project. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        tags is a list of tag. (Optional)
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
+        """
+        endpoint = "tasks/image/classification"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
 
     def get_multi_image_tasks(
         self,
@@ -214,9 +177,45 @@ class Client:
         task_name: str = None,
         offset: int = None,
         limit: int = 10,
-    ) -> dict:
+    ) -> list:
         """
-        Returns a list of tasks.
+        Returns a list of multi image tasks.
+        Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
+
+        project is slug of your project. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        tags is a list of tag. (Optional)
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
+        """
+        if limit > 10:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 10.", 422)
+        endpoint = "tasks/multi-image"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def get_video_tasks(
+        self,
+        project: str,
+        status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 10,
+    ) -> list:
+        """
+        Returns a list of video tasks.
         Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
@@ -229,7 +228,7 @@ class Client:
         if limit > 10:
             raise FastLabelInvalidException(
                 "Limit must be less than or equal to 10.", 422)
-        endpoint = "tasks/multi/image"
+        endpoint = "tasks/video"
         params = {"project": project}
         if status:
             params["status"] = status
@@ -241,7 +240,7 @@ class Client:
             params["offset"] = offset
         if limit:
             params["limit"] = limit
-        return self.__getrequest(endpoint, params=params)
+        return self.api.get_request(endpoint, params=params)
 
     def get_task_id_name_map(
         self, project: str,
@@ -269,9 +268,11 @@ class Client:
             params["offset"] = offset
         if limit:
             params["limit"] = limit
-        return self.__getrequest(endpoint, params=params)
+        return self.api.get_request(endpoint, params=params)
 
-    def create_task(
+    # Task Create
+
+    def create_image_task(
         self,
         project: str,
         name: str,
@@ -281,7 +282,7 @@ class Client:
         tags: list = [],
     ) -> str:
         """
-        Create a single task.
+        Create a single image task.
 
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
@@ -290,11 +291,11 @@ class Client:
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
-        endpoint = "tasks"
-        if not self.__is_supported_ext(file_path):
+        endpoint = "tasks/image"
+        if not utils.is_image_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are png, jpg, jpeg.", 422)
-        file = self.__base64_encode(file_path)
+        file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
@@ -304,7 +305,40 @@ class Client:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
-        return self.__postrequest(endpoint, payload=payload)
+        return self.api.post_request(endpoint, payload=payload)
+
+    def create_image_classification_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        attributes: list = [],
+        tags: list = [],
+    ) -> str:
+        """
+        Create a single image classification task.
+
+        project is slug of your project. (Required)
+        name is an unique identifier of task in your project. (Required)
+        file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        attributes is a list of attribute to be set in advance. (Optional)
+        tags is a list of tag to be set in advance. (Optional)
+        """
+        endpoint = "tasks/image/classification"
+        if not utils.is_image_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are png, jpg, jpeg.", 422)
+        file = utils.base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if attributes:
+            payload["attributes"] = attributes
+        if tags:
+            payload["tags"] = tags
+        return self.api.post_request(endpoint, payload=payload)
 
     def create_multi_image_task(
         self,
@@ -314,7 +348,7 @@ class Client:
         status: str = None,
         annotations: list = [],
         tags: list = [],
-    ) -> dict:
+    ) -> str:
         """
         Create a single multi image task.
 
@@ -329,14 +363,14 @@ class Client:
             raise FastLabelInvalidException(
                 "Folder does not exist.", 422)
 
-        endpoint = "tasks/multi/image"
+        endpoint = "tasks/multi-image"
         file_paths = glob.glob(os.path.join(folder_path, "*"))
         contents = []
         for file_path in file_paths:
-            if not self.__is_supported_ext(file_path):
+            if not utils.is_image_supported_ext(file_path):
                 raise FastLabelInvalidException(
                     "Supported extensions are png, jpg, jpeg.", 422)
-            file = self.__base64_encode(file_path)
+            file = utils.base64_encode(file_path)
             contents.append({
                 "name": os.path.basename(file_path),
                 "file": file
@@ -348,7 +382,38 @@ class Client:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
-        return self.__postrequest(endpoint, payload=payload)
+        return self.api.post_request(endpoint, payload=payload)
+
+    def create_video_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        tags: list = [],
+    ) -> str:
+        """
+        Create a single video task.
+
+        project is slug of your project. (Required)
+        name is an unique identifier of task in your project. (Required)
+        file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
+        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        tags is a list of tag to be set in advance. (Optional)
+        """
+        endpoint = "tasks/video"
+        if not utils.is_video_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are mp4.", 422)
+        file = utils.base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if tags:
+            payload["tags"] = tags
+        return self.api.post_request(endpoint, payload=payload)
+
+    # Task Update
 
     def update_task(
         self,
@@ -369,167 +434,22 @@ class Client:
             payload["status"] = status
         if tags:
             payload["tags"] = tags
-        return self.__putrequest(endpoint, payload=payload)
+        return self.api.put_request(endpoint, payload=payload)
+
+    # Task Delete
 
     def delete_task(self, task_id: str) -> None:
         """
         Delete a single task.
         """
         endpoint = "tasks/" + task_id
-        self.__deleterequest(endpoint)
+        self.api.delete_request(endpoint)
+
+    # Convert
 
     def to_coco(self, tasks: list) -> dict:
         """
         Convert tasks to COCO format.
         """
-        # Get categories
-        categories = self.__get_categories(tasks)
 
-        # Get images and annotations
-        images = []
-        annotations = []
-        annotation_id = 0
-        image_id = 0
-        for task in tasks:
-            if task["height"] == 0 or task["width"] == 0:
-                continue
-
-            image_id += 1
-            image = {
-                "file_name": task["name"],
-                "height": task["height"],
-                "width": task["width"],
-                "id": image_id,
-            }
-            images.append(image)
-
-            data = [{"annotation": annotation, "categories": categories,
-                     "image": image} for annotation in task["annotations"]]
-            with ThreadPoolExecutor(max_workers=8) as executor:
-                results = executor.map(self.__to_annotation, data)
-
-            for result in results:
-                annotation_id += 1
-                if not result:
-                    continue
-                result["id"] = annotation_id
-                annotations.append(result)
-
-        return {
-            "images": images,
-            "categories": categories,
-            "annotations": annotations,
-        }
-
-    def __base64_encode(self, file_path: str) -> str:
-        with open(file_path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
-
-    def __is_supported_ext(self, file_path: str) -> bool:
-        return file_path.lower().endswith(('.png', '.jpg', '.jpeg'))
-
-    def __get_categories(self, tasks: list) -> list:
-        values = []
-        for task in tasks:
-            for annotation in task["annotations"]:
-                if annotation["type"] != AnnotationType.bbox.value and annotation["type"] != AnnotationType.polygon.value:
-                    continue
-                values.append(annotation["value"])
-        values = list(set(values))
-
-        categories = []
-        for index, value in enumerate(values):
-            category = {
-                "supercategory": value,
-                "id": index + 1,
-                "name": value
-            }
-            categories.append(category)
-        return categories
-
-    def __to_annotation(self, data: dict) -> dict:
-        annotation = data["annotation"]
-        categories = data["categories"]
-        image = data["image"]
-        points = annotation["points"]
-        annotation_type = annotation["type"]
-        annotation_id = 0
-
-        if annotation_type != AnnotationType.bbox.value and annotation_type != AnnotationType.polygon.value:
-            return None
-        if not points or len(points) == 0:
-            return None
-        if annotation_type == AnnotationType.bbox.value and (int(points[0]) == int(points[2]) or int(points[1]) == int(points[3])):
-            return None
-
-        category = self.__get_category_by_name(categories, annotation["value"])
-
-        return self.__get_annotation(
-            annotation_id, points, category["id"], image, annotation_type)
-
-    def __get_category_by_name(self, categories: list, name: str) -> str:
-        category = [
-            category for category in categories if category["name"] == name][0]
-        return category
-
-    def __get_annotation(self, id_: int, points: list, category_id: int, image: dict, annotation_type: str) -> dict:
-        annotation = {}
-        annotation["segmentation"] = [points]
-        annotation["iscrowd"] = 0
-        annotation["area"] = self.__calc_area(annotation_type, points)
-        annotation["image_id"] = image["id"]
-        annotation["bbox"] = self.__to_bbox(points)
-        annotation["category_id"] = category_id
-        annotation["id"] = id_
-        return annotation
-
-    def __to_bbox(self, points: list) -> list:
-        points_splitted = [points[idx:idx + 2]
-                           for idx in range(0, len(points), 2)]
-        polygon_geo = geojson.Polygon(points_splitted)
-        coords = np.array(list(geojson.utils.coords(polygon_geo)))
-        left_top_x = coords[:, 0].min()
-        left_top_y = coords[:, 1].min()
-        right_bottom_x = coords[:, 0].max()
-        right_bottom_y = coords[:, 1].max()
-
-        return [
-            left_top_x,  # x
-            left_top_y,  # y
-            right_bottom_x - left_top_x,  # width
-            right_bottom_y - left_top_y,  # height
-        ]
-
-    def __calc_area(self, annotation_type: str, points: list) -> float:
-        area = 0
-        if annotation_type == AnnotationType.bbox.value:
-            width = points[0] - points[2]
-            height = points[1] - points[3]
-            area = width * height
-        elif annotation_type == AnnotationType.polygon.value:
-            x = points[0::2]
-            y = points[1::2]
-            area = 0.5 * np.abs(np.dot(x, np.roll(y, 1)) -
-                                np.dot(y, np.roll(x, 1)))
-        return area
-
-
-class AnnotationType(Enum):
-    bbox = "bbox"
-    polygon = "polygon"
-    keypoint = "keypoint"
-    classification = "classification"
-    line = "line"
-    segmentation = "segmentation"
-
-
-class FastLabelException(Exception):
-    def __init__(self, message, errcode):
-        super(FastLabelException, self).__init__(
-            "<Response [{}]> {}".format(errcode, message)
-        )
-        self.code = errcode
-
-
-class FastLabelInvalidException(FastLabelException, ValueError):
-    pass
+        return converters.to_coco(tasks)

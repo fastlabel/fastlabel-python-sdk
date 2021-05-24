@@ -2,10 +2,24 @@
 
 _If you are using FastLabel prototype, please install version 0.2.2._
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+    - [Limitation](#limitation)
+- [Task](#task)
+    - [Image](#image)
+    - [Image Classification](#image-classification)
+    - [Multi Image](#multi-image)
+    - [Video](#video)
+    - [Common](#common)
+- [Converter](#converter)
+    - [COCO](#coco)   
+
 ## Installation
 
 ```bash
-$ pip install --upgrade fastlabel
+pip install --upgrade fastlabel
 ```
 
 > Python version 3.7 or greater is required
@@ -25,7 +39,7 @@ import fastlabel
 client = fastlabel.Client()
 ```
 
-## Limitation
+### Limitation
 
 API is allowed to call 10000 times per 10 minutes. If you create/delete a large size of tasks, please wait a second for every requests.
 
@@ -35,18 +49,19 @@ API is allowed to call 10000 times per 10 minutes. If you create/delete a large 
 
 Supported following project types:
 
-- Bounding Box
-- Polygon
-- Keypoint
-- Line
-- Segmentation
+- Image - Bounding Box
+- Image - Polygon
+- Image - Keypoint
+- Image - Line
+- Image - Segmentation
+- Image - All
 
 #### Create Task
 
 - Create a new task.
 
 ```python
-task_id = client.create_task(
+task_id = client.create_image_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.jpg",
     file_path="./sample.jpg"
@@ -56,7 +71,7 @@ task_id = client.create_task(
 - Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
 
 ```python
-task_id = client.create_task(
+task_id = client.create_image_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.jpg",
     file_path="./sample.jpg",
@@ -79,26 +94,14 @@ task_id = client.create_task(
 )
 ```
 
-> Check [examples/create_task.py](/examples/create_task.py).
-
-#### Update Task
-
-- Update a single task status and tags.
-
-```python
-task_id = client.update_task(
-    task_id="YOUR_TASK_ID",
-    status="approved",
-    tags=["tag1", "tag2"]
-)
-```
+> Check [examples/create_image_task.py](/examples/create_image_task.py).
 
 #### Find Task
 
 - Find a single task.
 
 ```python
-task = client.find_task(task_id="YOUR_TASK_ID")
+task = client.find_image_task(task_id="YOUR_TASK_ID")
 ```
 
 #### Get Tasks
@@ -106,13 +109,13 @@ task = client.find_task(task_id="YOUR_TASK_ID")
 - Get tasks. (Up to 1000 tasks)
 
 ```python
-tasks = client.get_tasks(project="YOUR_PROJECT_SLUG")
+tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 ```
 
 - Filter and Get tasks. (Up to 1000 tasks)
 
 ```python
-tasks = client.get_tasks(
+tasks = client.get_image_tasks(
     project="YOUR_PROJECT_SLUG",
     status="approved", # status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'
     tags=["tag1", "tag2"] # up to 10 tags
@@ -130,8 +133,7 @@ offset = None
 while True:
     time.sleep(1)
 
-    tasks = client.get_tasks(
-        project="YOUR_PROJECT_SLUG", offset=offset)
+    tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG", offset=offset)
     all_tasks.extend(tasks)
 
     if len(tasks) > 0:
@@ -142,25 +144,22 @@ while True:
 
 > Please wait a second before sending another requests!
 
-#### Delete Task
+#### Response
 
-- Delete a single task.
-
-```python
-client.delete_task(task_id="YOUR_TASK_ID")
-```
-
-#### Task Response
-
-- Example of a single task object
+- Example of a single image task object
 
 ```python
 {
     "id": "YOUR_TASK_ID",
     "name": "cat.jpg",
+    "width": 100,   # image width
+    "height": 100,  # image height
     "url": "YOUR_TASK_URL",
     "status": "registered",
     "tags": [],
+    "assignee": "ASSIGNEE_NAME",
+    "reviewer": "REVIEWER_NAME",
+    "customerReviewer": "CUSTOMER_REVIEWER_NAME",
     "annotations": [
         {
             "attributes": [
@@ -183,15 +182,84 @@ client.delete_task(task_id="YOUR_TASK_ID")
 }
 ```
 
+### Image Classification
+
+Supported following project types:
+
+- Image - Classification
+
+#### Create Task
+
+- Create a new task.
+
+```python
+task_id = client.create_image_classification_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.jpg",
+    file_path="./sample.jpg",
+    attributes=[
+        {
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ],
+)
+```
+
+#### Find Task
+
+- Find a single task.
+
+```python
+task = client.find_image_classification_task(task_id="YOUR_TASK_ID")
+```
+
+#### Get Tasks
+
+- Get tasks. (Up to 1000 tasks)
+
+```python
+tasks = client.get_image_classification_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Response
+
+- Example of a single image classification task object
+
+```python
+{
+    "id": "YOUR_TASK_ID",
+    "name": "cat.jpg",
+    "width": 100,   # image width
+    "height": 100,  # image height
+    "url": "YOUR_TASK_URL",
+    "status": "registered",
+    "tags": [],
+    "assignee": "ASSIGNEE_NAME",
+    "reviewer": "REVIEWER_NAME",
+    "customerReviewer": "CUSTOMER_REVIEWER_NAME",
+    "attributes": [
+        {
+            "key": "kind",
+            "name": "Kind",
+            "type": "text",
+            "value": "Scottish field"
+        }
+    ],
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
+```
+
 ### Multi Image
 
 Supported following project types:
 
-- Bounding Box
-- Polygon
-- Keypoint
-- Line
-- Segmentation
+- Multi Image - Bounding Box
+- Multi Image - Polygon
+- Multi Image - Keypoint
+- Multi Image - Line
+- Multi Image - Segmentation
 
 #### Create Task
 
@@ -228,10 +296,6 @@ task = client.create_multi_image_task(
 )
 ```
 
-#### Update Task
-
-- Same as image task.
-
 #### Find Task
 
 - Find a single task.
@@ -248,11 +312,7 @@ task = client.find_multi_image_task(task_id="YOUR_TASK_ID")
 tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
 ```
 
-#### Delete Task
-
-- Same as image task.
-
-#### Task Response
+#### Response
 
 - Example of a single task object
 
@@ -264,12 +324,15 @@ tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
         {
             "name": "content-name",
             "url": "content-url",
-            "width": "content-width",
-            "height": "content-height",
+            "width": 100,
+            "height": 100,
         }
     ],
     "status": "registered",
     "tags": [],
+    "assignee": "ASSIGNEE_NAME",
+    "reviewer": "REVIEWER_NAME",
+    "customerReviewer": "CUSTOMER_REVIEWER_NAME",
     "annotations": [
         {
             "content": "content-name"
@@ -297,6 +360,126 @@ tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
 }
 ```
 
+### Video
+
+Supported following project types:
+
+- Video - Bounding Box
+
+#### Create Task
+
+- Create a new task.
+
+```python
+task_id = client.create_video_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.mp4",
+    file_path="./sample.mp4"
+)
+```
+
+#### Find Task
+
+- Find a single task.
+
+```python
+task = client.find_video_task(task_id="YOUR_TASK_ID")
+```
+
+#### Get Tasks
+
+- Get tasks. (Up to 10 tasks)
+
+```python
+tasks = client.get_video_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Response
+
+- Example of a single image classification task object
+
+```python
+{
+    "id": "YOUR_TASK_ID",
+    "name": "cat.jpg",
+    "width": 100,   # image width
+    "height": 100,  # image height
+    "fps": 30.0,    # frame per seconds
+    "frameCount": 480,  # total frame count of video
+    "duration": 16.0,   # total duration of video
+    "url": "YOUR_TASK_URL",
+    "status": "registered",
+    "tags": [],
+    "assignee": "ASSIGNEE_NAME",
+    "reviewer": "REVIEWER_NAME",
+    "customerReviewer": "CUSTOMER_REVIEWER_NAME",
+    "annotations": [
+        {
+            "attributes": [],
+            "color": "#b36d18",
+            "points": {
+                "1": {  # number of frame
+                    "value": [
+                        100,  # top-left x
+                        100,  # top-left y
+                        200,  # bottom-right x
+                        200   # bottom-right y
+                    ],
+                    "autogenerated": False  # False when annotated manually. True when auto-generated by system.
+                },
+                "2": {
+                    "value": [
+                        110,
+                        110,
+                        220,
+                        220
+                    ],
+                    "autogenerated": True
+                },
+                "3": {
+                    "value": [
+                        120,
+                        120,
+                        240,
+                        240
+                    ],
+                    "autogenerated": False
+                }
+            },
+            "title": "Cat",
+            "type": "bbox",
+            "value": "cat"
+        }
+    ],
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
+```
+
+### Common
+
+APIs for update and delete are same over all tasks.
+
+#### Update Task
+
+- Update a single task status and tags.
+
+```python
+task_id = client.update_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    tags=["tag1", "tag2"]
+)
+```
+
+#### Delete Task
+
+- Delete a single task.
+
+```python
+client.delete_task(task_id="YOUR_TASK_ID")
+```
+
 ## Converter
 
 ### COCO
@@ -304,7 +487,7 @@ tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
 - Get tasks and convert to [COCO format](https://cocodataset.org/#format-data) (supporting bbox or polygon annotation type).
 
 ```python
-tasks = client.get_tasks(project="YOUR_PROJECT_SLUG")
+tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 pprint(client.to_coco(tasks))
 ```
 
