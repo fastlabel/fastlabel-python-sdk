@@ -11,7 +11,10 @@ import geojson
 
 logger = getLogger(__name__)
 
-FASTLABEL_ENDPOINT = "https://api.fastlabel.ai/v1/"
+# FASTLABEL_ENDPOINT = "https://api.fastlabel.ai/v1/"
+
+FASTLABEL_ENDPOINT = "http://localhost:4000/v1/"
+# export FASTLABEL_ACCESS_TOKEN=OTc3MGUxODgtZDU5My00NWFlLWJlNzAtYjY1NDI3NzhmNWM1
 
 
 class Client:
@@ -134,6 +137,18 @@ class Client:
         endpoint = "tasks/" + task_id
         return self.__getrequest(endpoint)
 
+    def find_task_by_name(self, project: str, task_name: str) -> dict:
+        """
+        Find a signle task by name.
+
+        project is slug of your project. (Required)
+        task_name is a task name. (Required)
+        """
+        tasks = self.get_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
     def find_multi_image_task(self, task_id: str) -> dict:
         """
         Find a signle multi image task.
@@ -141,11 +156,25 @@ class Client:
         endpoint = "tasks/multi/image/" + task_id
         return self.__getrequest(endpoint)
 
+    def find_multi_image_task_by_name(self, project: str, task_name: str) -> dict:
+        """
+        Find a signle multi image task by name.
+
+        project is slug of your project. (Required)
+        task_name is a task name. (Required)
+        """
+        tasks = self.get_multi_image_tasks(
+            project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
     def get_tasks(
         self,
         project: str,
         status: str = None,
         tags: list = [],
+        task_name: str = None,
         offset: int = None,
         limit: int = 100,
     ) -> list:
@@ -156,15 +185,21 @@ class Client:
         project is slug of your project. (Required)
         status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
         tags is a list of tag. (Optional)
+        task_name is a task name. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
         """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422)
         endpoint = "tasks"
         params = {"project": project}
         if status:
             params["status"] = status
         if tags:
             params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
         if offset:
             params["offset"] = offset
         if limit:
@@ -176,6 +211,7 @@ class Client:
         project: str,
         status: str = None,
         tags: list = [],
+        task_name: str = None,
         offset: int = None,
         limit: int = 10,
     ) -> dict:
@@ -186,6 +222,7 @@ class Client:
         project is slug of your project. (Required)
         status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
         tags is a list of tag. (Optional)
+        task_name is a task name. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
         """
@@ -198,6 +235,36 @@ class Client:
             params["status"] = status
         if tags:
             params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.__getrequest(endpoint, params=params)
+
+    def get_task_id_name_map(
+        self, project: str,
+        offset: int = None,
+        limit: int = 1000,
+    ) -> list:
+        """
+        Returns a list of task ids and names.
+        e.g.) [
+                {"id": "88e74507-07b5-4607-a130-cb6316ca872c", "name": "01_cat.jpg"}
+                {"id": "fe2c24a4-8270-46eb-9c78-bb7281c8bdgs", "name": "02_cat.jpg"}
+              ]
+        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+
+        project is slug of your project. (Required)
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422)
+        endpoint = "tasks/map/id-name"
+        params = {"project": project}
         if offset:
             params["offset"] = offset
         if limit:
@@ -312,6 +379,9 @@ class Client:
         self.__deleterequest(endpoint)
 
     def to_coco(self, tasks: list) -> dict:
+        """
+        Convert tasks to COCO format.
+        """
         # Get categories
         categories = self.__get_categories(tasks)
 
