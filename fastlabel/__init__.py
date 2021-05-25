@@ -248,7 +248,7 @@ class Client:
         limit: int = 1000,
     ) -> list:
         """
-        Returns a list of task ids and names.
+        Returns a map of task ids and names.
         e.g.) {
                 "88e74507-07b5-4607-a130-cb6316ca872c", "01_cat.jpg",
                 "fe2c24a4-8270-46eb-9c78-bb7281c8bdgs", "02_cat.jpg"
@@ -535,7 +535,7 @@ class Client:
     def create_classification_annotation(
         self,
         project: str,
-        attributes: list = []
+        attributes: list
     ) -> str:
         """
         Create a classification annotation.
