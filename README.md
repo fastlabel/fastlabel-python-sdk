@@ -6,15 +6,16 @@ _If you are using FastLabel prototype, please install version 0.2.2._
 
 - [Installation](#installation)
 - [Usage](#usage)
-    - [Limitation](#limitation)
+  - [Limitation](#limitation)
 - [Task](#task)
-    - [Image](#image)
-    - [Image Classification](#image-classification)
-    - [Multi Image](#multi-image)
-    - [Video](#video)
-    - [Common](#common)
+  - [Image](#image)
+  - [Image Classification](#image-classification)
+  - [Multi Image](#multi-image)
+  - [Video](#video)
+  - [Common](#common)
+- [Annotation](#annotation)
 - [Converter](#converter)
-    - [COCO](#coco)   
+  - [COCO](#coco)
 
 ## Installation
 
@@ -102,6 +103,12 @@ task_id = client.create_image_task(
 
 ```python
 task = client.find_image_task(task_id="YOUR_TASK_ID")
+```
+
+- Find a single task by name.
+
+```python
+tasks = client.find_image_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
 ```
 
 #### Get Tasks
@@ -478,6 +485,180 @@ task_id = client.update_task(
 
 ```python
 client.delete_task(task_id="YOUR_TASK_ID")
+```
+
+#### Get Tasks Id and Name map
+
+```python
+map = client.get_task_id_name_map(project="YOUR_PROJECT_SLUG")
+```
+
+## Annotation
+
+### Create Annotaion
+
+- Create a new annotation.
+
+```python
+annotation_id = client.create_annotation(
+    project="YOUR_PROJECT_SLUG", type="bbox", value="cat", title="Cat", color="#FF0000")
+```
+
+- Create a new annotation with attributes.
+
+```python
+attributes = [
+    {
+        "type": "text",
+        "name": "Kind",
+        "key": "kind"
+    },
+    {
+        "type": "select",
+        "name": "Size",
+        "key": "size",
+        "options": [ # select, radio and checkbox type requires options
+            {
+                "title": "Large",
+                "value": "large"
+            },
+            {
+                "title": "Small",
+                "value": "small"
+            },
+        ]
+    },
+]
+annotation_id = client.create_annotation(
+    project="YOUR_PROJECT_SLUG", type="bbox", value="cat", title="Cat", color="#FF0000", attributes=attributes)
+```
+
+- Create a new classification annotation.
+
+```python
+annotation_id = client.create_classification_annotation(
+    project="YOUR_PROJECT_SLUG", attributes=attributes)
+```
+
+### Find Annotation
+
+- Find an annotation.
+
+```python
+annotaion = client.find_annotation(annotation_id="YOUR_ANNOTATIPN_ID")
+```
+
+- Find an annotation by value.
+
+```python
+annotaion = client.find_annotation_by_value(project="YOUR_PROJECT_SLUG", value="cat")
+```
+
+- Find an annotation by value in classification project.
+
+```python
+annotaion = client.find_annotation_by_value(
+    project="YOUR_PROJECT_SLUG", value="classification") # "classification" is fixed value
+```
+
+### Get Annotations
+
+- Get annotations. (Up to 1000 annotations)
+
+```python
+annotatios = client.get_annotations(project="YOUR_PROJECT_SLUG")
+```
+
+### Response
+
+- Example of an annotation object
+
+```python
+{
+    "id": "YOUR_ANNOTATION_ID",
+    "type": "bbox",
+    "value": "cat",
+    "title": "Cat",
+    "color": "#FF0000",
+    "attributes": [
+        {
+            "id": "YOUR_ATTRIBUTE_ID",
+            "key": "kind",
+            "name": "Kind",
+            "options": [],
+            "type": "text",
+            "value": ""
+        },
+        {
+            "id": "YOUR_ATTRIBUTE_ID",
+            "key": "size",
+            "name": "Size",
+            "options": [
+                {"title": "Large", "value": "large"},
+                {"title": "Small", "value": "small"}
+            ],
+            "type": "select",
+            "value": ""
+        }
+    ],
+    "createdAt": "2021-05-25T05:36:50.459Z",
+    "updatedAt": "2021-05-25T05:36:50.459Z"
+}
+```
+
+### Update Annotation
+
+- Update an annotation.
+
+```python
+annotation_id = client.update_annotation(
+    annotation_id="YOUR_ANNOTATION_ID", value="cat2", title="Cat2", color="#FF0000")
+```
+
+- Update an annotation with attributes.
+
+```python
+attributes = [
+    {
+        "id": "YOUR_ATTRIBUTE_ID",  # check by sdk get methods
+        "type": "text",
+        "name": "Kind2",
+        "key": "kind2"
+    },
+    {
+        "id": "YOUR_ATTRIBUTE_ID",
+        "type": "select",
+        "name": "Size2",
+        "key": "size2",
+        "options": [
+            {
+                "title": "Large2",
+                "value": "large2"
+            },
+            {
+                "title": "Small2",
+                "value": "small2"
+            },
+        ]
+    },
+]
+annotation_id = client.update_annotation(
+    annotation_id="YOUR_ANNOTATION_ID", value="cat2", title="Cat2", color="#FF0000", attributes=attributes)
+```
+
+- Update a classification annotation.
+
+```python
+annotation_id = client.update_classification_annotation(
+    project="YOUR_PROJECT_SLUG", attributes=attributes)
+```
+
+### Delete Annotation
+
+- Delete an annotation.
+
+```python
+client.delete_annotation(annotation_id="YOUR_ANNOTATIPN_ID")
 ```
 
 ## Converter
