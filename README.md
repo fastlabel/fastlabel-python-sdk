@@ -517,7 +517,7 @@ attributes = [
         "type": "select",
         "name": "Size",
         "key": "size",
-        "options": [ # select, radio and checkbox type needs options
+        "options": [ # select, radio and checkbox type requires options
             {
                 "title": "Large",
                 "value": "large"
