@@ -249,10 +249,10 @@ class Client:
     ) -> list:
         """
         Returns a list of task ids and names.
-        e.g.) [
-                {"id": "88e74507-07b5-4607-a130-cb6316ca872c", "name": "01_cat.jpg"}
-                {"id": "fe2c24a4-8270-46eb-9c78-bb7281c8bdgs", "name": "02_cat.jpg"}
-              ]
+        e.g.) {
+                "88e74507-07b5-4607-a130-cb6316ca872c", "01_cat.jpg",
+                "fe2c24a4-8270-46eb-9c78-bb7281c8bdgs", "02_cat.jpg"
+              }
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
@@ -445,7 +445,7 @@ class Client:
         endpoint = "tasks/" + task_id
         self.api.delete_request(endpoint)
 
-    # Convert
+    # Task Convert
 
     def to_coco(self, tasks: list) -> dict:
         """
@@ -453,3 +453,147 @@ class Client:
         """
 
         return converters.to_coco(tasks)
+
+    # Annotation
+
+    def find_annotation(self, annotation_id: str) -> dict:
+        """
+        Find an annotation.
+        """
+        endpoint = "annotations/" + annotation_id
+        return self.api.get_request(endpoint)
+
+    def find_annotation_by_value(self, project: str, value: str) -> dict:
+        """
+        Find an annotation by value.
+        """
+        annotations = self.get_annotations(project=project, value=value)
+        if not annotations:
+            return None
+        return annotations[0]
+
+    def get_annotations(
+        self,
+        project: str,
+        value: str = None,
+        offset: int = None,
+        limit: int = 10,
+    ) -> list:
+        """
+        Returns a list of annotations.
+        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+
+        project is slug of your project. (Required)
+        value is an unique identifier of annotation in your project. (Required)
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422)
+        endpoint = "annotations"
+        params = {"project": project}
+        if value:
+            params["value"] = value
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def create_annotation(
+        self,
+        project: str,
+        type: str,
+        value: str,
+        title: str,
+        color: str,
+        attributes: list = []
+    ) -> str:
+        """
+        Create an annotation.
+
+        project is slug of your project. (Required)
+        type can be 'bbox', 'polygon', 'keypoint', 'classification', 'line', 'segmentation'. (Required)
+        value is an unique identifier of annotation in your project. (Required)
+        title is a display name of value. (Required)
+        color is hex color code like #ffffff. (Required)
+        attributes is a list of attribute. (Optional)
+        """
+        endpoint = "annotations"
+        payload = {
+            "project": project,
+            "type": type,
+            "value": value,
+            "title": title,
+            "color": color
+        }
+        if attributes:
+            payload["attributes"] = attributes
+        return self.api.post_request(endpoint, payload=payload)
+
+    def create_classification_annotation(
+        self,
+        project: str,
+        attributes: list = []
+    ) -> str:
+        """
+        Create a classification annotation.
+
+        project is slug of your project. (Required)
+        attributes is a list of attribute. (Required)
+        """
+        endpoint = "annotations/classification"
+        payload = {"project": project, "attributes": attributes}
+        return self.api.post_request(endpoint, payload=payload)
+
+    def update_annotation(
+        self,
+        annotation_id: str,
+        value: str = None,
+        title: str = None,
+        color: str = None,
+        attributes: list = []
+    ) -> str:
+        """
+        Update an annotation.
+
+        annotation_id is an id of the annotation. (Required)
+        value is an unique identifier of annotation in your project. (Optional)
+        title is a display name of value. (Optional)
+        color is hex color code like #ffffff. (Optional)
+        attributes is a list of attribute. (Optional)
+        """
+        endpoint = "annotations/" + annotation_id
+        payload = {}
+        if value:
+            payload["value"] = value
+        if title:
+            payload["title"] = title
+        if color:
+            payload["color"] = color
+        if attributes:
+            payload["attributes"] = attributes
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_classification_annotation(
+        self,
+        annotation_id: str,
+        attributes: list
+    ) -> str:
+        """
+        Update a classification annotation.
+
+        annotation_id is an id of the annotation. (Required)
+        attributes is a list of attribute. (Required)
+        """
+        endpoint = "annotations/classification/" + annotation_id
+        payload = {"attributes": attributes}
+        return self.api.put_request(endpoint, payload=payload)
+
+    def delete_annotation(self, annotation_id: str) -> None:
+        """
+        Delete an annotation.
+        """
+        endpoint = "annotations/" + annotation_id
+        self.api.delete_request(endpoint)
