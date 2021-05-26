@@ -14,10 +14,10 @@ class AnnotationType(Enum):
     segmentation = "segmentation"
 
 
+# COCO
+
+
 def to_coco(tasks: list) -> dict:
-    """
-    Convert tasks to COCO format.
-    """
     # Get categories
     categories = __get_categories(tasks)
 
@@ -147,3 +147,130 @@ def __calc_area(annotation_type: str, points: list) -> float:
         area = 0.5 * np.abs(np.dot(x, np.roll(y, 1)) -
                             np.dot(y, np.roll(x, 1)))
     return area
+
+
+# YOLO
+
+
+def to_yolo(tasks: list) -> tuple:
+    coco = to_coco(tasks)
+    yolo = __coco2yolo(coco)
+    return yolo
+
+
+def __coco2yolo(coco: dict) -> tuple:
+    categories = coco["categories"]
+
+    annos = []
+    for image in coco["images"]:
+        dw = 1. / image["width"]
+        dh = 1. / image["height"]
+
+        # Get objects
+        objs = []
+        for annotation in coco["annotations"]:
+            if image["id"] != annotation["image_id"]:
+                continue
+
+            category_index = "0"
+            for index, category in enumerate(categories):
+                if category["id"] == annotation["category_id"]:
+                    category_index = str(index)
+                    break
+
+            xmin = annotation["bbox"][0]
+            ymin = annotation["bbox"][1]
+            xmax = annotation["bbox"][0] + annotation["bbox"][2]
+            ymax = annotation["bbox"][1] + annotation["bbox"][3]
+
+            x = (xmin + xmax) / 2
+            y = (ymin + ymax) / 2
+            w = xmax - xmin
+            h = ymax - ymin
+
+            x = str(_truncate(x * dw, 7))
+            y = str(_truncate(y * dh, 7))
+            w = str(_truncate(w * dw, 7))
+            h = str(_truncate(h * dh, 7))
+
+            obj = [category_index, x, y, w, h]
+            objs.append(" ".join(obj))
+
+        # get annotation
+        anno = {
+            "filename": image["file_name"],
+            "object": objs
+        }
+        annos.append(anno)
+
+    return annos, categories
+
+
+def _truncate(n, decimals=0) -> float:
+    multiplier = 10 ** decimals
+    return int(n * multiplier) / multiplier
+
+
+# Pascal VOC
+
+
+def to_pascalvoc(tasks: list) -> list:
+    coco = to_coco(tasks)
+    pascalvoc = __coco2pascalvoc(coco)
+    return pascalvoc
+
+
+def __coco2pascalvoc(coco: dict) -> list:
+    pascalvoc = []
+
+    for image in coco["images"]:
+
+        # Get objects
+        objs = []
+        for annotation in coco["annotations"]:
+            if image["id"] != annotation["image_id"]:
+                continue
+            category = _get_category_by_id(
+                coco["categories"], annotation["category_id"])
+
+            x = annotation["bbox"][0]
+            y = annotation["bbox"][1]
+            w = annotation["bbox"][2]
+            h = annotation["bbox"][3]
+
+            obj = {
+                "name": category["name"],
+                "pose": "Unspecified",
+                "truncated": 0,
+                "difficult": 0,
+                "bndbox": {
+                        "xmin": x,
+                        "ymin": y,
+                        "xmax": x + w,
+                        "ymax": y + h,
+                },
+            }
+            objs.append(obj)
+
+        # get annotation
+        voc = {
+            "annotation": {
+                "filename": image["file_name"],
+                "size": {
+                    "width": image["width"],
+                    "height": image["height"],
+                    "depth": 3,
+                },
+                "segmented": 0,
+                "object": objs
+            }
+        }
+        pascalvoc.append(voc)
+
+    return pascalvoc
+
+
+def _get_category_by_id(categories: list, id_: str) -> str:
+    category = [
+        category for category in categories if category["id"] == id_][0]
+    return category

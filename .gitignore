@@ -12,3 +12,4 @@ annotation.json
 *.jpeg
 *.png
 tests/
+output/
