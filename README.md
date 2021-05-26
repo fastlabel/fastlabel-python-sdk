@@ -16,6 +16,8 @@ _If you are using FastLabel prototype, please install version 0.2.2._
 - [Annotation](#annotation)
 - [Converter](#converter)
   - [COCO](#coco)
+  - [YOLO](#yolo)
+  - [Pascal VOC](#pascal-voc)
 
 ## Installation
 
