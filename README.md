@@ -501,10 +501,10 @@ map = client.get_task_id_name_map(project="YOUR_PROJECT_SLUG")
 
 ```python
 annotation_id = client.create_annotation(
-    project="YOUR_PROJECT_SLUG", type="bbox", value="cat", title="Cat", color="#FF0000")
+    project="YOUR_PROJECT_SLUG", type="bbox", value="cat", title="Cat")
 ```
 
-- Create a new annotation with attributes.
+- Create a new annotation with color and attributes.
 
 ```python
 attributes = [
@@ -663,13 +663,39 @@ client.delete_annotation(annotation_id="YOUR_ANNOTATIPN_ID")
 
 ## Converter
 
+Supporting bbox or polygon annotation type.
+
 ### COCO
 
-- Get tasks and convert to [COCO format](https://cocodataset.org/#format-data) (supporting bbox or polygon annotation type).
+- Get tasks and export as a [COCO format](https://cocodataset.org/#format-data) file.
 
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
-pprint(client.to_coco(tasks))
+client.export_coco(tasks)
+```
+
+- Export with specifying output directory.
+
+```python
+client.export_coco(tasks=tasks, output_dir="YOUR_DIRECTROY")
+```
+
+### YOLO
+
+- Get tasks and export as YOLO format files.
+
+```python
+tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
+client.export_yolo(tasks)
+```
+
+### Pascal VOC
+
+- Get tasks and export as Pascal VOC format files.
+
+```python
+tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
+client.export_pascalvoc(tasks)
 ```
 
 ## API Docs

@@ -1,6 +1,9 @@
 import os
 import glob
+import json
 from logging import getLogger
+
+import xmltodict
 
 from .exceptions import FastLabelInvalidException
 from .api import Api
@@ -246,7 +249,7 @@ class Client:
         self, project: str,
         offset: int = None,
         limit: int = 1000,
-    ) -> list:
+    ) -> dict:
         """
         Returns a map of task ids and names.
         e.g.) {
@@ -447,12 +450,58 @@ class Client:
 
     # Task Convert
 
-    def to_coco(self, tasks: list) -> dict:
+    def export_coco(self, tasks: list, output_dir: str = os.path.join("output", "coco")) -> None:
         """
-        Convert tasks to COCO format.
-        """
+        Convert tasks to COCO format and export as a file.
 
-        return converters.to_coco(tasks)
+        tasks is a list of tasks. (Required)
+        output_dir is output directory(default: output/coco). (Optional)
+        """
+        coco = converters.to_coco(tasks)
+        os.makedirs(output_dir, exist_ok=True)
+        file_path = os.path.join(output_dir, "annotations.json")
+        with open(file_path, 'w') as f:
+            json.dump(coco, f, indent=4, ensure_ascii=False)
+
+    def export_yolo(self, tasks: list, output_dir: str = os.path.join("output", "yolo")) -> None:
+        """
+        Convert tasks to YOLO format and export as files.
+
+        tasks is a list of tasks. (Required)
+        output_dir is output directory(default: output/yolo). (Optional)
+        """
+        annos, categories = converters.to_yolo(tasks)
+        for anno in annos:
+            file_name = anno["filename"]
+            basename = utils.get_basename(file_name)
+            file_path = os.path.join(
+                output_dir, "annotations", basename + ".txt")
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            with open(file_path, 'w', encoding="utf8") as f:
+                for obj in anno["object"]:
+                    f.write(obj)
+                    f.write("\n")
+        with open(os.path.join(output_dir, "classes.txt"), 'w', encoding="utf8") as f:
+            for category in categories:
+                f.write(category["name"])
+                f.write("\n")
+
+    def export_pascalvoc(self, tasks: list, output_dir: str = os.path.join("output", "pascalvoc")) -> None:
+        """
+        Convert tasks to Pascal VOC format as files.
+
+        tasks is a list of tasks. (Required)
+        output_dir is output directory(default: output/pascalvoc). (Optional)
+        """
+        pascalvoc = converters.to_pascalvoc(tasks)
+        for voc in pascalvoc:
+            file_name = voc["annotation"]["filename"]
+            basename = utils.get_basename(file_name)
+            file_path = os.path.join(output_dir, basename + ".xml")
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            xml = xmltodict.unparse(voc, pretty=True, full_document=False)
+            with open(file_path, 'w', encoding="utf8") as f:
+                f.write(xml)
 
     # Annotation
 
@@ -507,7 +556,7 @@ class Client:
         type: str,
         value: str,
         title: str,
-        color: str,
+        color: str = None,
         attributes: list = []
     ) -> str:
         """
@@ -517,7 +566,7 @@ class Client:
         type can be 'bbox', 'polygon', 'keypoint', 'classification', 'line', 'segmentation'. (Required)
         value is an unique identifier of annotation in your project. (Required)
         title is a display name of value. (Required)
-        color is hex color code like #ffffff. (Required)
+        color is hex color code like #ffffff. (Optional)
         attributes is a list of attribute. (Optional)
         """
         endpoint = "annotations"
@@ -526,8 +575,9 @@ class Client:
             "type": type,
             "value": value,
             "title": title,
-            "color": color
         }
+        if color:
+            payload["color"] = color
         if attributes:
             payload["attributes"] = attributes
         return self.api.post_request(endpoint, payload=payload)
