@@ -647,3 +647,142 @@ class Client:
         """
         endpoint = "annotations/" + annotation_id
         self.api.delete_request(endpoint)
+
+    # Project
+
+    def find_project(self, project_id: str) -> dict:
+        """
+        Find a project.
+        """
+        endpoint = "projects/" + project_id
+        return self.api.get_request(endpoint)
+
+    def find_project_by_slug(self, slug: str) -> dict:
+        """
+        Find a project by slug.
+
+        slug is slug of your project. (Required)
+        """
+        projects = self.get_projects(slug=slug)
+        if not projects:
+            return None
+        return projects[0]
+
+    def get_projects(
+        self,
+        slug: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of projects.
+        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+
+        slug is slug of your project. (Optional)
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422)
+        endpoint = "projects"
+        params = {}
+        if slug:
+            params["slug"] = slug
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def get_project_id_slug_map(
+        self,
+        offset: int = None,
+        limit: int = 1000,
+    ) -> dict:
+        """
+        Returns a map of project ids and slugs.
+        e.g.) {
+                "88e74507-07b5-4607-a130-cb6316ca872c", "image-bbox-slug",
+                "fe2c24a4-8270-46eb-9c78-bb7281c8bdgs", "image-video-slug"
+              }
+        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422)
+        endpoint = "projects/map/id-slug"
+        params = {}
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def create_project(
+        self,
+        type: str,
+        name: str,
+        slug: str,
+        is_bitmap: bool = False,
+        job_size: int = 10,
+        use_annotation_service: bool = False
+    ) -> str:
+        """
+        Create a project.
+
+        type can be 'image_bbox', 'image_polygon', 'image_keypoint', 'image_line', 'image_segmentation', 'image_classification', 'image_all', 'multi_image_bbox', 'multi_image_polygon', 'multi_image_keypoint', 'multi_image_line', 'multi_image_segmentation', 'video_bbox', 'video_single_classification'. (Required)
+        name is name of your project. (Required)
+        slug is slug of your project. (Required)
+        is_bitmap is whether to be annotated by pixel. (Optional)
+        job_size is the number of tasks the annotator gets at one time. (Optional)
+        use_annotation_service is whether to request FastLabel to provide annotation service or not. (Optional)
+        """
+        endpoint = "projects"
+        payload = {
+            "type": type,
+            "name": name,
+            "slug": slug,
+        }
+        if is_bitmap:
+            payload["isBitmap"] = is_bitmap
+        if job_size:
+            payload["jobSize"] = job_size
+        if use_annotation_service:
+            payload["useAnnotationService"] = use_annotation_service
+        return self.api.post_request(endpoint, payload=payload)
+
+    def update_project(
+        self,
+        project_id: str,
+        name: str = None,
+        slug: str = None,
+        job_size: int = None,
+    ) -> str:
+        """
+        Update a project.
+
+        project_id is an id of the project. (Required)
+        name is name of your project. (Optional)
+        slug is slug of your project. (Optional)
+        job_size is the number of tasks the annotator gets at one time. (Optional)
+        """
+        endpoint = "projects/" + project_id
+        payload = {}
+        if name:
+            payload["name"] = name
+        if slug:
+            payload["slug"] = slug
+        if job_size:
+            payload["jobSize"] = job_size
+        return self.api.put_request(endpoint, payload=payload)
+
+    def delete_project(self, project_id: str) -> None:
+        """
+        Delete a project.
+        """
+        endpoint = "projects/" + project_id
+        self.api.delete_request(endpoint)
