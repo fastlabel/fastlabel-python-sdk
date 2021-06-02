@@ -14,6 +14,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [Video](#video)
   - [Common](#common)
 - [Annotation](#annotation)
+- [Project](#project)
 - [Converter](#converter)
   - [COCO](#coco)
   - [YOLO](#yolo)
@@ -547,19 +548,19 @@ annotation_id = client.create_classification_annotation(
 - Find an annotation.
 
 ```python
-annotaion = client.find_annotation(annotation_id="YOUR_ANNOTATIPN_ID")
+annotation = client.find_annotation(annotation_id="YOUR_ANNOTATION_ID")
 ```
 
 - Find an annotation by value.
 
 ```python
-annotaion = client.find_annotation_by_value(project="YOUR_PROJECT_SLUG", value="cat")
+annotation = client.find_annotation_by_value(project="YOUR_PROJECT_SLUG", value="cat")
 ```
 
 - Find an annotation by value in classification project.
 
 ```python
-annotaion = client.find_annotation_by_value(
+annotation = client.find_annotation_by_value(
     project="YOUR_PROJECT_SLUG", value="classification") # "classification" is fixed value
 ```
 
@@ -568,7 +569,7 @@ annotaion = client.find_annotation_by_value(
 - Get annotations. (Up to 1000 annotations)
 
 ```python
-annotatios = client.get_annotations(project="YOUR_PROJECT_SLUG")
+annotations = client.get_annotations(project="YOUR_PROJECT_SLUG")
 ```
 
 ### Response
@@ -660,7 +661,76 @@ annotation_id = client.update_classification_annotation(
 - Delete an annotation.
 
 ```python
-client.delete_annotation(annotation_id="YOUR_ANNOTATIPN_ID")
+client.delete_annotation(annotation_id="YOUR_ANNOTATION_ID")
+```
+
+## Project
+
+### Create Project
+
+- Create a new project.
+
+```python
+project_id = client.create_project(
+    type="image_bbox", name="ImageNet", slug="image-net")
+```
+
+### Find Project
+
+- Find a project.
+
+```python
+project = client.find_project(project_id="YOUR_PROJECT_ID")
+```
+
+- Find a project by slug.
+
+```python
+project = client.find_project_by_slug(slug="YOUR_PROJECT_SLUG")
+```
+
+### Get Projects
+
+- Get projects. (Up to 1000 projects)
+
+```python
+projects = client.get_projects()
+```
+
+### Response
+
+- Example of a project object
+
+```python
+{
+    "id": "YOUR_PROJECT_ID",
+    "type": "image_bbox",
+    "slug": "YOUR_PROJECT_SLUG",
+    "name": "YOUR_PROJECT_NAME",
+    "isBitmap": False,
+    "jobSize": 10,
+    "useAnnotationService": False,
+    "status": "active",
+    "createdAt": "2021-04-20T03:20:41.427Z",
+    "updatedAt": "2021-04-20T03:20:41.427Z",
+}
+```
+
+### Update Project
+
+- Update a project.
+
+```python
+project_id = client.update_project(
+    project_id="YOUR_PROJECT_ID", name="NewImageNet", slug="new-image-net", job_size=20)
+```
+
+### Delete Project
+
+- Delete a project.
+
+```python
+client.delete_project(project_id="YOUR_PROJECT_ID")
 ```
 
 ## Converter
