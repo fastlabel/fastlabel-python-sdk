@@ -393,6 +393,7 @@ class Client:
         name: str,
         file_path: str,
         status: str = None,
+        annotations: list = [],
         tags: list = [],
     ) -> str:
         """
@@ -402,6 +403,7 @@ class Client:
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
         status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
         endpoint = "tasks/video"
@@ -412,6 +414,10 @@ class Client:
         payload = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
+        if annotations:
+            for annotation in annotations:
+                annotation["content"] = name
+            payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
         return self.api.post_request(endpoint, payload=payload)
