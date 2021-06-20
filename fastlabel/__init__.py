@@ -116,7 +116,7 @@ class Client:
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'send_backed', 'approved', 'customer_send_backed', 'customer_approved'. (Optional)
         tags is a list of tag. (Optional)
         task_name is a task name. (Optional)
         offset is the starting position number to fetch. (Optional)
@@ -153,7 +153,7 @@ class Client:
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'send_backed', 'approved', 'customer_send_backed', 'customer_approved'. (Optional)
         tags is a list of tag. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
@@ -186,7 +186,7 @@ class Client:
         Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'send_backed', 'approved', 'customer_send_backed', 'customer_approved'. (Optional)
         tags is a list of tag. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
@@ -222,7 +222,7 @@ class Client:
         Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'send_backed', 'approved', 'customer_send_backed', 'customer_approved'. (Optional)
         tags is a list of tag. (Optional)
         task_name is a task name. (Optional)
         offset is the starting position number to fetch. (Optional)
@@ -290,7 +290,7 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
-        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'send_backed', 'approved', 'customer_send_backed', 'customer_approved'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -325,7 +325,7 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
-        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'send_backed', 'approved', 'customer_send_backed', 'customer_approved'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -358,7 +358,7 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         folder_path is a path to data folder. Files should be under the folder. Nested folder structure is not supported. Supported extensions of files are png, jpg, jpeg. (Required)
-        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'send_backed', 'approved', 'customer_send_backed', 'customer_approved'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -402,7 +402,7 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
-        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'send_backed', 'approved', 'customer_send_backed', 'customer_approved'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -434,7 +434,7 @@ class Client:
         Update a single task.
 
         task_id is an id of the task. (Required)
-        status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'send_backed', 'approved', 'customer_send_backed', 'customer_approved'. (Optional)
         tags is a list of tag to be set. (Optional)
         """
         endpoint = "tasks/" + task_id
