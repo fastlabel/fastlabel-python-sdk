@@ -127,7 +127,7 @@ tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 ```python
 tasks = client.get_image_tasks(
     project="YOUR_PROJECT_SLUG",
-    status="approved", # status can be 'registered', 'in_progress', 'completed', 'skipped', 'in_review', 'send_backed', 'approved', 'customer_in_review', 'customer_send_backed', 'customer_approved'
+    status="approved", # status can be 'registered', 'completed', 'skipped', 'send_backed', 'approved', 'customer_send_backed', 'customer_approved'
     tags=["tag1", "tag2"] # up to 10 tags
 )
 ```
