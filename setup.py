@@ -8,7 +8,7 @@ with open("requirements.txt", encoding="utf-8") as file:
 
 setuptools.setup(
     name="fastlabel",
-    version="0.9.3",
+    version="0.9.4",
     author="eisuke-ueta",
     author_email="eisuke.ueta@fastlabel.ai",
     description="The official Python SDK for FastLabel API, the Data Platform for AI",

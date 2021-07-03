@@ -509,6 +509,22 @@ class Client:
             with open(file_path, 'w', encoding="utf8") as f:
                 f.write(xml)
 
+    def export_labelme(self, tasks: list, output_dir: str = os.path.join("output", "labelme")) -> None:
+        """
+        Convert tasks to labelme format as files.
+
+        tasks is a list of tasks. (Required)
+        output_dir is output directory(default: output/labelme). (Optional)
+        """
+        labelmes = converters.to_labelme(tasks)
+        for labelme in labelmes:
+            file_name = labelme["imagePath"]
+            basename = utils.get_basename(file_name)
+            file_path = os.path.join(output_dir, basename + ".json")
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            with open(file_path, 'w') as f:
+                json.dump(labelme, f, indent=4, ensure_ascii=False)
+
     # Annotation
 
     def find_annotation(self, annotation_id: str) -> dict:

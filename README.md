@@ -19,6 +19,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [COCO](#coco)
   - [YOLO](#yolo)
   - [Pascal VOC](#pascal-voc)
+  - [labelme](#labelme)
 
 ## Installation
 
@@ -813,6 +814,15 @@ client.export_yolo(tasks)
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 client.export_pascalvoc(tasks)
+```
+
+### labelme
+
+- Get tasks and export as labelme format files.
+
+```python
+tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
+client.export_labelme(tasks)
 ```
 
 ## API Docs
