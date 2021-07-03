@@ -220,6 +220,60 @@ def to_pascalvoc(tasks: list) -> list:
     return pascalvoc
 
 
+# labelme
+
+
+def to_labelme(tasks: list) -> list:
+    labelmes =[]
+    for task in tasks:
+        shapes = []
+        for annotation in task["annotations"]:
+                shape_type = __to_labelme_shape_type(annotation["type"])
+                if not shape_type:
+                    continue
+                points = annotation["points"]
+                if len(points) == 0:
+                    continue
+
+                shape_points = []
+                if annotation["type"] == "segmentation":
+                    for i in range(int(len(points[0][0]) / 2)):
+                        shape_points.append([points[0][0][i * 2], points[0][0][(i * 2) + 1]]) 
+                else:
+                    for i in range(int(len(points) / 2)):
+                        shape_points.append([points[i * 2], points[(i * 2) + 1]]) 
+
+                shape = {
+                        "label": annotation["value"],
+                        "points": shape_points,
+                        "group_id": None,
+                        "shape_type": shape_type,
+                        "flags": {}
+                }
+                shapes.append(shape)
+        labelmes.append({
+                "version": "4.5.9",
+                "flags": {},
+                "shapes": shapes,
+                "imagePath": task["name"],
+                "imageData": None,
+                "imageHeight": task["height"],
+                "imageWidth": task["width"],
+        })
+    return labelmes
+
+def __to_labelme_shape_type(annotation_type: str) -> str:
+    if annotation_type == "polygon" or annotation_type == "segmentation":
+        return "polygon"
+    if annotation_type == "bbox":
+        return "rectangle"
+    if annotation_type == "keypoint":
+        return "point"
+    if annotation_type == "line":
+        return "line"
+    return None
+
+
 def __coco2pascalvoc(coco: dict) -> list:
     pascalvoc = []
 
