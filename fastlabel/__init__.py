@@ -368,6 +368,9 @@ class Client:
 
         endpoint = "tasks/multi-image"
         file_paths = glob.glob(os.path.join(folder_path, "*"))
+        if not file_paths:
+            raise FastLabelInvalidException(
+                "Folder does not have any file.", 422)
         contents = []
         for file_path in file_paths:
             if not utils.is_image_supported_ext(file_path):
