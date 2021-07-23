@@ -2,12 +2,14 @@ import os
 import glob
 import json
 from logging import getLogger
+from PIL import Image, ImageDraw
 
 import xmltodict
 
 from .exceptions import FastLabelInvalidException
 from .api import Api
-from fastlabel import converters, utils
+from fastlabel import converters, utils, const
+from fastlabel.const import AnnotationType
 
 logger = getLogger(__name__)
 
@@ -527,6 +529,112 @@ class Client:
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             with open(file_path, 'w') as f:
                 json.dump(labelme, f, indent=4, ensure_ascii=False)
+
+
+    # Instance / Semantic Segmetation
+    def export_instance_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "instance_segmentation"), pallete: list[int] = const.COLOR_PALETTE) -> None:
+        """
+        Convert tasks to index color instance segmentation (PNG files).
+        Supports only bbox, polygon and segmentation annotation types. Hollowed points are not supported.
+        Supports up to 57 instances in default colors palette. Check const.COLOR_PALETTE for more details.
+
+        tasks is a list of tasks. (Required)
+        output_dir is output directory(default: output/instance_segmentation). (Optional)
+        pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional)
+        """
+        tasks = converters.to_pixel_coordinates(tasks)
+        for task in tasks:
+            self.__export_index_color_image(task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=True)
+    
+    def export_semantic_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "semantic_segmentation"), pallete: list[int] = const.COLOR_PALETTE) -> None:
+        """
+        Convert tasks to index color semantic segmentation (PNG files).
+        Supports only bbox, polygon and segmentation annotation types. Hollowed points are not supported.
+        Check const.COLOR_PALETTE for color pallete.
+
+        tasks is a list of tasks. (Required)
+        output_dir is output directory(default: output/semantic_segmentation). (Optional)
+        pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional)
+        """
+        classes = []
+        for task in tasks:
+            for annotation in task["annotations"]:
+                classes.append(annotation["value"])
+        classes = list(set(classes))
+        classes.sort()
+
+        tasks = converters.to_pixel_coordinates(tasks)
+        for task in tasks:
+            self.__export_index_color_image(task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=False, classes=classes)
+
+    def __export_index_color_image(self, task: list, output_dir: str, pallete: list[int], is_instance_segmentation: bool = True, classes: list = []) -> None:
+        image = Image.new("RGB", (task["width"], task["height"]), 0)
+        image = image.convert('P')
+        image.putpalette(pallete)
+        draw = ImageDraw.Draw(image)
+
+        index = 1
+        for annotation in task["annotations"]:
+            color = index if is_instance_segmentation else classes.index(annotation["value"]) + 1
+            if annotation["type"] == AnnotationType.segmentation.value:
+                for region in annotation["points"]:
+                    for points in region:
+                        pillow_draw_points = self.__get_pillow_draw_points(points)
+                        draw.polygon(pillow_draw_points, fill=color)
+                        # hollowd points are not supported
+                        break
+            elif annotation["type"] == AnnotationType.polygon.value:
+                pillow_draw_points = self.__get_pillow_draw_points(annotation["points"])
+                draw.polygon(pillow_draw_points, fill=color)
+            elif annotation["type"] == AnnotationType.bbox.value:
+                pillow_draw_points = self.__get_pillow_draw_points(annotation["points"])
+                draw.polygon(pillow_draw_points, fill=color)
+            else:
+                continue
+            index += 1
+
+        image_path = os.path.join(output_dir, utils.get_basename(task["name"]) + ".png")
+        os.makedirs(os.path.dirname(image_path), exist_ok=True)
+        image.save(image_path)
+
+    def __get_pillow_draw_points(self, points: list[int]) -> list[int]:
+        """
+        Convert points to pillow draw points. Diagonal points are not supported.
+        """
+        x_points = []
+        x_points.append(points[0])
+        x_points.append(points[1])
+        for i in range(int(len(points) / 2)):
+            if i == 0:
+                continue
+            x = points[i * 2]
+            y = points[i * 2 + 1]
+            if y > x_points[(i - 1) * 2 + 1]:
+                x_points[(i - 1) * 2] = x_points[(i - 1) * 2] - 1
+                x = x - 1
+            x_points.append(x)
+            x_points.append(y)
+
+        y_points = []
+        y_points.append(points[0])
+        y_points.append(points[1])
+        for i in range(int(len(points) / 2)):
+            if i == 0:
+                continue
+            x = points[i * 2]
+            y = points[i * 2 + 1]
+            if x < y_points[(i - 1) * 2]:
+                y_points[(i - 1) * 2 + 1] = y_points[(i - 1) * 2 + 1] - 1
+                y = y - 1
+            y_points.append(x)
+            y_points.append(y)
+
+        new_points = []
+        for i in range(int(len(points) / 2)):
+            new_points.append(x_points[i * 2])
+            new_points.append(y_points[i * 2 + 1])
+        return new_points
+
 
     # Annotation
 
