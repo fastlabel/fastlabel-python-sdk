@@ -20,7 +20,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [YOLO](#yolo)
   - [Pascal VOC](#pascal-voc)
   - [labelme](#labelme)
-  - [Instance/Semantic Segmentation](#segmentation)
+  - [Segmentation](#segmentation)
 
 ## Installation
 
@@ -826,7 +826,7 @@ tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 client.export_labelme(tasks)
 ```
 
-### Instance/Semantic Segmentation
+### Segmentation
 
 Get tasks and export index color instance/semantic segmentation (PNG files).
 Only support the following annotation types.
