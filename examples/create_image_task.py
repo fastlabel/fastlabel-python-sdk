@@ -14,7 +14,7 @@ annotations = [{
     "attributes": [
         {
             "key": "kind",
-            "value": "三毛猫"
+            "value": "Scottish field"
         }
     ],
     "points": [
