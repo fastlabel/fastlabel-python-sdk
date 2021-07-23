@@ -1,18 +1,9 @@
-from enum import Enum
 from concurrent.futures import ThreadPoolExecutor
 
+import copy
 import geojson
 import numpy as np
-
-
-class AnnotationType(Enum):
-    bbox = "bbox"
-    polygon = "polygon"
-    keypoint = "keypoint"
-    classification = "classification"
-    line = "line"
-    segmentation = "segmentation"
-
+from fastlabel.const import AnnotationType
 
 # COCO
 
@@ -273,6 +264,78 @@ def __to_labelme_shape_type(annotation_type: str) -> str:
         return "line"
     return None
 
+
+def to_pixel_coordinates(tasks: list) -> list:
+    """
+    Remove diagonal coordinates and return pixel outline coordinates.
+    Only support bbox, polygon, and segmentation annotation types.
+    """
+    tasks = copy.deepcopy(tasks)
+    for task in tasks:
+        for annotation in task["annotations"]:
+            if annotation["type"] == AnnotationType.segmentation.value:
+                new_regions = []
+                for region in annotation["points"]:
+                    new_region = []
+                    for points in region:
+                        new_points = __get_pixel_coordinates(points)
+                        new_region.append(new_points)
+                    new_regions.append(new_region)
+                annotation["points"] = new_regions
+            elif annotation["type"] == AnnotationType.polygon.value:
+                new_points = __get_pixel_coordinates(annotation["points"])
+                annotation["points"] = new_points
+            elif annotation["type"] == AnnotationType.bbox.value:
+                points = annotation["points"]
+                points = [int(point) for point in points]
+                xmin = min([points[0], points[2]])
+                ymin = min([points[1], points[3]])
+                xmax = max([points[0], points[2]])
+                ymax = max([points[1], points[3]])
+                annotation["points"] = [
+                    xmin, ymin,
+                    xmax, ymin,
+                    xmax, ymax,
+                    xmin, ymax,
+                ]
+            else:
+                continue
+    return tasks
+
+def __get_pixel_coordinates(points: list[int or float]) -> list[int]:
+    """
+    Remove diagonal coordinates and return pixel outline coordinates.
+    """
+    if len(points) == 0:
+        return
+
+    new_points = []
+    new_points.append(int(points[0]))
+    new_points.append(int(points[1]))
+    for i in range(int(len(points) / 2)):
+        if i == 0:
+            continue
+
+        prev_x = int(points[(i-1) * 2])
+        prev_y = int(points[(i-1) * 2 + 1])
+        x = int(points[i * 2])
+        y = int(points[i * 2 + 1])
+
+        if prev_x == x or prev_y == y:
+            # just add x, y coordinates if not diagonal
+            new_points.append(x)
+            new_points.append(y)
+        else:
+            # remove diagonal
+            xdiff = x - prev_x
+            ydiff = y - prev_y
+            mindiff = min([abs(xdiff), abs(ydiff)])
+            for i in range(mindiff):
+                new_points.append(int(prev_x + int(xdiff / mindiff * i)))
+                new_points.append(int(prev_y + int(ydiff / mindiff * (i + 1))))
+                new_points.append(int(prev_x + int(xdiff / mindiff * (i + 1))))
+                new_points.append(int(prev_y + int(ydiff / mindiff * (i + 1))))
+    return new_points
 
 def __coco2pascalvoc(coco: dict) -> list:
     pascalvoc = []

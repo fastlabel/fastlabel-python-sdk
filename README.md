@@ -20,6 +20,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [YOLO](#yolo)
   - [Pascal VOC](#pascal-voc)
   - [labelme](#labelme)
+  - [Segmentation](#segmentation)
 
 ## Installation
 
@@ -63,7 +64,7 @@ Supported following project types:
 
 #### Create Task
 
-- Create a new task.
+Create a new task.
 
 ```python
 task_id = client.create_image_task(
@@ -73,7 +74,7 @@ task_id = client.create_image_task(
 )
 ```
 
-- Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
+Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
 
 ```python
 task_id = client.create_image_task(
@@ -103,13 +104,13 @@ task_id = client.create_image_task(
 
 #### Find Task
 
-- Find a single task.
+Find a single task.
 
 ```python
 task = client.find_image_task(task_id="YOUR_TASK_ID")
 ```
 
-- Find a single task by name.
+Find a single task by name.
 
 ```python
 tasks = client.find_image_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
@@ -117,7 +118,7 @@ tasks = client.find_image_task_by_name(project="YOUR_PROJECT_SLUG", task_name="Y
 
 #### Get Tasks
 
-- Get tasks. (Up to 1000 tasks)
+Get tasks. (Up to 1000 tasks)
 
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
@@ -133,7 +134,7 @@ tasks = client.get_image_tasks(
 )
 ```
 
-- Get a large size of tasks. (Over 1000 tasks)
+Get a large size of tasks. (Over 1000 tasks)
 
 ```python
 import time
@@ -157,7 +158,7 @@ while True:
 
 #### Response
 
-- Example of a single image task object
+Example of a single image task object
 
 ```python
 {
@@ -201,7 +202,7 @@ Supported following project types:
 
 #### Create Task
 
-- Create a new task.
+Create a new task.
 
 ```python
 task_id = client.create_image_classification_task(
@@ -219,7 +220,7 @@ task_id = client.create_image_classification_task(
 
 #### Find Task
 
-- Find a single task.
+Find a single task.
 
 ```python
 task = client.find_image_classification_task(task_id="YOUR_TASK_ID")
@@ -227,7 +228,7 @@ task = client.find_image_classification_task(task_id="YOUR_TASK_ID")
 
 #### Get Tasks
 
-- Get tasks. (Up to 1000 tasks)
+Get tasks. (Up to 1000 tasks)
 
 ```python
 tasks = client.get_image_classification_tasks(project="YOUR_PROJECT_SLUG")
@@ -235,7 +236,7 @@ tasks = client.get_image_classification_tasks(project="YOUR_PROJECT_SLUG")
 
 #### Response
 
-- Example of a single image classification task object
+Example of a single image classification task object
 
 ```python
 {
@@ -274,7 +275,7 @@ Supported following project types:
 
 #### Create Task
 
-- Create a new task.
+Create a new task.
 
 ```python
 task = client.create_multi_image_task(
@@ -309,7 +310,7 @@ task = client.create_multi_image_task(
 
 #### Find Task
 
-- Find a single task.
+Find a single task.
 
 ```python
 task = client.find_multi_image_task(task_id="YOUR_TASK_ID")
@@ -317,7 +318,7 @@ task = client.find_multi_image_task(task_id="YOUR_TASK_ID")
 
 #### Get Tasks
 
-- Get tasks.
+Get tasks.
 
 ```python
 tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
@@ -325,7 +326,7 @@ tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
 
 #### Response
 
-- Example of a single task object
+Example of a single task object
 
 ```python
 {
@@ -379,7 +380,7 @@ Supported following project types:
 
 #### Create Task
 
-- Create a new task.
+Create a new task.
 
 ```python
 task_id = client.create_video_task(
@@ -389,7 +390,7 @@ task_id = client.create_video_task(
 )
 ```
 
-- Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
+Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
 
 ```python
 task_id = client.create_video_task(
@@ -436,7 +437,7 @@ task_id = client.create_video_task(
 
 #### Find Task
 
-- Find a single task.
+Find a single task.
 
 ```python
 task = client.find_video_task(task_id="YOUR_TASK_ID")
@@ -444,7 +445,7 @@ task = client.find_video_task(task_id="YOUR_TASK_ID")
 
 #### Get Tasks
 
-- Get tasks. (Up to 10 tasks)
+Get tasks. (Up to 10 tasks)
 
 ```python
 tasks = client.get_video_tasks(project="YOUR_PROJECT_SLUG")
@@ -452,7 +453,7 @@ tasks = client.get_video_tasks(project="YOUR_PROJECT_SLUG")
 
 #### Response
 
-- Example of a single image classification task object
+Example of a single image classification task object
 
 ```python
 {
@@ -518,7 +519,7 @@ APIs for update and delete are same over all tasks.
 
 #### Update Task
 
-- Update a single task status and tags.
+Update a single task status and tags.
 
 ```python
 task_id = client.update_task(
@@ -530,7 +531,7 @@ task_id = client.update_task(
 
 #### Delete Task
 
-- Delete a single task.
+Delete a single task.
 
 ```python
 client.delete_task(task_id="YOUR_TASK_ID")
@@ -539,21 +540,21 @@ client.delete_task(task_id="YOUR_TASK_ID")
 #### Get Tasks Id and Name map
 
 ```python
-map = client.get_task_id_name_map(project="YOUR_PROJECT_SLUG")
+id_name_map = client.get_task_id_name_map(project="YOUR_PROJECT_SLUG")
 ```
 
 ## Annotation
 
 ### Create Annotaion
 
-- Create a new annotation.
+Create a new annotation.
 
 ```python
 annotation_id = client.create_annotation(
     project="YOUR_PROJECT_SLUG", type="bbox", value="cat", title="Cat")
 ```
 
-- Create a new annotation with color and attributes.
+Create a new annotation with color and attributes.
 
 ```python
 attributes = [
@@ -582,7 +583,7 @@ annotation_id = client.create_annotation(
     project="YOUR_PROJECT_SLUG", type="bbox", value="cat", title="Cat", color="#FF0000", attributes=attributes)
 ```
 
-- Create a new classification annotation.
+Create a new classification annotation.
 
 ```python
 annotation_id = client.create_classification_annotation(
@@ -591,19 +592,19 @@ annotation_id = client.create_classification_annotation(
 
 ### Find Annotation
 
-- Find an annotation.
+Find an annotation.
 
 ```python
 annotation = client.find_annotation(annotation_id="YOUR_ANNOTATION_ID")
 ```
 
-- Find an annotation by value.
+Find an annotation by value.
 
 ```python
 annotation = client.find_annotation_by_value(project="YOUR_PROJECT_SLUG", value="cat")
 ```
 
-- Find an annotation by value in classification project.
+Find an annotation by value in classification project.
 
 ```python
 annotation = client.find_annotation_by_value(
@@ -612,7 +613,7 @@ annotation = client.find_annotation_by_value(
 
 ### Get Annotations
 
-- Get annotations. (Up to 1000 annotations)
+Get annotations. (Up to 1000 annotations)
 
 ```python
 annotations = client.get_annotations(project="YOUR_PROJECT_SLUG")
@@ -620,7 +621,7 @@ annotations = client.get_annotations(project="YOUR_PROJECT_SLUG")
 
 ### Response
 
-- Example of an annotation object
+Example of an annotation object
 
 ```python
 {
@@ -657,14 +658,14 @@ annotations = client.get_annotations(project="YOUR_PROJECT_SLUG")
 
 ### Update Annotation
 
-- Update an annotation.
+Update an annotation.
 
 ```python
 annotation_id = client.update_annotation(
     annotation_id="YOUR_ANNOTATION_ID", value="cat2", title="Cat2", color="#FF0000")
 ```
 
-- Update an annotation with attributes.
+Update an annotation with attributes.
 
 ```python
 attributes = [
@@ -695,7 +696,7 @@ annotation_id = client.update_annotation(
     annotation_id="YOUR_ANNOTATION_ID", value="cat2", title="Cat2", color="#FF0000", attributes=attributes)
 ```
 
-- Update a classification annotation.
+Update a classification annotation.
 
 ```python
 annotation_id = client.update_classification_annotation(
@@ -704,7 +705,7 @@ annotation_id = client.update_classification_annotation(
 
 ### Delete Annotation
 
-- Delete an annotation.
+Delete an annotation.
 
 ```python
 client.delete_annotation(annotation_id="YOUR_ANNOTATION_ID")
@@ -714,7 +715,7 @@ client.delete_annotation(annotation_id="YOUR_ANNOTATION_ID")
 
 ### Create Project
 
-- Create a new project.
+Create a new project.
 
 ```python
 project_id = client.create_project(
@@ -723,13 +724,13 @@ project_id = client.create_project(
 
 ### Find Project
 
-- Find a project.
+Find a project.
 
 ```python
 project = client.find_project(project_id="YOUR_PROJECT_ID")
 ```
 
-- Find a project by slug.
+Find a project by slug.
 
 ```python
 project = client.find_project_by_slug(slug="YOUR_PROJECT_SLUG")
@@ -737,7 +738,7 @@ project = client.find_project_by_slug(slug="YOUR_PROJECT_SLUG")
 
 ### Get Projects
 
-- Get projects. (Up to 1000 projects)
+Get projects. (Up to 1000 projects)
 
 ```python
 projects = client.get_projects()
@@ -745,7 +746,7 @@ projects = client.get_projects()
 
 ### Response
 
-- Example of a project object
+Example of a project object
 
 ```python
 {
@@ -764,7 +765,7 @@ projects = client.get_projects()
 
 ### Update Project
 
-- Update a project.
+Update a project.
 
 ```python
 project_id = client.update_project(
@@ -773,7 +774,7 @@ project_id = client.update_project(
 
 ### Delete Project
 
-- Delete a project.
+Delete a project.
 
 ```python
 client.delete_project(project_id="YOUR_PROJECT_ID")
@@ -785,14 +786,14 @@ Supporting bbox or polygon annotation type.
 
 ### COCO
 
-- Get tasks and export as a [COCO format](https://cocodataset.org/#format-data) file.
+Get tasks and export as a [COCO format](https://cocodataset.org/#format-data) file.
 
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 client.export_coco(tasks)
 ```
 
-- Export with specifying output directory.
+Export with specifying output directory.
 
 ```python
 client.export_coco(tasks=tasks, output_dir="YOUR_DIRECTROY")
@@ -800,7 +801,7 @@ client.export_coco(tasks=tasks, output_dir="YOUR_DIRECTROY")
 
 ### YOLO
 
-- Get tasks and export as YOLO format files.
+Get tasks and export as YOLO format files.
 
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
@@ -809,7 +810,7 @@ client.export_yolo(tasks)
 
 ### Pascal VOC
 
-- Get tasks and export as Pascal VOC format files.
+Get tasks and export as Pascal VOC format files.
 
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
@@ -818,12 +819,33 @@ client.export_pascalvoc(tasks)
 
 ### labelme
 
-- Get tasks and export as labelme format files.
+Get tasks and export as labelme format files.
 
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 client.export_labelme(tasks)
 ```
+
+### Segmentation
+
+Get tasks and export index color instance/semantic segmentation (PNG files).
+Only support the following annotation types.
+
+- bbox
+- polygon
+- segmentation (Hollowed points are not supported.)
+
+```python
+tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
+client.export_instance_segmentation(tasks)
+```
+
+```python
+tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
+client.export_semantic_segmentation(tasks)
+```
+
+> Please check const.COLOR_PALLETE for index colors.
 
 ## API Docs
 
