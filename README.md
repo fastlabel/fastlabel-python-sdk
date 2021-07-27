@@ -12,6 +12,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [Image Classification](#image-classification)
   - [Multi Image](#multi-image)
   - [Video](#video)
+  - [Video Classification](#video-classification)
   - [Common](#common)
 - [Annotation](#annotation)
 - [Project](#project)
@@ -232,6 +233,24 @@ Get tasks. (Up to 1000 tasks)
 
 ```python
 tasks = client.get_image_classification_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Update Tasks
+
+Update a signle task.
+
+```python
+task_id = client.update_image_classification_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    tags=["tag1", "tag2"]
+    attributes=[
+        {
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ],
+)
 ```
 
 #### Response
@@ -511,6 +530,38 @@ Example of a single image classification task object
     "createdAt": "2021-02-22T11:25:27.158Z",
     "updatedAt": "2021-02-22T11:25:27.158Z"
 }
+```
+
+### Video Classification
+
+Supported following project types:
+
+- Video - Classification (Single)
+
+#### Get Tasks
+
+Get tasks. (Up to 1000 tasks)
+
+```python
+tasks = client.get_video_classification_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Update Tasks
+
+Update a signle task.
+
+```python
+task_id = client.update_video_classification_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    tags=["tag1", "tag2"]
+    attributes=[
+        {
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ],
+)
 ```
 
 ### Common
