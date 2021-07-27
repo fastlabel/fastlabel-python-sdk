@@ -247,6 +247,39 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
+    def get_video_classification_tasks(
+        self,
+        project: str,
+        status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of video classification tasks.
+        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+
+        project is slug of your project. (Required)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        tags is a list of tag. (Optional)
+        offset is the starting position number to fetch. (Optional)
+        limit is the max number to fetch. (Optional)
+        """
+        endpoint = "tasks/video/classification"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
     def get_task_id_name_map(
         self, project: str,
         offset: int = None,
@@ -446,6 +479,56 @@ class Client:
         payload = {}
         if status:
             payload["status"] = status
+        if tags:
+            payload["tags"] = tags
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_image_classification_task(
+        self,
+        task_id: str,
+        status: str = None,
+        attributes: list = [],
+        tags: list = [],
+    ) -> str:
+        """
+        Create a single image classification task.
+
+        task_id is an id of the task. (Required)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        attributes is a list of attribute to be set in advance. (Optional)
+        tags is a list of tag to be set in advance. (Optional)
+        """
+        endpoint = "tasks/image/classification/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if attributes:
+            payload["attributes"] = attributes
+        if tags:
+            payload["tags"] = tags
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_video_classification_task(
+        self,
+        task_id: str,
+        status: str = None,
+        attributes: list = [],
+        tags: list = [],
+    ) -> str:
+        """
+        Create a single video classification task.
+
+        task_id is an id of the task. (Required)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        attributes is a list of attribute to be set in advance. (Optional)
+        tags is a list of tag to be set in advance. (Optional)
+        """
+        endpoint = "tasks/video/classification/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if attributes:
+            payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
         return self.api.put_request(endpoint, payload=payload)
