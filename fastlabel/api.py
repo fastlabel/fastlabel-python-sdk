@@ -3,7 +3,11 @@ import requests
 
 from .exceptions import FastLabelException, FastLabelInvalidException
 
-FASTLABEL_ENDPOINT = "https://api.fastlabel.ai/v1/"
+# FASTLABEL_ENDPOINT = "https://api.fastlabel.ai/v1/"
+
+# FASTLABEL_ENDPOINT = "http://localhost:4000/v1/"
+FASTLABEL_ENDPOINT = "http://api:4000/v1/"
+# export FASTLABEL_ACCESS_TOKEN=NTI3MmI4NTUtNWE1NC00ZWFiLWE4MDUtZDE5ZmQ0MjMzMjRi
 
 
 class Api:

@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from typing import List
 
 import copy
 import geojson
@@ -302,7 +303,7 @@ def to_pixel_coordinates(tasks: list) -> list:
                 continue
     return tasks
 
-def __get_pixel_coordinates(points: list[int or float]) -> list[int]:
+def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
     """
     Remove diagonal coordinates and return pixel outline coordinates.
     """
