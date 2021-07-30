@@ -3,7 +3,9 @@ import glob
 import json
 from typing import List
 from logging import getLogger
-from PIL import Image, ImageDraw
+from PIL import Image
+import cv2
+import numpy as np
 
 import xmltodict
 
@@ -653,9 +655,8 @@ class Client:
 
     def __export_index_color_image(self, task: list, output_dir: str, pallete: List[int], is_instance_segmentation: bool = True, classes: list = []) -> None:
         image = Image.new("RGB", (task["width"], task["height"]), 0)
-        image = image.convert('P')
-        image.putpalette(pallete)
-        draw = ImageDraw.Draw(image)
+        image = np.array(image)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         index = 1
         for annotation in task["annotations"]:
@@ -663,25 +664,28 @@ class Client:
             if annotation["type"] == AnnotationType.segmentation.value:
                 for region in annotation["points"]:
                     for points in region:
-                        pillow_draw_points = self.__get_pillow_draw_points(points)
-                        draw.polygon(pillow_draw_points, fill=color)
+                        cv_draw_points = self.__get_cv_draw_points(points)
+                        cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
                         # hollowd points are not supported
                         break
             elif annotation["type"] == AnnotationType.polygon.value:
-                pillow_draw_points = self.__get_pillow_draw_points(annotation["points"])
-                draw.polygon(pillow_draw_points, fill=color)
+                cv_draw_points = self.__get_cv_draw_points(annotation["points"])
+                cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
             elif annotation["type"] == AnnotationType.bbox.value:
-                pillow_draw_points = self.__get_pillow_draw_points(annotation["points"])
-                draw.polygon(pillow_draw_points, fill=color)
+                cv_draw_points = self.__get_cv_draw_points(annotation["points"])
+                cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
             else:
                 continue
             index += 1
 
         image_path = os.path.join(output_dir, utils.get_basename(task["name"]) + ".png")
         os.makedirs(os.path.dirname(image_path), exist_ok=True)
+        image = Image.fromarray(image)
+        image = image.convert('P')
+        image.putpalette(pallete)
         image.save(image_path)
 
-    def __get_pillow_draw_points(self, points: List[int]) -> List[int]:
+    def __get_cv_draw_points(self, points: List[int]) -> List[int]:
         """
         Convert points to pillow draw points. Diagonal points are not supported.
         """
@@ -717,7 +721,11 @@ class Client:
         for i in range(int(len(points) / 2)):
             new_points.append(x_points[i * 2])
             new_points.append(y_points[i * 2 + 1])
-        return new_points
+
+        cv_points = []
+        for i in range(int(len(new_points) / 2)):
+            cv_points.append((new_points[i * 2], new_points[i * 2 + 1]))
+        return np.array(cv_points)
 
 
     # Annotation

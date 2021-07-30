@@ -301,14 +301,65 @@ def to_pixel_coordinates(tasks: list) -> list:
                 ]
             else:
                 continue
+
+    # Remove duplicate points
+    for task in tasks:
+        for anno in task["annotations"]:
+            if annotation["type"] == AnnotationType.segmentation.value:
+                new_regions = []
+                for region in anno["points"]:
+                    new_region = []
+                    for points in region:
+                        new_points = __remove_duplicated_coordinates(points)
+                        new_region.append(new_points)
+                    new_regions.append(new_region)
+                anno["points"] = new_regions
+            elif annotation["type"] == AnnotationType.polygon.value:
+                new_points = __remove_duplicated_coordinates(annotation["points"])
+                annotation["points"] = new_points
     return tasks
+
+def __remove_duplicated_coordinates(points: List[int]) -> List[int]:
+    """
+    Remove duplicated coordinates.
+    """
+    if len(points) == 0:
+        return []
+
+    new_points = []
+    for i in range(int(len(points) / 2)):
+        if i == 0:
+            new_points.append(points[i*2])
+            new_points.append(points[i*2 + 1])
+
+        if new_points[-2] == points[i*2] and new_points[-1] == points[i*2 + 1]:
+            continue
+
+        if len(new_points) <= 2:
+            new_points.append(points[i*2])
+            new_points.append(points[i*2 + 1])
+        else:
+            if new_points[-4] == new_points[-2] and new_points[-2] == points[i*2]:
+                new_points.pop()
+                new_points.pop()
+                new_points.append(points[i*2])
+                new_points.append(points[i*2 + 1])
+            elif new_points[-3] == new_points[-1] and new_points[-1] == points[i*2 + 1]:
+                new_points.pop()
+                new_points.pop()
+                new_points.append(points[i*2])
+                new_points.append(points[i*2 + 1])
+            else:
+                new_points.append(points[i*2])
+                new_points.append(points[i*2 + 1])
+    return new_points
 
 def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
     """
     Remove diagonal coordinates and return pixel outline coordinates.
     """
     if len(points) == 0:
-        return
+        return []
 
     new_points = []
     new_points.append(int(points[0]))
