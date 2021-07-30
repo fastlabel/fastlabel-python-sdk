@@ -1,6 +1,7 @@
 import os
 import glob
 import json
+from typing import List
 from logging import getLogger
 from PIL import Image, ImageDraw
 
@@ -615,7 +616,7 @@ class Client:
 
 
     # Instance / Semantic Segmetation
-    def export_instance_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "instance_segmentation"), pallete: list[int] = const.COLOR_PALETTE) -> None:
+    def export_instance_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "instance_segmentation"), pallete: List[int] = const.COLOR_PALETTE) -> None:
         """
         Convert tasks to index color instance segmentation (PNG files).
         Supports only bbox, polygon and segmentation annotation types. Hollowed points are not supported.
@@ -629,7 +630,7 @@ class Client:
         for task in tasks:
             self.__export_index_color_image(task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=True)
     
-    def export_semantic_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "semantic_segmentation"), pallete: list[int] = const.COLOR_PALETTE) -> None:
+    def export_semantic_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "semantic_segmentation"), pallete: List[int] = const.COLOR_PALETTE) -> None:
         """
         Convert tasks to index color semantic segmentation (PNG files).
         Supports only bbox, polygon and segmentation annotation types. Hollowed points are not supported.
@@ -650,7 +651,7 @@ class Client:
         for task in tasks:
             self.__export_index_color_image(task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=False, classes=classes)
 
-    def __export_index_color_image(self, task: list, output_dir: str, pallete: list[int], is_instance_segmentation: bool = True, classes: list = []) -> None:
+    def __export_index_color_image(self, task: list, output_dir: str, pallete: List[int], is_instance_segmentation: bool = True, classes: list = []) -> None:
         image = Image.new("RGB", (task["width"], task["height"]), 0)
         image = image.convert('P')
         image.putpalette(pallete)
@@ -680,7 +681,7 @@ class Client:
         os.makedirs(os.path.dirname(image_path), exist_ok=True)
         image.save(image_path)
 
-    def __get_pillow_draw_points(self, points: list[int]) -> list[int]:
+    def __get_pillow_draw_points(self, points: List[int]) -> List[int]:
         """
         Convert points to pillow draw points. Diagonal points are not supported.
         """
