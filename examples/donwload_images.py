@@ -7,7 +7,7 @@ from multiprocessing import Pool, cpu_count
 
 client = fastlabel.Client()
 IMAGE_DIR = "images"
-PROJECT_SLUG = "food-image-collection"
+PROJECT_SLUG = "YOUR_PROJECT_SLUG"
 
 def get_all_tasks() -> list:
     # Iterate pages until new tasks are empty.
