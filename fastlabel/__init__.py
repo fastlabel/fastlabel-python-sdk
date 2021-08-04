@@ -578,7 +578,9 @@ class Client:
                 for obj in anno["object"]:
                     f.write(obj)
                     f.write("\n")
-        with open(os.path.join(output_dir, "classes.txt"), 'w', encoding="utf8") as f:
+        classes_file_path = os.path.join(output_dir, "classes.txt")
+        os.makedirs(os.path.dirname(classes_file_path), exist_ok=True)
+        with open(classes_file_path, 'w', encoding="utf8") as f:
             for category in categories:
                 f.write(category["name"])
                 f.write("\n")
