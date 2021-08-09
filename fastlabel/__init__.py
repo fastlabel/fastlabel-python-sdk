@@ -111,6 +111,7 @@ class Client:
         self,
         project: str,
         status: str = None,
+        external_status: str = None,
         tags: list = [],
         task_name: str = None,
         offset: int = None,
@@ -121,7 +122,8 @@ class Client:
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         tags is a list of tag. (Optional)
         task_name is a task name. (Optional)
         offset is the starting position number to fetch. (Optional)
@@ -134,6 +136,8 @@ class Client:
         params = {"project": project}
         if status:
             params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
         if tags:
             params["tags"] = tags
         if task_name:
@@ -148,6 +152,7 @@ class Client:
         self,
         project: str,
         status: str = None,
+        external_status: str = None,
         tags: list = [],
         task_name: str = None,
         offset: int = None,
@@ -158,7 +163,8 @@ class Client:
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         tags is a list of tag. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
@@ -167,6 +173,8 @@ class Client:
         params = {"project": project}
         if status:
             params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
         if tags:
             params["tags"] = tags
         if task_name:
@@ -181,6 +189,7 @@ class Client:
         self,
         project: str,
         status: str = None,
+        external_status: str = None,
         tags: list = [],
         task_name: str = None,
         offset: int = None,
@@ -191,7 +200,8 @@ class Client:
         Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         tags is a list of tag. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
@@ -203,6 +213,8 @@ class Client:
         params = {"project": project}
         if status:
             params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
         if tags:
             params["tags"] = tags
         if task_name:
@@ -217,6 +229,7 @@ class Client:
         self,
         project: str,
         status: str = None,
+        external_status: str = None,
         tags: list = [],
         task_name: str = None,
         offset: int = None,
@@ -227,7 +240,8 @@ class Client:
         Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         tags is a list of tag. (Optional)
         task_name is a task name. (Optional)
         offset is the starting position number to fetch. (Optional)
@@ -240,6 +254,8 @@ class Client:
         params = {"project": project}
         if status:
             params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
         if tags:
             params["tags"] = tags
         if task_name:
@@ -254,6 +270,7 @@ class Client:
         self,
         project: str,
         status: str = None,
+        external_status: str = None,
         tags: list = [],
         task_name: str = None,
         offset: int = None,
@@ -264,7 +281,8 @@ class Client:
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         tags is a list of tag. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
@@ -273,6 +291,8 @@ class Client:
         params = {"project": project}
         if status:
             params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
         if tags:
             params["tags"] = tags
         if task_name:
@@ -319,6 +339,7 @@ class Client:
         name: str,
         file_path: str,
         status: str = None,
+        external_status: str = None,
         annotations: list = [],
         tags: list = [],
     ) -> str:
@@ -328,7 +349,8 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -340,6 +362,8 @@ class Client:
         payload = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
@@ -354,6 +378,7 @@ class Client:
         name: str,
         file_path: str,
         status: str = None,
+        external_status: str = None,
         attributes: list = [],
         tags: list = [],
     ) -> str:
@@ -363,7 +388,8 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -387,6 +413,7 @@ class Client:
         name: str,
         folder_path: str,
         status: str = None,
+        external_status: str = None,
         annotations: list = [],
         tags: list = [],
     ) -> str:
@@ -396,7 +423,8 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         folder_path is a path to data folder. Files should be under the folder. Nested folder structure is not supported. Supported extensions of files are png, jpg, jpeg. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -422,6 +450,8 @@ class Client:
         payload = {"project": project, "name": name, "contents": contents}
         if status:
             payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
         if annotations:
             payload["annotations"] = annotations
         if tags:
@@ -434,6 +464,7 @@ class Client:
         name: str,
         file_path: str,
         status: str = None,
+        external_status: str = None,
         annotations: list = [],
         tags: list = [],
     ) -> str:
@@ -443,7 +474,8 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -455,6 +487,8 @@ class Client:
         payload = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
@@ -469,19 +503,23 @@ class Client:
         self,
         task_id: str,
         status: str = None,
+        external_status: str = None,
         tags: list = [],
     ) -> str:
         """
         Update a single task.
 
         task_id is an id of the task. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         tags is a list of tag to be set. (Optional)
         """
         endpoint = "tasks/" + task_id
         payload = {}
         if status:
             payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
         if tags:
             payload["tags"] = tags
         return self.api.put_request(endpoint, payload=payload)
@@ -490,6 +528,7 @@ class Client:
         self,
         task_id: str,
         status: str = None,
+        external_status: str = None,
         attributes: list = [],
         tags: list = [],
     ) -> str:
@@ -497,7 +536,8 @@ class Client:
         Create a single image classification task.
 
         task_id is an id of the task. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -505,6 +545,8 @@ class Client:
         payload = {}
         if status:
             payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -515,6 +557,7 @@ class Client:
         self,
         task_id: str,
         status: str = None,
+        external_status: str = None,
         attributes: list = [],
         tags: list = [],
     ) -> str:
@@ -522,7 +565,8 @@ class Client:
         Create a single video classification task.
 
         task_id is an id of the task. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -530,6 +574,8 @@ class Client:
         payload = {}
         if status:
             payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -956,7 +1002,6 @@ class Client:
         slug: str,
         is_bitmap: bool = False,
         job_size: int = 10,
-        use_annotation_service: bool = False
     ) -> str:
         """
         Create a project.
@@ -966,7 +1011,6 @@ class Client:
         slug is slug of your project. (Required)
         is_bitmap is whether to be annotated by pixel. (Optional)
         job_size is the number of tasks the annotator gets at one time. (Optional)
-        use_annotation_service is whether to request FastLabel to provide annotation service or not. (Optional)
         """
         endpoint = "projects"
         payload = {
@@ -978,8 +1022,6 @@ class Client:
             payload["isBitmap"] = is_bitmap
         if job_size:
             payload["jobSize"] = job_size
-        if use_annotation_service:
-            payload["useAnnotationService"] = use_annotation_service
         return self.api.post_request(endpoint, payload=payload)
 
     def update_project(
