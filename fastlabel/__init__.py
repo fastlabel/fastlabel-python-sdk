@@ -92,6 +92,13 @@ class Client:
         endpoint = "tasks/video/" + task_id
         return self.api.get_request(endpoint)
 
+    def find_video_classification_task(self, task_id: str) -> dict:
+        """
+        Find a signle video classification task.
+        """
+        endpoint = "tasks/video/classification/" + task_id
+        return self.api.get_request(endpoint)
+
     def find_video_task_by_name(self, project: str, task_name: str) -> dict:
         """
         Find a signle video task by name.
@@ -401,6 +408,8 @@ class Client:
         payload = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -473,7 +482,7 @@ class Client:
 
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
-        file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
+        file_path is a path to data. Supported extensions are mp4. (Required)
         status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
         external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
@@ -493,6 +502,42 @@ class Client:
             for annotation in annotations:
                 annotation["content"] = name
             payload["annotations"] = annotations
+        if tags:
+            payload["tags"] = tags
+        return self.api.post_request(endpoint, payload=payload)
+
+    def create_video_classification_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        external_status: str = None,
+        attributes: list = [],
+        tags: list = [],
+    ) -> str:
+        """
+        Create a single video classification task.
+
+        project is slug of your project. (Required)
+        name is an unique identifier of task in your project. (Required)
+        file_path is a path to data. Supported extensions are mp4. (Required)
+        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        attributes is a list of attribute to be set in advance. (Optional)
+        tags is a list of tag to be set in advance. (Optional)
+        """
+        endpoint = "tasks/video/classification"
+        if not utils.is_video_supported_ext(file_path):
+            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
+        file = utils.base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if attributes:
+            payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
         return self.api.post_request(endpoint, payload=payload)

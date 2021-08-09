@@ -546,6 +546,32 @@ Supported following project types:
 
 - Video - Classification (Single)
 
+#### Create Task
+
+Create a new task.
+
+```python
+task_id = client.create_video_classification_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.mp4",
+    file_path="./sample.mp4",
+    attributes=[
+        {
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ],
+)
+```
+
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_video_classification_task(task_id="YOUR_TASK_ID")
+```
+
 #### Get Tasks
 
 Get tasks. (Up to 1000 tasks)
