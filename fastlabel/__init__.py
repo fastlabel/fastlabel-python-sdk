@@ -1045,7 +1045,7 @@ class Client:
         type: str,
         name: str,
         slug: str,
-        is_bitmap: bool = False,
+        is_pixel: bool = False,
         job_size: int = 10,
     ) -> str:
         """
@@ -1054,7 +1054,7 @@ class Client:
         type can be 'image_bbox', 'image_polygon', 'image_keypoint', 'image_line', 'image_segmentation', 'image_classification', 'image_all', 'multi_image_bbox', 'multi_image_polygon', 'multi_image_keypoint', 'multi_image_line', 'multi_image_segmentation', 'video_bbox', 'video_single_classification'. (Required)
         name is name of your project. (Required)
         slug is slug of your project. (Required)
-        is_bitmap is whether to be annotated by pixel. (Optional)
+        is_pixel is whether to annotate image with pixel level. (Optional)
         job_size is the number of tasks the annotator gets at one time. (Optional)
         """
         endpoint = "projects"
@@ -1063,8 +1063,8 @@ class Client:
             "name": name,
             "slug": slug,
         }
-        if is_bitmap:
-            payload["isBitmap"] = is_bitmap
+        if is_pixel:
+            payload["isPixel"] = is_pixel
         if job_size:
             payload["jobSize"] = job_size
         return self.api.post_request(endpoint, payload=payload)

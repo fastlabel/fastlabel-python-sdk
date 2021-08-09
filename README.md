@@ -839,7 +839,7 @@ Example of a project object
     "type": "image_bbox",
     "slug": "YOUR_PROJECT_SLUG",
     "name": "YOUR_PROJECT_NAME",
-    "isBitmap": False,
+    "isPixel": False,
     "jobSize": 10,
     "status": "active",
     "createdAt": "2021-04-20T03:20:41.427Z",
