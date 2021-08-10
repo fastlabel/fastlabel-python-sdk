@@ -130,7 +130,7 @@ tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 ```python
 tasks = client.get_image_tasks(
     project="YOUR_PROJECT_SLUG",
-    status="approved", # status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back', 'customer_approved'
+    status="approved", # status can be 'pending', 'registered', 'completed', 'skipped', 'sent_back', 'approved'
     tags=["tag1", "tag2"] # up to 10 tags
 )
 ```
@@ -169,10 +169,12 @@ Example of a single image task object
     "height": 100,  # image height
     "url": "YOUR_TASK_URL",
     "status": "registered",
+    "externalStatus": "registered",
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
-    "customerReviewer": "CUSTOMER_REVIEWER_NAME",
+    "externalAssignee": "EXTERNAL_ASSIGNEE_NAME",
+    "externalReviewer": "EXTERNAL_REVIEWER_NAME",
     "annotations": [
         {
             "attributes": [
@@ -265,10 +267,12 @@ Example of a single image classification task object
     "height": 100,  # image height
     "url": "YOUR_TASK_URL",
     "status": "registered",
+    "externalStatus": "registered",
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
-    "customerReviewer": "CUSTOMER_REVIEWER_NAME",
+    "externalAssignee": "EXTERNAL_ASSIGNEE_NAME",
+    "externalReviewer": "EXTERNAL_REVIEWER_NAME",
     "attributes": [
         {
             "key": "kind",
@@ -360,10 +364,12 @@ Example of a single task object
         }
     ],
     "status": "registered",
+    "externalStatus": "registered",
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
-    "customerReviewer": "CUSTOMER_REVIEWER_NAME",
+    "externalAssignee": "EXTERNAL_ASSIGNEE_NAME",
+    "externalReviewer": "EXTERNAL_REVIEWER_NAME",
     "annotations": [
         {
             "content": "content-name"
@@ -485,10 +491,12 @@ Example of a single image classification task object
     "duration": 16.0,   # total duration of video
     "url": "YOUR_TASK_URL",
     "status": "registered",
+    "externalStatus": "registered",
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
-    "customerReviewer": "CUSTOMER_REVIEWER_NAME",
+    "externalAssignee": "EXTERNAL_ASSIGNEE_NAME",
+    "externalReviewer": "EXTERNAL_REVIEWER_NAME",
     "annotations": [
         {
             "attributes": [],
@@ -537,6 +545,32 @@ Example of a single image classification task object
 Supported following project types:
 
 - Video - Classification (Single)
+
+#### Create Task
+
+Create a new task.
+
+```python
+task_id = client.create_video_classification_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.mp4",
+    file_path="./sample.mp4",
+    attributes=[
+        {
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ],
+)
+```
+
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_video_classification_task(task_id="YOUR_TASK_ID")
+```
 
 #### Get Tasks
 
@@ -805,9 +839,8 @@ Example of a project object
     "type": "image_bbox",
     "slug": "YOUR_PROJECT_SLUG",
     "name": "YOUR_PROJECT_NAME",
-    "isBitmap": False,
+    "isPixel": False,
     "jobSize": 10,
-    "useAnnotationService": False,
     "status": "active",
     "createdAt": "2021-04-20T03:20:41.427Z",
     "updatedAt": "2021-04-20T03:20:41.427Z",
