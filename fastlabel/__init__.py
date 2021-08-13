@@ -129,8 +129,8 @@ class Client:
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag. (Optional)
         task_name is a task name. (Optional)
         offset is the starting position number to fetch. (Optional)
@@ -170,8 +170,8 @@ class Client:
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
@@ -207,8 +207,8 @@ class Client:
         Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
@@ -247,8 +247,8 @@ class Client:
         Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag. (Optional)
         task_name is a task name. (Optional)
         offset is the starting position number to fetch. (Optional)
@@ -288,8 +288,8 @@ class Client:
         Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
 
         project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag. (Optional)
         offset is the starting position number to fetch. (Optional)
         limit is the max number to fetch. (Optional)
@@ -356,8 +356,8 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -395,8 +395,8 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -432,8 +432,8 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         folder_path is a path to data folder. Files should be under the folder. Nested folder structure is not supported. Supported extensions of files are png, jpg, jpeg. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -483,8 +483,8 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are mp4. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -522,8 +522,8 @@ class Client:
         project is slug of your project. (Required)
         name is an unique identifier of task in your project. (Required)
         file_path is a path to data. Supported extensions are mp4. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -555,8 +555,8 @@ class Client:
         Update a single task.
 
         task_id is an id of the task. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set. (Optional)
         """
         endpoint = "tasks/" + task_id
@@ -581,8 +581,8 @@ class Client:
         Create a single image classification task.
 
         task_id is an id of the task. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -610,8 +610,8 @@ class Client:
         Create a single video classification task.
 
         task_id is an id of the task. (Required)
-        status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'sent_back', 'approved', 'customer_sent_back'. (Optional)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
         """
@@ -1047,6 +1047,8 @@ class Client:
         slug: str,
         is_pixel: bool = False,
         job_size: int = 10,
+        workflow: str = "two_step",
+        external_workflow: str = "two_step",
     ) -> str:
         """
         Create a project.
@@ -1056,12 +1058,16 @@ class Client:
         slug is slug of your project. (Required)
         is_pixel is whether to annotate image with pixel level. (Optional)
         job_size is the number of tasks the annotator gets at one time. (Optional)
+        workflow is the type of annotation wokflow. workflow can be 'two_step' or 'three_step' (Optional)
+        external_workflow is the type of external annotation wokflow. external_workflow can be 'two_step' or 'three_step' (Optional)
         """
         endpoint = "projects"
         payload = {
             "type": type,
             "name": name,
             "slug": slug,
+            "workflow": workflow,
+            "externalWorkflow": external_workflow,
         }
         if is_pixel:
             payload["isPixel"] = is_pixel
@@ -1075,6 +1081,8 @@ class Client:
         name: str = None,
         slug: str = None,
         job_size: int = None,
+        workflow: str = None,
+        external_workflow: str = None,
     ) -> str:
         """
         Update a project.
@@ -1083,6 +1091,8 @@ class Client:
         name is name of your project. (Optional)
         slug is slug of your project. (Optional)
         job_size is the number of tasks the annotator gets at one time. (Optional)
+        workflow is the type of annotation wokflow. workflow can be 'two_step' or 'three_step' (Optional)
+        external_workflow is the type of external annotation wokflow. external_workflow can be 'two_step' or 'three_step' (Optional)
         """
         endpoint = "projects/" + project_id
         payload = {}
@@ -1092,6 +1102,10 @@ class Client:
             payload["slug"] = slug
         if job_size:
             payload["jobSize"] = job_size
+        if workflow:
+            payload["workflow"] = workflow
+        if external_workflow:
+            payload["externalWorkflow"] = external_workflow
         return self.api.put_request(endpoint, payload=payload)
 
     def delete_project(self, project_id: str) -> None:
