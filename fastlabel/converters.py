@@ -304,16 +304,16 @@ def to_pixel_coordinates(tasks: list) -> list:
 
     # Remove duplicate points
     for task in tasks:
-        for anno in task["annotations"]:
+        for annotation in task["annotations"]:
             if annotation["type"] == AnnotationType.segmentation.value:
                 new_regions = []
-                for region in anno["points"]:
+                for region in annotation["points"]:
                     new_region = []
                     for points in region:
                         new_points = __remove_duplicated_coordinates(points)
                         new_region.append(new_points)
                     new_regions.append(new_region)
-                anno["points"] = new_regions
+                annotation["points"] = new_regions
             elif annotation["type"] == AnnotationType.polygon.value:
                 new_points = __remove_duplicated_coordinates(annotation["points"])
                 annotation["points"] = new_points

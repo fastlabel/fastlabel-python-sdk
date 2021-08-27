@@ -756,11 +756,14 @@ class Client:
             color = index if is_instance_segmentation else classes.index(annotation["value"]) + 1
             if annotation["type"] == AnnotationType.segmentation.value:
                 for region in annotation["points"]:
+                    count = 0
                     for points in region:
                         cv_draw_points = self.__get_cv_draw_points(points)
-                        cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
-                        # hollowd points are not supported
-                        break
+                        if count == 0:
+                            cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
+                        else:
+                            cv2.fillPoly(image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
+                        count += 1
             elif annotation["type"] == AnnotationType.polygon.value:
                 cv_draw_points = self.__get_cv_draw_points(annotation["points"])
                 cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
