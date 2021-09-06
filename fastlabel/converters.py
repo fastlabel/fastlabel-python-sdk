@@ -4,6 +4,7 @@ from typing import List
 import copy
 import geojson
 import numpy as np
+import math
 from fastlabel.const import AnnotationType
 
 # COCO
@@ -274,9 +275,74 @@ def _truncate(n, decimals=0) -> float:
 
 
 def to_pascalvoc(tasks: list) -> list:
-    coco = to_coco(tasks)
-    pascalvoc = __coco2pascalvoc(coco)
+    pascalvoc = []
+    for task in tasks:
+        if task["height"] == 0 or task["width"] == 0:
+            continue
+
+        pascal_objs = []
+        data = [{"annotation": annotation}
+                for annotation in task["annotations"]]
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            results = executor.map(__get_pascalvoc_obj, data)
+
+        for result in results:
+            if not result:
+                continue
+            pascal_objs.append(result)
+
+        voc = {
+            "annotation": {
+                "filename": task["name"],
+                "size": {
+                    "width": task["width"],
+                    "height": task["height"],
+                    "depth": 3,
+                },
+                "segmented": 0,
+                "object": pascal_objs
+            }
+        }
+        pascalvoc.append(voc)
     return pascalvoc
+
+def __get_pascalvoc_obj(data: dict) -> dict:
+    annotation = data["annotation"]
+    points = annotation["points"]
+    annotation_type = annotation["type"]
+    if annotation_type != AnnotationType.bbox.value and annotation_type != AnnotationType.polygon.value:
+        return None
+    if not points or len(points) == 0:
+        return None
+    if annotation_type == AnnotationType.bbox.value and (int(points[0]) == int(points[2]) or int(points[1]) == int(points[3])):
+        return None
+    bbox = __to_bbox(points)
+    x = bbox[0]
+    y = bbox[1]
+    w = bbox[2]
+    h = bbox[3]
+
+    return {
+        "name": annotation["value"],
+        "pose": "Unspecified",
+                "truncated": __get_pascalvoc_tag_value(annotation, "truncated"),
+                "occluded": __get_pascalvoc_tag_value(annotation, "occluded"),
+                "difficult": __get_pascalvoc_tag_value(annotation, "difficult"),
+                "bndbox": {
+                    "xmin": math.floor(x),
+                    "ymin": math.floor(y),
+                    "xmax": math.floor(x + w),
+                    "ymax": math.floor(y + h),
+        },
+    }
+
+def __get_pascalvoc_tag_value(annotation: dict, target_tag_name: str) -> int:
+    attributes = annotation["attributes"]
+    if not attributes:
+        return 0
+    related_attr = next(
+        (attribute for attribute in attributes if attribute["type"] == "switch" and attribute["key"] == target_tag_name), None)
+    return int(related_attr["value"]) if related_attr else 0
 
 
 # labelme
@@ -455,58 +521,3 @@ def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
                 new_points.append(int(prev_x + int(xdiff / mindiff * (i + 1))))
                 new_points.append(int(prev_y + int(ydiff / mindiff * (i + 1))))
     return new_points
-
-def __coco2pascalvoc(coco: dict) -> list:
-    pascalvoc = []
-
-    for image in coco["images"]:
-
-        # Get objects
-        objs = []
-        for annotation in coco["annotations"]:
-            if image["id"] != annotation["image_id"]:
-                continue
-            category = _get_category_by_id(
-                coco["categories"], annotation["category_id"])
-
-            x = annotation["bbox"][0]
-            y = annotation["bbox"][1]
-            w = annotation["bbox"][2]
-            h = annotation["bbox"][3]
-
-            obj = {
-                "name": category["name"],
-                "pose": "Unspecified",
-                "truncated": 0,
-                "difficult": 0,
-                "bndbox": {
-                        "xmin": x,
-                        "ymin": y,
-                        "xmax": x + w,
-                        "ymax": y + h,
-                },
-            }
-            objs.append(obj)
-
-        # get annotation
-        voc = {
-            "annotation": {
-                "filename": image["file_name"],
-                "size": {
-                    "width": image["width"],
-                    "height": image["height"],
-                    "depth": 3,
-                },
-                "segmented": 0,
-                "object": objs
-            }
-        }
-        pascalvoc.append(voc)
-
-    return pascalvoc
-
-
-def _get_category_by_id(categories: list, id_: str) -> str:
-    category = [
-        category for category in categories if category["id"] == id_][0]
-    return category
