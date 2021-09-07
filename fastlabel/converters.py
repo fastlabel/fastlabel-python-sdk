@@ -146,13 +146,11 @@ def __calc_area(annotation_type: str, points: list) -> float:
 
 
 def to_yolo(tasks: list, classes: list) -> tuple:
-    yolo = ()
     if len(classes) == 0:
         coco = to_coco(tasks)
-        yolo = __coco2yolo(coco)
+        return __coco2yolo(coco)
     else:
-        yolo = __to_yolo(tasks, classes)
-    return yolo
+        return __to_yolo(tasks, classes)
 
 
 def __coco2yolo(coco: dict) -> tuple:

@@ -889,7 +889,15 @@ Get tasks and export as YOLO format files.
 
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
-client.export_yolo(tasks)
+client.export_yolo(tasks, output_dir="YOUR_DIRECTROY")
+```
+
+Get tasks and export as YOLO format files with classes.txt
+You can use fixed classes.txt and arrange order of each annotaiton file's order
+
+```python
+tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
+client.export_yolo(tasks=tasks, classes=classes, output_dir="YOUR_DIRECTROY")
 ```
 
 ### Pascal VOC
