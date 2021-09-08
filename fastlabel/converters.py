@@ -145,10 +145,12 @@ def __calc_area(annotation_type: str, points: list) -> float:
 # YOLO
 
 
-def to_yolo(tasks: list) -> tuple:
-    coco = to_coco(tasks)
-    yolo = __coco2yolo(coco)
-    return yolo
+def to_yolo(tasks: list, classes: list) -> tuple:
+    if len(classes) == 0:
+        coco = to_coco(tasks)
+        return __coco2yolo(coco)
+    else:
+        return __to_yolo(tasks, classes)
 
 
 def __coco2yolo(coco: dict) -> tuple:
@@ -197,6 +199,69 @@ def __coco2yolo(coco: dict) -> tuple:
         annos.append(anno)
 
     return annos, categories
+
+
+def __to_yolo(tasks: list, classes: list) -> tuple:
+    annos = []
+    for task in tasks:
+        if task["height"] == 0 or task["width"] == 0:
+            continue
+        objs = []
+        data = [{"annotation": annotation, "task": task, "classes": classes}
+                for annotation in task["annotations"]]
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            results = executor.map(__get_yolo_annotation, data)
+            for result in results:
+                if not result:
+                    continue
+                objs.append(" ".join(result))
+            anno = {
+                "filename": task["name"],
+                "object": objs
+            }
+            annos.append(anno)
+
+    categories = map(lambda val: {"name": val}, classes)
+
+    return annos, categories
+
+
+def __get_yolo_annotation(data: dict) -> dict:
+    annotation = data["annotation"]
+    points = annotation["points"]
+    annotation_type = annotation["type"]
+    value = annotation["value"]
+    classes = list(data["classes"])
+    task = data["task"]
+    if annotation_type != AnnotationType.bbox.value and annotation_type != AnnotationType.polygon.value:
+        return None
+    if not points or len(points) == 0:
+        return None
+    if annotation_type == AnnotationType.bbox.value and (int(points[0]) == int(points[2]) or int(points[1]) == int(points[3])):
+        return None
+    if not annotation["value"] in classes:
+        return None
+
+    dw = 1. / task["width"]
+    dh = 1. / task["height"]
+
+    bbox = __to_bbox(points)
+    xmin = bbox[0]
+    ymin = bbox[1]
+    xmax = bbox[0] + bbox[2]
+    ymax = bbox[1] + bbox[3]
+
+    x = (xmin + xmax) / 2
+    y = (ymin + ymax) / 2
+    w = xmax - xmin
+    h = ymax - ymin
+
+    x = str(_truncate(x * dw, 7))
+    y = str(_truncate(y * dh, 7))
+    w = str(_truncate(w * dw, 7))
+    h = str(_truncate(h * dh, 7))
+    category_index = str(classes.index(value))
+    return [category_index, x, y, w, h]
 
 
 def _truncate(n, decimals=0) -> float:

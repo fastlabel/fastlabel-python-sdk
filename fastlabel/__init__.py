@@ -651,14 +651,17 @@ class Client:
         with open(file_path, 'w') as f:
             json.dump(coco, f, indent=4, ensure_ascii=False)
 
-    def export_yolo(self, tasks: list, output_dir: str = os.path.join("output", "yolo")) -> None:
+    def export_yolo(self, tasks: list, classes: list = [], output_dir: str = os.path.join("output", "yolo")) -> None:
         """
         Convert tasks to YOLO format and export as files.
+        If you pass classes, classes.txt will be generated based on it .
+        If not , classes.txt will be generated based on passed tasks .(Annotations never used in your project will not be exported.)
 
         tasks is a list of tasks. (Required)
+        classes is a list of annotation values.  e.g. ['dog','bird'] (Optional)
         output_dir is output directory(default: output/yolo). (Optional)
         """
-        annos, categories = converters.to_yolo(tasks)
+        annos, categories = converters.to_yolo(tasks, classes)
         for anno in annos:
             file_name = anno["filename"]
             basename = utils.get_basename(file_name)
