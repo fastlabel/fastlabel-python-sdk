@@ -1,20 +1,20 @@
-import os
 import glob
 import json
-from typing import List
+import os
+import re
 from logging import getLogger
-from PIL import Image
+from typing import List
+
 import cv2
 import numpy as np
-
 import xmltodict
+from PIL import Image
 
-from .exceptions import FastLabelInvalidException
-from .api import Api
-from fastlabel import converters, utils, const
+from fastlabel import const, converters, utils
 from fastlabel.const import AnnotationType
-import pprint
-import re
+
+from .api import Api
+from .exceptions import FastLabelInvalidException
 
 
 logger = getLogger(__name__)
@@ -639,34 +639,53 @@ class Client:
         endpoint = "tasks/" + task_id
         self.api.delete_request(endpoint)
 
+    # Convert to Fastlabel
+
     def convert_coco_to_fastlabel(self, file_path: str) -> dict:
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             file = f.read()
             return converters.execute_coco_to_fastlabel(eval(file))
 
     def convert_labelme_to_fastlabel(self, folder_path: str) -> dict:
         results = {}
-        for file_path in glob.iglob(os.path.join(folder_path, "**/**.json"), recursive=True):
-            with open(file_path, 'r') as f:
-                c = converters.execute_labelme_to_fastlabel(json.load(f), file_path.replace(os.path.join(*[folder_path, ""]), ""))
+        for file_path in glob.iglob(
+            os.path.join(folder_path, "**/**.json"), recursive=True
+        ):
+            with open(file_path, "r") as f:
+                c = converters.execute_labelme_to_fastlabel(
+                    json.load(f),
+                    file_path.replace(os.path.join(*[folder_path, ""]), ""),
+                )
                 results[c[0]] = c[1]
         return results
-    
+
     def convert_pascalvoc_to_fastlabel(self, folder_path: str) -> dict:
         results = {}
-        for file_path in glob.iglob(os.path.join(folder_path, "**/**.xml"), recursive=True):
-            with open(file_path, 'r') as f:
+        for file_path in glob.iglob(
+            os.path.join(folder_path, "**/**.xml"), recursive=True
+        ):
+            with open(file_path, "r") as f:
                 file = f.read()
-                c = converters.execute_pascalvoc_to_fastlabel(xmltodict.parse(file), file_path.replace(os.path.join(*[folder_path, ""]), ""))
+                c = converters.execute_pascalvoc_to_fastlabel(
+                    xmltodict.parse(file),
+                    file_path.replace(os.path.join(*[folder_path, ""]), ""),
+                )
                 results[c[0]] = c[1]
         return results
-    
-    def convert_yolo_to_fastlabel(self, classes_file_path: str, dataset_folder_path: str) -> dict:        
+
+    def convert_yolo_to_fastlabel(
+        self, classes_file_path: str, dataset_folder_path: str
+    ) -> dict:
         classes = self._get_yolo_format_classes(classes_file_path)
         image_sizes = self._get_yolo_image_sizes(dataset_folder_path)
         yolo_annotations = self._get_yolo_format_annotations(dataset_folder_path)
-        
-        return converters.execute_yolo_to_fastlabel(classes, image_sizes, yolo_annotations, os.path.join(*[dataset_folder_path, ""]))
+
+        return converters.execute_yolo_to_fastlabel(
+            classes,
+            image_sizes,
+            yolo_annotations,
+            os.path.join(*[dataset_folder_path, ""]),
+        )
 
     def _get_yolo_format_classes(self, classes_file_path: str) -> dict:
         """
@@ -677,7 +696,7 @@ class Client:
         }
         """
         classes = {}
-        with open(classes_file_path, 'r') as f:
+        with open(classes_file_path, "r") as f:
             lines = f.readlines()
             line_index = 0
             for line in lines:
@@ -696,45 +715,59 @@ class Client:
         }
         """
         image_types = ["jpg", "jpeg", "png"]
-        image_paths = [p for p in glob.glob(os.path.join(dataset_folder_path, "**/*"), recursive=True) if re.search('/*\.({})'.format("|".join(image_types)), str(p))]
+        image_paths = [
+            p for p in glob.glob(os.path.join(dataset_folder_path, "**/*"), recursive=True)
+            if re.search("/*\.({})".format("|".join(image_types)), str(p))
+        ]
         image_sizes = {}
         for image_path in image_paths:
             image = Image.open(image_path)
             width, height = image.size
-            image_sizes[image_path.replace(os.path.splitext(image_path)[1], "")] = {"image_file_path":image_path, "size": [width, height]}
-            
+            image_sizes[image_path.replace(os.path.splitext(image_path)[1], "")] = {
+                "image_file_path": image_path,
+                "size": [width, height],
+            }
+
         return image_sizes
 
     def _get_yolo_format_annotations(self, dataset_folder_path: str) -> dict:
         """
         return data format
         {
-            annotaion_file_path_without_ext: 
+            annotaion_file_path_without_ext:
                 [
-                    yolo_class_id, 
-                    yolo_center_x_ratio, 
-                    yolo_center_y_ratio, 
-                    yolo_anno_width_ratio, 
-                    yolo_anno_height_ratio 
+                    yolo_class_id,
+                    yolo_center_x_ratio,
+                    yolo_center_y_ratio,
+                    yolo_anno_width_ratio,
+                    yolo_anno_height_ratio
                 ],
             ...
         }
         """
         yolo_annotations = {}
-        annotaion_file_paths = [p for p in glob.glob(os.path.join(dataset_folder_path, "**/*.txt"), recursive=True) if re.search(('/*\.txt'), str(p))]
+        annotaion_file_paths = [
+            p for p in glob.glob(os.path.join(dataset_folder_path, "**/*.txt"), recursive=True)
+            if re.search(("/*\.txt"), str(p))
+        ]
         for annotaion_file_path in annotaion_file_paths:
-            with open(annotaion_file_path, 'r') as f:
+            with open(annotaion_file_path, "r") as f:
                 anno_lines = f.readlines()
                 annotaion_key = annotaion_file_path.replace(".txt", "")
                 yolo_annotations[annotaion_key] = []
                 for anno_line in anno_lines:
-                    yolo_annotations[annotaion_key].append(anno_line.strip().split(' '))
+                    yolo_annotations[annotaion_key].append(anno_line.strip().split(" "))
         return yolo_annotations
 
     def get_image_path(self, image_folder_path) -> dict:
         image_types = ["jpg", "jpeg", "png"]
-        image_paths = [p for p in glob.glob(os.path.join(image_folder_path, "**/*"), recursive=True) if re.search('/*\.({})'.format("|".join(image_types)), str(p))]
-        results = {image_path.replace(os.path.join(*[image_folder_path, ""]), ""): image_path for image_path in image_paths}
+        image_paths = [
+            p for p in glob.glob(os.path.join(image_folder_path, "**/*"), recursive=True)
+            if re.search("/*\.({})".format("|".join(image_types)), str(p))
+        ]
+        results = {
+            image_path.replace(os.path.join(*[image_folder_path, ""]), ""): image_path for image_path in image_paths
+        }
 
         return results
 

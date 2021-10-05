@@ -22,6 +22,8 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [Pascal VOC](#pascal-voc)
   - [labelme](#labelme)
   - [Segmentation](#segmentation)
+- [Converter (to FastLabel format)](#Converter-to-FastLabel-format)
+
 
 ## Installation
 
@@ -939,6 +941,142 @@ client.export_instance_segmentation(tasks)
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 client.export_semantic_segmentation(tasks)
 ```
+
+
+## Converter to FastLabel format
+
+#### Response
+Example of a converted annotations
+```python
+{
+  'sample.jpg':  [
+    {
+      'points': [
+        100,
+        100,
+        200,
+        200
+      ],
+      'type': 'bbox',
+      'value': 'cat'
+    }
+  ],
+  'sample2.jpg':  [
+    {
+      'points': [
+        100,
+        100,
+        200,
+        200
+      ],
+      'type': 'bbox',
+      'value': 'cat'
+    }
+  ]
+}
+```
+
+### COCO
+
+Supported bbox or polygon annotation type.
+
+Convert annotation file of [COCO format](https://cocodataset.org/#format-data) as a Fastlabel format and create task.  
+
+file_path: COCO annotation json file path
+
+```python
+annotations_map = client.convert_coco_to_fastlabel(file_path="./sample.json")
+task_id = client.create_image_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.jpg",
+    file_path="./sample.jpg",
+    annotations=annotations_map["sample.jpg"]
+)
+```
+
+Example of converting annotations to create multiple tasks.
+```python
+annotations_map = client.convert_yolo_to_fastlabel(file_path="./sample.json")
+image_paths = client.get_image_path(image_folder_path="./dataset/")
+for image_path in image_paths:
+    time.sleep(1)
+
+    project = "YOUR_PROJECT_SLUG"
+    name = image_path
+    file_path = image_paths.get(image_path)
+    annotations = annotations_map.get(image_path) if annotations_map.get(image_path) is not None else []
+    task_id = client.create_image_task(
+        project=project,
+        name=name,
+        file_path=file_path,
+        annotations=annotations
+    )
+```
+
+### YOLO
+
+Supported bbox annotation type.
+
+Convert annotation file of YOLO format as a Fastlabel format and create task.
+
+classes_file_path: YOLO classes text file path  
+dataset_folder_path: Folder path containing YOLO Images and annotation  
+
+```python
+annotations_map = client.convert_yolo_to_fastlabel(
+    classes_file_path="./classese.txt",
+    dataset_folder_path="./dataset/"
+)
+task_id = client.create_image_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.jpg",
+    file_path="./sample.jpg",
+    annotations=annotations_map["sample.jpg"]
+)
+```
+
+### Pascal VOC
+
+Supported bbox annotation type.
+
+Convert annotation file of Pascal VOC format as a Fastlabel format and create task.
+
+folder_path: Folder path including pascal VOC format annotation files
+
+```python
+annotations_map = client.convert_pascalvoc_to_fastlabel(folder_path="./dataset/")
+task_id = client.create_image_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.jpg",
+    file_path="./sample.jpg",
+    annotations=annotations_map["sample.jpg"]
+)
+```
+
+### labelme
+
+support the following annotation types.
+- bbox
+- polygon
+- points
+- line
+
+Convert annotation file of labelme format as a Fastlabel format and create task.
+
+folder_path: Folder path including labelme format annotation files
+
+```python
+annotations_map = client.convert_labelme_to_fastlabel(folder_path="./dataset/")
+task_id = client.create_image_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.jpg",
+    file_path="./sample.jpg",
+    annotations=annotations_map["sample.jpg"]
+)
+```
+
+
+
 
 > Please check const.COLOR_PALLETE for index colors.
 
