@@ -21,3 +21,6 @@ def get_basename(file_path: str) -> str:
           path/to/file.jpg -> path/to/file
     """
     return os.path.splitext(file_path)[0]
+
+def get_supported_image_ext() -> list:
+    return ["jpg", "jpeg", "png"]

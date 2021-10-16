@@ -642,11 +642,21 @@ class Client:
     # Convert to Fastlabel
 
     def convert_coco_to_fastlabel(self, file_path: str) -> dict:
+        """
+        Convert COCO format to FastLabel format as annotation file.
+
+        file_path is a COCO format annotation file. (Required)
+        """
         with open(file_path, "r") as f:
             file = f.read()
             return converters.execute_coco_to_fastlabel(eval(file))
 
     def convert_labelme_to_fastlabel(self, folder_path: str) -> dict:
+        """
+        Convert labelme format to FastLabel format as annotation files.
+
+        folder_path is the folder that contains the labelme format files with the json extension. (Required)
+        """
         results = {}
         for file_path in glob.iglob(
             os.path.join(folder_path, "**/**.json"), recursive=True
@@ -660,6 +670,11 @@ class Client:
         return results
 
     def convert_pascalvoc_to_fastlabel(self, folder_path: str) -> dict:
+        """
+        Convert PascalVOC format to FastLabel format as annotation files.
+
+        folder_path is the folder that contains the PascalVOC format files with the xml extension. (Required)
+        """
         results = {}
         for file_path in glob.iglob(
             os.path.join(folder_path, "**/**.xml"), recursive=True
@@ -676,9 +691,15 @@ class Client:
     def convert_yolo_to_fastlabel(
         self, classes_file_path: str, dataset_folder_path: str
     ) -> dict:
-        classes = self._get_yolo_format_classes(classes_file_path)
-        image_sizes = self._get_yolo_image_sizes(dataset_folder_path)
-        yolo_annotations = self._get_yolo_format_annotations(dataset_folder_path)
+        """
+        Convert YOLO format to FastLabel format as annotation files.
+
+        classes_file_path is YOLO format class file. (Required)
+        dataset_folder_path is the folder that contains the image file and YOLO format files with the txt extension. (Required)
+        """
+        classes = self.__get_yolo_format_classes(classes_file_path)
+        image_sizes = self.__get_yolo_image_sizes(dataset_folder_path)
+        yolo_annotations = self.__get_yolo_format_annotations(dataset_folder_path)
 
         return converters.execute_yolo_to_fastlabel(
             classes,
@@ -687,7 +708,7 @@ class Client:
             os.path.join(*[dataset_folder_path, ""]),
         )
 
-    def _get_yolo_format_classes(self, classes_file_path: str) -> dict:
+    def __get_yolo_format_classes(self, classes_file_path: str) -> dict:
         """
         return data format
         {
@@ -704,7 +725,7 @@ class Client:
                 line_index += 1
         return classes
 
-    def _get_yolo_image_sizes(self, dataset_folder_path: str) -> dict:
+    def __get_yolo_image_sizes(self, dataset_folder_path: str) -> dict:
         """
         return data format
         {
@@ -714,7 +735,7 @@ class Client:
             ...
         }
         """
-        image_types = ["jpg", "jpeg", "png"]
+        image_types = utils.get_supported_image_ext()
         image_paths = [
             p for p in glob.glob(os.path.join(dataset_folder_path, "**/*"), recursive=True)
             if re.search("/*\.({})".format("|".join(image_types)), str(p))
@@ -730,7 +751,7 @@ class Client:
 
         return image_sizes
 
-    def _get_yolo_format_annotations(self, dataset_folder_path: str) -> dict:
+    def __get_yolo_format_annotations(self, dataset_folder_path: str) -> dict:
         """
         return data format
         {
@@ -759,17 +780,6 @@ class Client:
                     yolo_annotations[annotaion_key].append(anno_line.strip().split(" "))
         return yolo_annotations
 
-    def get_image_path(self, image_folder_path) -> dict:
-        image_types = ["jpg", "jpeg", "png"]
-        image_paths = [
-            p for p in glob.glob(os.path.join(image_folder_path, "**/*"), recursive=True)
-            if re.search("/*\.({})".format("|".join(image_types)), str(p))
-        ]
-        results = {
-            image_path.replace(os.path.join(*[image_folder_path, ""]), ""): image_path for image_path in image_paths
-        }
-
-        return results
 
     # Task Convert
 
