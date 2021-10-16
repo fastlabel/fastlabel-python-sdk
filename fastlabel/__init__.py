@@ -647,6 +647,8 @@ class Client:
 
         file_path is a COCO format annotation file. (Required)
 
+        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
+        
         output format example.
         {
             'sample1.jpg':  [
@@ -684,6 +686,9 @@ class Client:
         Convert labelme format to FastLabel format as annotation files.
 
         folder_path is the folder that contains the labelme format files with the json extension. (Required)
+
+        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
+        If the tree has multiple hierarchies, the key is the relative path rooted at the specified folder name.
 
         output format example.
         In the case of labelme, the key is the tree structure if the tree structure is multi-level.
@@ -741,6 +746,9 @@ class Client:
         Convert PascalVOC format to FastLabel format as annotation files.
 
         folder_path is the folder that contains the PascalVOC format files with the xml extension. (Required)
+
+        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
+        If the tree has multiple hierarchies, the key is the relative path rooted at the specified folder name.
 
         output format example.
         In the case of PascalVOC, the key is the tree structure if the tree structure is multi-level.
@@ -802,6 +810,9 @@ class Client:
 
         classes_file_path is YOLO format class file. (Required)
         dataset_folder_path is the folder that contains the image file and YOLO format files with the txt extension. (Required)
+        
+        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
+        If the tree has multiple hierarchies, the key is the relative path rooted at the specified folder name.
 
         output format example.
         In the case of YOLO, the key is the tree structure if the tree structure is multi-level.
