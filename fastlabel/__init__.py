@@ -646,6 +646,34 @@ class Client:
         Convert COCO format to FastLabel format as annotation file.
 
         file_path is a COCO format annotation file. (Required)
+
+        output format example.
+        {
+            'sample1.jpg':  [
+                {
+                'points': [
+                    100,
+                    100,
+                    200,
+                    200
+                ],
+                'type': 'bbox',
+                'value': 'cat'
+                }
+            ],
+            'sample2.jpg':  [
+                {
+                'points': [
+                    100,
+                    100,
+                    200,
+                    200
+                ],
+                'type': 'bbox',
+                'value': 'cat'
+                }
+            ]
+        }
         """
         with open(file_path, "r") as f:
             file = f.read()
@@ -656,6 +684,45 @@ class Client:
         Convert labelme format to FastLabel format as annotation files.
 
         folder_path is the folder that contains the labelme format files with the json extension. (Required)
+
+        output format example.
+        In the case of labelme, the key is the tree structure if the tree structure is multi-level.
+        
+        [tree structure]
+        dataset
+        ├── sample1.jpg
+        ├── sample1.json
+        └── sample_dir
+            ├── sample2.jpg
+            └── sample2.json
+
+        [output]
+        {
+            'sample1.jpg':  [
+                {
+                'points': [
+                    100,
+                    100,
+                    200,
+                    200
+                ],
+                'type': 'bbox',
+                'value': 'cat'
+                }
+            ],
+            'sample_dir/sample2.jpg':  [
+                {
+                'points': [
+                    100,
+                    100,
+                    200,
+                    200
+                ],
+                'type': 'bbox',
+                'value': 'cat'
+                }
+            ]
+        }
         """
         results = {}
         for file_path in glob.iglob(
@@ -674,6 +741,45 @@ class Client:
         Convert PascalVOC format to FastLabel format as annotation files.
 
         folder_path is the folder that contains the PascalVOC format files with the xml extension. (Required)
+
+        output format example.
+        In the case of PascalVOC, the key is the tree structure if the tree structure is multi-level.
+
+        [tree structure]
+        dataset
+        ├── sample1.jpg
+        ├── sample1.xml
+        └── sample_dir
+            ├── sample2.jpg
+            └── sample2.xml
+
+        [output]
+        {
+            'sample1.jpg':  [
+                {
+                'points': [
+                    100,
+                    100,
+                    200,
+                    200
+                ],
+                'type': 'bbox',
+                'value': 'cat'
+                }
+            ],
+            'sample_dir/sample2.jpg':  [
+                {
+                'points': [
+                    100,
+                    100,
+                    200,
+                    200
+                ],
+                'type': 'bbox',
+                'value': 'cat'
+                }
+            ]
+        }
         """
         results = {}
         for file_path in glob.iglob(
@@ -696,6 +802,45 @@ class Client:
 
         classes_file_path is YOLO format class file. (Required)
         dataset_folder_path is the folder that contains the image file and YOLO format files with the txt extension. (Required)
+
+        output format example.
+        In the case of YOLO, the key is the tree structure if the tree structure is multi-level.
+
+        [tree structure]
+        dataset
+        ├── sample1.jpg
+        ├── sample1.txt
+        └── sample_dir
+            ├── sample2.jpg
+            └── sample2.txt
+
+        [output]
+        {
+            'sample1.jpg':  [
+                {
+                'points': [
+                    100,
+                    100,
+                    200,
+                    200
+                ],
+                'type': 'bbox',
+                'value': 'cat'
+                }
+            ],
+            'sample_dir/sample2.jpg':  [
+                {
+                'points': [
+                    100,
+                    100,
+                    200,
+                    200
+                ],
+                'type': 'bbox',
+                'value': 'cat'
+                }
+            ]
+        }
         """
         classes = self.__get_yolo_format_classes(classes_file_path)
         image_sizes = self.__get_yolo_image_sizes(dataset_folder_path)
