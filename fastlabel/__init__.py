@@ -529,7 +529,8 @@ class Client:
         """
         endpoint = "tasks/video/classification"
         if not utils.is_video_supported_ext(file_path):
-            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
+            raise FastLabelInvalidException(
+                "Supported extensions are mp4.", 422)
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
         if status:
@@ -651,14 +652,17 @@ class Client:
         with open(file_path, 'w') as f:
             json.dump(coco, f, indent=4, ensure_ascii=False)
 
-    def export_yolo(self, tasks: list, output_dir: str = os.path.join("output", "yolo")) -> None:
+    def export_yolo(self, tasks: list, classes: list = [], output_dir: str = os.path.join("output", "yolo")) -> None:
         """
         Convert tasks to YOLO format and export as files.
+        If you pass classes, classes.txt will be generated based on it .
+        If not , classes.txt will be generated based on passed tasks .(Annotations never used in your project will not be exported.)
 
         tasks is a list of tasks. (Required)
+        classes is a list of annotation values.  e.g. ['dog','bird'] (Optional)
         output_dir is output directory(default: output/yolo). (Optional)
         """
-        annos, categories = converters.to_yolo(tasks)
+        annos, categories = converters.to_yolo(tasks, classes)
         for anno in annos:
             file_name = anno["filename"]
             basename = utils.get_basename(file_name)
@@ -709,12 +713,12 @@ class Client:
             with open(file_path, 'w') as f:
                 json.dump(labelme, f, indent=4, ensure_ascii=False)
 
-
     # Instance / Semantic Segmetation
+
     def export_instance_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "instance_segmentation"), pallete: List[int] = const.COLOR_PALETTE) -> None:
         """
         Convert tasks to index color instance segmentation (PNG files).
-        Supports only bbox, polygon and segmentation annotation types. Hollowed points are not supported.
+        Supports only bbox, polygon and segmentation annotation types.
         Supports up to 57 instances in default colors palette. Check const.COLOR_PALETTE for more details.
 
         tasks is a list of tasks. (Required)
@@ -723,12 +727,13 @@ class Client:
         """
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
-            self.__export_index_color_image(task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=True)
-    
+            self.__export_index_color_image(
+                task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=True)
+
     def export_semantic_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "semantic_segmentation"), pallete: List[int] = const.COLOR_PALETTE) -> None:
         """
         Convert tasks to index color semantic segmentation (PNG files).
-        Supports only bbox, polygon and segmentation annotation types. Hollowed points are not supported.
+        Supports only bbox, polygon and segmentation annotation types.
         Check const.COLOR_PALETTE for color pallete.
 
         tasks is a list of tasks. (Required)
@@ -744,7 +749,8 @@ class Client:
 
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
-            self.__export_index_color_image(task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=False, classes=classes)
+            self.__export_index_color_image(
+                task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=False, classes=classes)
 
     def __export_index_color_image(self, task: list, output_dir: str, pallete: List[int], is_instance_segmentation: bool = True, classes: list = []) -> None:
         image = Image.new("RGB", (task["width"], task["height"]), 0)
@@ -753,28 +759,39 @@ class Client:
 
         index = 1
         for annotation in task["annotations"]:
-            color = index if is_instance_segmentation else classes.index(annotation["value"]) + 1
+            color = index if is_instance_segmentation else classes.index(
+                annotation["value"]) + 1
             if annotation["type"] == AnnotationType.segmentation.value:
                 for region in annotation["points"]:
                     count = 0
                     for points in region:
-                        cv_draw_points = self.__get_cv_draw_points(points)
                         if count == 0:
-                            cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
+                            cv_draw_points = self.__get_cv_draw_points(points)
+                            cv2.fillPoly(
+                                image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
                         else:
-                            cv2.fillPoly(image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
+                            # Reverse hollow points for opencv because this points are counter clockwise
+                            cv_draw_points = self.__get_cv_draw_points(
+                                utils.reverse_points(points))
+                            cv2.fillPoly(
+                                image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
                         count += 1
             elif annotation["type"] == AnnotationType.polygon.value:
-                cv_draw_points = self.__get_cv_draw_points(annotation["points"])
-                cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
+                cv_draw_points = self.__get_cv_draw_points(
+                    annotation["points"])
+                cv2.fillPoly(image, [cv_draw_points], color,
+                             lineType=cv2.LINE_8, shift=0)
             elif annotation["type"] == AnnotationType.bbox.value:
-                cv_draw_points = self.__get_cv_draw_points(annotation["points"])
-                cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
+                cv_draw_points = self.__get_cv_draw_points(
+                    annotation["points"])
+                cv2.fillPoly(image, [cv_draw_points], color,
+                             lineType=cv2.LINE_8, shift=0)
             else:
                 continue
             index += 1
 
-        image_path = os.path.join(output_dir, utils.get_basename(task["name"]) + ".png")
+        image_path = os.path.join(
+            output_dir, utils.get_basename(task["name"]) + ".png")
         os.makedirs(os.path.dirname(image_path), exist_ok=True)
         image = Image.fromarray(image)
         image = image.convert('P')
@@ -822,7 +839,6 @@ class Client:
         for i in range(int(len(new_points) / 2)):
             cv_points.append((new_points[i * 2], new_points[i * 2 + 1]))
         return np.array(cv_points)
-
 
     # Annotation
 
