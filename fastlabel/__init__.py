@@ -385,7 +385,7 @@ class Client:
         if tags:
             payload["tags"] = tags
 
-        self._fill_assign_users(payload, **kwargs)
+        self.__fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
 
@@ -432,7 +432,7 @@ class Client:
         if tags:
             payload["tags"] = tags
 
-        self._fill_assign_users(payload, **kwargs)
+        self.__fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
 
@@ -493,7 +493,7 @@ class Client:
         if tags:
             payload["tags"] = tags
 
-        self._fill_assign_users(payload, **kwargs)
+        self.__fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
 
@@ -542,7 +542,7 @@ class Client:
         if tags:
             payload["tags"] = tags
 
-        self._fill_assign_users(payload, **kwargs)
+        self.__fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
 
@@ -589,7 +589,7 @@ class Client:
         if tags:
             payload["tags"] = tags
 
-        self._fill_assign_users(payload, **kwargs)
+        self.__fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
 
@@ -626,7 +626,7 @@ class Client:
         if tags:
             payload["tags"] = tags
 
-        self._fill_assign_users(payload, **kwargs)
+        self.__fill_assign_users(payload, **kwargs)
 
         return self.api.put_request(endpoint, payload=payload)
 
@@ -665,7 +665,7 @@ class Client:
         if tags:
             payload["tags"] = tags
 
-        self._fill_assign_users(payload, **kwargs)
+        self.__fill_assign_users(payload, **kwargs)
 
         return self.api.put_request(endpoint, payload=payload)
 
@@ -704,7 +704,7 @@ class Client:
         if tags:
             payload["tags"] = tags
 
-        self._fill_assign_users(payload, **kwargs)
+        self.__fill_assign_users(payload, **kwargs)
 
         return self.api.put_request(endpoint, payload=payload)
 
@@ -1215,7 +1215,7 @@ class Client:
         self.api.delete_request(endpoint)
 
     @staticmethod
-    def _fill_assign_users(payload: dict, **kwargs):
+    def __fill_assign_users(payload: dict, **kwargs):
         if "assignee" in kwargs:
             payload["assignee"] = kwargs.get("assignee")
         if "reviewer" in kwargs:
