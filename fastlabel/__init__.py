@@ -349,12 +349,7 @@ class Client:
         external_status: str = None,
         annotations: list = [],
         tags: list = [],
-        assignee: str = None,
-        reviewer: str = None,
-        approver: str = None,
-        external_assignee: str = None,
-        external_reviewer: str = None,
-        external_approver: str = None,
+        **kwargs
     ) -> str:
         """
         Create a single image task.
@@ -389,18 +384,8 @@ class Client:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
-        if assignee:
-            payload["assignee"] = assignee
-        if reviewer:
-            payload["reviewer"] = reviewer
-        if approver:
-            payload["approver"] = approver
-        if external_assignee:
-            payload["externalAssignee"] = external_assignee
-        if external_reviewer:
-            payload["externalReviewer"] = external_reviewer
-        if external_approver:
-            payload["externalApprover"] = external_approver
+
+        self._fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
 
@@ -413,12 +398,7 @@ class Client:
         external_status: str = None,
         attributes: list = [],
         tags: list = [],
-        assignee: str = None,
-        reviewer: str = None,
-        approver: str = None,
-        external_assignee: str = None,
-        external_reviewer: str = None,
-        external_approver: str = None,
+        **kwargs,
     ) -> str:
         """
         Create a single image classification task.
@@ -451,18 +431,8 @@ class Client:
             payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
-        if assignee:
-            payload["assignee"] = assignee
-        if reviewer:
-            payload["reviewer"] = reviewer
-        if approver:
-            payload["approver"] = approver
-        if external_assignee:
-            payload["externalAssignee"] = external_assignee
-        if external_reviewer:
-            payload["externalReviewer"] = external_reviewer
-        if external_approver:
-            payload["externalApprover"] = external_approver
+
+        self._fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
 
@@ -475,12 +445,7 @@ class Client:
         external_status: str = None,
         annotations: list = [],
         tags: list = [],
-        assignee: str = None,
-        reviewer: str = None,
-        approver: str = None,
-        external_assignee: str = None,
-        external_reviewer: str = None,
-        external_approver: str = None,
+        **kwargs,
     ) -> str:
         """
         Create a single multi image task.
@@ -527,18 +492,8 @@ class Client:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
-        if assignee:
-            payload["assignee"] = assignee
-        if reviewer:
-            payload["reviewer"] = reviewer
-        if approver:
-            payload["approver"] = approver
-        if external_assignee:
-            payload["externalAssignee"] = external_assignee
-        if external_reviewer:
-            payload["externalReviewer"] = external_reviewer
-        if external_approver:
-            payload["externalApprover"] = external_approver
+
+        self._fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
 
@@ -551,12 +506,7 @@ class Client:
         external_status: str = None,
         annotations: list = [],
         tags: list = [],
-        assignee: str = None,
-        reviewer: str = None,
-        approver: str = None,
-        external_assignee: str = None,
-        external_reviewer: str = None,
-        external_approver: str = None,
+        **kwargs,
     ) -> str:
         """
         Create a single video task.
@@ -591,18 +541,8 @@ class Client:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
-        if assignee:
-            payload["assignee"] = assignee
-        if reviewer:
-            payload["reviewer"] = reviewer
-        if approver:
-            payload["approver"] = approver
-        if external_assignee:
-            payload["externalAssignee"] = external_assignee
-        if external_reviewer:
-            payload["externalReviewer"] = external_reviewer
-        if external_approver:
-            payload["externalApprover"] = external_approver
+
+        self._fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
 
@@ -615,12 +555,7 @@ class Client:
         external_status: str = None,
         attributes: list = [],
         tags: list = [],
-        assignee: str = None,
-        reviewer: str = None,
-        approver: str = None,
-        external_assignee: str = None,
-        external_reviewer: str = None,
-        external_approver: str = None,
+        **kwargs,
     ) -> str:
         """
         Create a single video classification task.
@@ -652,18 +587,8 @@ class Client:
             payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
-        if assignee:
-            payload["assignee"] = assignee
-        if reviewer:
-            payload["reviewer"] = reviewer
-        if approver:
-            payload["approver"] = approver
-        if external_assignee:
-            payload["externalAssignee"] = external_assignee
-        if external_reviewer:
-            payload["externalReviewer"] = external_reviewer
-        if external_approver:
-            payload["externalApprover"] = external_approver
+
+        self._fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
 
@@ -675,12 +600,7 @@ class Client:
         status: str = None,
         external_status: str = None,
         tags: list = [],
-        assignee: str = None,
-        reviewer: str = None,
-        approver: str = None,
-        external_assignee: str = None,
-        external_reviewer: str = None,
-        external_approver: str = None,
+        **kwargs,
     ) -> str:
         """
         Update a single task.
@@ -704,18 +624,8 @@ class Client:
             payload["externalStatus"] = external_status
         if tags:
             payload["tags"] = tags
-        if assignee:
-            payload["assignee"] = assignee
-        if reviewer:
-            payload["reviewer"] = reviewer
-        if approver:
-            payload["approver"] = approver
-        if external_assignee:
-            payload["externalAssignee"] = external_assignee
-        if external_reviewer:
-            payload["externalReviewer"] = external_reviewer
-        if external_approver:
-            payload["externalApprover"] = external_approver
+
+        self._fill_assign_users(payload, **kwargs)
 
         return self.api.put_request(endpoint, payload=payload)
 
@@ -726,12 +636,7 @@ class Client:
         external_status: str = None,
         attributes: list = [],
         tags: list = [],
-        assignee: str = None,
-        reviewer: str = None,
-        approver: str = None,
-        external_assignee: str = None,
-        external_reviewer: str = None,
-        external_approver: str = None,
+        **kwargs,
     ) -> str:
         """
         Create a single image classification task.
@@ -758,18 +663,8 @@ class Client:
             payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
-        if assignee:
-            payload["assignee"] = assignee
-        if reviewer:
-            payload["reviewer"] = reviewer
-        if approver:
-            payload["approver"] = approver
-        if external_assignee:
-            payload["externalAssignee"] = external_assignee
-        if external_reviewer:
-            payload["externalReviewer"] = external_reviewer
-        if external_approver:
-            payload["externalApprover"] = external_approver
+
+        self._fill_assign_users(payload, **kwargs)
 
         return self.api.put_request(endpoint, payload=payload)
 
@@ -780,12 +675,7 @@ class Client:
         external_status: str = None,
         attributes: list = [],
         tags: list = [],
-        assignee: str = None,
-        reviewer: str = None,
-        approver: str = None,
-        external_assignee: str = None,
-        external_reviewer: str = None,
-        external_approver: str = None,
+        **kwargs,
     ) -> str:
         """
         Create a single video classification task.
@@ -812,18 +702,8 @@ class Client:
             payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
-        if assignee:
-            payload["assignee"] = assignee
-        if reviewer:
-            payload["reviewer"] = reviewer
-        if approver:
-            payload["approver"] = approver
-        if external_assignee:
-            payload["externalAssignee"] = external_assignee
-        if external_reviewer:
-            payload["externalReviewer"] = external_reviewer
-        if external_approver:
-            payload["externalApprover"] = external_approver
+
+        self._fill_assign_users(payload, **kwargs)
 
         return self.api.put_request(endpoint, payload=payload)
 
@@ -1320,3 +1200,18 @@ class Client:
         """
         endpoint = "projects/" + project_id
         self.api.delete_request(endpoint)
+
+    @staticmethod
+    def _fill_assign_users(payload: dict, **kwargs):
+        if "assignee" in kwargs:
+            payload["assignee"] = kwargs.get("assignee")
+        if "reviewer" in kwargs:
+            payload["reviewer"] = kwargs.get("reviewer")
+        if "approver" in kwargs:
+            payload["approver"] = kwargs.get("approver")
+        if "external_assignee" in kwargs:
+            payload["externalAssignee"] = kwargs.get("external_assignee")
+        if "external_reviewer" in kwargs:
+            payload["externalReviewer"] = kwargs.get("external_reviewer")
+        if "external_approver" in kwargs:
+            payload["externalApprover"] = kwargs.get("external_approver")
