@@ -245,6 +245,7 @@ Update a signle task.
 task_id = client.update_image_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    assignee="USER_SLUG",
     tags=["tag1", "tag2"]
     attributes=[
         {
@@ -588,6 +589,7 @@ Update a signle task.
 task_id = client.update_video_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    assignee="USER_SLUG",
     tags=["tag1", "tag2"]
     attributes=[
         {
