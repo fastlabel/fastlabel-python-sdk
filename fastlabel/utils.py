@@ -1,5 +1,6 @@
 import os
 import base64
+from typing import List
 
 
 def base64_encode(file_path: str) -> str:
@@ -23,7 +24,7 @@ def get_basename(file_path: str) -> str:
     return os.path.splitext(file_path)[0]
 
 
-def reverse_points(points: list[int]) -> list[int]:
+def reverse_points(points: List[int]) -> List[int]:
     """
     e.g.)
     [4, 5, 4, 9, 8, 9, 8, 5, 4, 5] => [4, 5, 8, 5, 8, 9, 4, 9, 4, 5]
