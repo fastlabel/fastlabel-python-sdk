@@ -22,8 +22,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [Pascal VOC](#pascal-voc)
   - [labelme](#labelme)
   - [Segmentation](#segmentation)
-- [Converter (to FastLabel format)](#converter-to-fastLabel-format)
-
+- [Converter to FastLabel format](#converter-to-fastlabel-format)
 
 ## Installation
 
@@ -942,11 +941,12 @@ tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 client.export_semantic_segmentation(tasks)
 ```
 
-
 ## Converter to FastLabel format
 
 ### Response
+
 Example of a converted annotations
+
 ```python
 {
   'sample1.jpg':  [
@@ -1020,7 +1020,7 @@ dataset
 
 Supported bbox or polygon annotation type.
 
-Convert annotation file of [COCO format](https://cocodataset.org/#format-data) as a Fastlabel format and create task.  
+Convert annotation file of [COCO format](https://cocodataset.org/#format-data) as a Fastlabel format and create task.
 
 file_path: COCO annotation json file path
 
@@ -1075,7 +1075,7 @@ Supported bbox annotation type.
 Convert annotation file of YOLO format as a Fastlabel format and create task.
 
 classes_file_path: YOLO classes text file path  
-dataset_folder_path: Folder path containing YOLO Images and annotation  
+dataset_folder_path: Folder path containing YOLO Images and annotation
 
 ```python
 annotations_map = client.convert_yolo_to_fastlabel(
@@ -1129,7 +1129,6 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
     )
 ```
 
-
 ### Pascal VOC
 
 Supported bbox annotation type.
@@ -1182,10 +1181,10 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
     )
 ```
 
-
 ### labelme
 
 support the following annotation types.
+
 - bbox
 - polygon
 - points
@@ -1238,9 +1237,6 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
         annotations=annotations
     )
 ```
-
-
-
 
 > Please check const.COLOR_PALLETE for index colors.
 
