@@ -6,6 +6,7 @@ import geojson
 import numpy as np
 import math
 from fastlabel.const import AnnotationType
+import os
 
 # COCO
 
@@ -519,3 +520,167 @@ def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
                 new_points.append(int(prev_x + int(xdiff / mindiff * (i + 1))))
                 new_points.append(int(prev_y + int(ydiff / mindiff * (i + 1))))
     return new_points
+
+
+def execute_coco_to_fastlabel(coco: dict) -> dict:
+    coco_images = {}
+    for c in coco["images"]:
+        coco_images[c["id"]] = c["file_name"]
+
+    coco_categories = {}
+    for c in coco["categories"]:
+        coco_categories[c["id"]] = c["name"]
+
+    coco_annotations = coco["annotations"]
+
+    results = {}
+    for coco_image_key in coco_images:
+        target_coco_annotations = filter(
+            lambda annotation: annotation["image_id"] == coco_image_key,
+            coco_annotations,
+        )
+        if not target_coco_annotations:
+            return
+
+        annotations = []
+        for target_coco_annotation in target_coco_annotations:
+            category_name = coco_categories[target_coco_annotation["category_id"]]
+            if not category_name:
+                return
+
+            segmentation = target_coco_annotation["segmentation"][0]
+            annotation_type = ""
+            if len(segmentation) == 4:
+                annotation_type = AnnotationType.bbox.value
+            if len(segmentation) > 4:
+                annotation_type = AnnotationType.polygon.value
+            annotations.append(
+                {
+                    "value": category_name,
+                    "points": segmentation,
+                    "type": annotation_type,
+                }
+            )
+        results[coco_images[coco_image_key]] = annotations
+    return results
+
+def execute_labelme_to_fastlabel(labelme: dict, file_path: str = None) -> tuple:
+    file_name = ""
+    if file_path:
+        file_name = file_path.replace(
+            ".json", os.path.splitext(labelme["imagePath"])[1]
+        )
+    else:
+        file_name = labelme["imagePath"]
+    labelme_annotations = labelme["shapes"]
+
+    annotations = []
+    for labelme_annotation in labelme_annotations:
+        label = labelme_annotation["label"]
+        if not label:
+            return
+
+        points = np.ravel(labelme_annotation["points"])
+        annotation_type = __get_annotation_type_by_labelme(
+            labelme_annotation["shape_type"]
+        )
+        annotations.append(
+            {"value": label, "points": points.tolist(), "type": annotation_type}
+        )
+
+    return (file_name, annotations)
+
+def execute_pascalvoc_to_fastlabel(pascalvoc: dict, file_path: str = None) -> tuple:
+    target_pascalvoc = pascalvoc["annotation"]
+    file_name = ""  # file_path if file_path else target_pascalvoc["filename"]
+    if file_path:
+        file_name = file_path.replace(
+            ".xml", os.path.splitext(target_pascalvoc["filename"])[1]
+        )
+    else:
+        file_name = target_pascalvoc["filename"]
+    pascalvoc_annotations = target_pascalvoc["object"]
+    if not isinstance(pascalvoc_annotations, list):
+        pascalvoc_annotations = [pascalvoc_annotations]
+
+    annotations = []
+    for pascalvoc_annotation in pascalvoc_annotations:
+        category_name = pascalvoc_annotation["name"]
+        if not category_name:
+            return
+
+        points = [
+            int(pascalvoc_annotation["bndbox"][item])
+            for item in pascalvoc_annotation["bndbox"]
+        ]
+        annotations.append(
+            {
+                "value": category_name,
+                "points": points,
+                "type": AnnotationType.bbox.value,
+            }
+        )
+
+    return (file_name, annotations)
+
+
+def execute_yolo_to_fastlabel(
+    classes: dict,
+    image_sizes: dict,
+    yolo_annotations: dict,
+    dataset_folder_path: str = None,
+) -> dict:
+    results = {}
+    for yolo_anno_key in yolo_annotations:
+        annotations = []
+        for each_image_annotation in yolo_annotations[yolo_anno_key]:
+            (
+                yolo_class_id,
+                yolo_center_x_ratio,
+                yolo_center_y_ratio,
+                yolo_anno_width_ratio,
+                yolo_anno_height_ratio,
+            ) = each_image_annotation
+            image_width, image_height = image_sizes[yolo_anno_key]["size"]
+
+            classs_name = classes[str(yolo_class_id)]
+
+            yolo_center_x_point = float(image_width) * float(yolo_center_x_ratio)
+            yolo_center_y_point = float(image_height) * float(yolo_center_y_ratio)
+            yolo_anno_width_size = float(image_width) * float(yolo_anno_width_ratio)
+            yolo_anno_height_size = float(image_height) * float(yolo_anno_height_ratio)
+
+            points = []
+            points.append(yolo_center_x_point - (yolo_anno_width_size / 2))  # x1
+            points.append(yolo_center_y_point - (yolo_anno_height_size / 2))  # y1
+            points.append(yolo_center_x_point + (yolo_anno_width_size / 2))  # x2
+            points.append(yolo_center_y_point + (yolo_anno_height_size / 2))  # y2
+            annotations.append(
+                {
+                    "value": classs_name,
+                    "points": points,
+                    "type": AnnotationType.bbox.value,
+                }
+            )
+
+        file_path = (
+            image_sizes[yolo_anno_key]["image_file_path"].replace(
+                os.path.join(*[dataset_folder_path, ""]), ""
+            )
+            if dataset_folder_path
+            else image_sizes[yolo_anno_key]["image_file_path"]
+        )
+        results[file_path] = annotations
+
+    return results
+
+def __get_annotation_type_by_labelme(shape_type: str) -> str:
+    if shape_type == "rectangle":
+        return "bbox"
+    if shape_type == "polygon":
+        return "polygon"
+    if shape_type == "point":
+        return "keypoint"
+    if shape_type == "line":
+        return "line"
+    return None

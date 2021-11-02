@@ -24,6 +24,10 @@ def get_basename(file_path: str) -> str:
     return os.path.splitext(file_path)[0]
 
 
+def get_supported_image_ext() -> list:
+    return ["jpg", "jpeg", "png"]
+
+
 def reverse_points(points: List[int]) -> List[int]:
     """
     e.g.)

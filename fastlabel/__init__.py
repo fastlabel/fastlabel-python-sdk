@@ -1,18 +1,21 @@
-import os
 import glob
 import json
-from typing import List
+import os
+import re
 from logging import getLogger
-from PIL import Image
+from typing import List
+
 import cv2
 import numpy as np
-
 import xmltodict
+from PIL import Image
 
-from .exceptions import FastLabelInvalidException
-from .api import Api
-from fastlabel import converters, utils, const
+from fastlabel import const, converters, utils
 from fastlabel.const import AnnotationType
+
+from .api import Api
+from .exceptions import FastLabelInvalidException
+
 
 logger = getLogger(__name__)
 
@@ -716,6 +719,305 @@ class Client:
         """
         endpoint = "tasks/" + task_id
         self.api.delete_request(endpoint)
+
+    # Convert to Fastlabel
+
+    def convert_coco_to_fastlabel(self, file_path: str) -> dict:
+        """
+        Convert COCO format to FastLabel format as annotation file.
+
+        file_path is a COCO format annotation file. (Required)
+
+        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
+
+        output format example.
+        {
+            'sample1.jpg':  [
+                {
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
+                }
+            ],
+            'sample2.jpg':  [
+                {
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
+                }
+            ]
+        }
+        """
+        with open(file_path, "r") as f:
+            file = f.read()
+            return converters.execute_coco_to_fastlabel(eval(file))
+
+    def convert_labelme_to_fastlabel(self, folder_path: str) -> dict:
+        """
+        Convert labelme format to FastLabel format as annotation files.
+
+        folder_path is the folder that contains the labelme format files with the json extension. (Required)
+
+        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
+        If the tree has multiple hierarchies, the key is the relative path rooted at the specified folder name.
+
+        output format example.
+        In the case of labelme, the key is the tree structure if the tree structure is multi-level.
+
+        [tree structure]
+        dataset
+        ├── sample1.jpg
+        ├── sample1.json
+        └── sample_dir
+            ├── sample2.jpg
+            └── sample2.json
+
+        [output]
+        {
+            'sample1.jpg':  [
+                {
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
+                }
+            ],
+            'sample_dir/sample2.jpg':  [
+                {
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
+                    }
+            ]
+        }
+        """
+        results = {}
+        for file_path in glob.iglob(
+            os.path.join(folder_path, "**/**.json"), recursive=True
+        ):
+            with open(file_path, "r") as f:
+                c = converters.execute_labelme_to_fastlabel(
+                    json.load(f),
+                    file_path.replace(os.path.join(*[folder_path, ""]), ""),
+                )
+                results[c[0]] = c[1]
+        return results
+
+    def convert_pascalvoc_to_fastlabel(self, folder_path: str) -> dict:
+        """
+        Convert PascalVOC format to FastLabel format as annotation files.
+
+        folder_path is the folder that contains the PascalVOC format files with the xml extension. (Required)
+
+        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
+        If the tree has multiple hierarchies, the key is the relative path rooted at the specified folder name.
+
+        output format example.
+        In the case of PascalVOC, the key is the tree structure if the tree structure is multi-level.
+
+        [tree structure]
+        dataset
+        ├── sample1.jpg
+        ├── sample1.xml
+        └── sample_dir
+            ├── sample2.jpg
+            └── sample2.xml
+
+        [output]
+        {
+            'sample1.jpg':  [
+                {
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
+                }
+            ],
+            'sample_dir/sample2.jpg':  [
+                {
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
+                }
+            ]
+        }
+        """
+        results = {}
+        for file_path in glob.iglob(
+            os.path.join(folder_path, "**/**.xml"), recursive=True
+        ):
+            with open(file_path, "r") as f:
+                file = f.read()
+                c = converters.execute_pascalvoc_to_fastlabel(
+                    xmltodict.parse(file),
+                    file_path.replace(os.path.join(*[folder_path, ""]), ""),
+                )
+                results[c[0]] = c[1]
+        return results
+
+    def convert_yolo_to_fastlabel(
+        self, classes_file_path: str, dataset_folder_path: str
+    ) -> dict:
+        """
+        Convert YOLO format to FastLabel format as annotation files.
+
+        classes_file_path is YOLO format class file. (Required)
+        dataset_folder_path is the folder that contains the image file and YOLO format files with the txt extension. (Required)
+
+        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
+        If the tree has multiple hierarchies, the key is the relative path rooted at the specified folder name.
+
+        output format example.
+        In the case of YOLO, the key is the tree structure if the tree structure is multi-level.
+
+        [tree structure]
+        dataset
+        ├── sample1.jpg
+        ├── sample1.txt
+        └── sample_dir
+            ├── sample2.jpg
+            └── sample2.txt
+
+        [output]
+        {
+            'sample1.jpg':  [
+                {
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
+                }
+            ],
+            'sample_dir/sample2.jpg':  [
+                {
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
+                }
+            ]
+        }
+        """
+        classes = self.__get_yolo_format_classes(classes_file_path)
+        image_sizes = self.__get_yolo_image_sizes(dataset_folder_path)
+        yolo_annotations = self.__get_yolo_format_annotations(
+            dataset_folder_path)
+
+        return converters.execute_yolo_to_fastlabel(
+            classes,
+            image_sizes,
+            yolo_annotations,
+            os.path.join(*[dataset_folder_path, ""]),
+        )
+
+    def __get_yolo_format_classes(self, classes_file_path: str) -> dict:
+        """
+        return data format
+        {
+            id: classs_name
+            ...
+        }
+        """
+        classes = {}
+        with open(classes_file_path, "r") as f:
+            lines = f.readlines()
+            line_index = 0
+            for line in lines:
+                classes[str(line_index)] = line.strip()
+                line_index += 1
+        return classes
+
+    def __get_yolo_image_sizes(self, dataset_folder_path: str) -> dict:
+        """
+        return data format
+        {
+            image_file_path_without_ext: {
+                "image_file_path": image file full path
+                "size": [whdth, height]
+            ...
+        }
+        """
+        image_types = utils.get_supported_image_ext()
+        image_paths = [
+            p for p in glob.glob(os.path.join(dataset_folder_path, "**/*"), recursive=True)
+            if re.search("/*\.({})".format("|".join(image_types)), str(p))
+        ]
+        image_sizes = {}
+        for image_path in image_paths:
+            image = Image.open(image_path)
+            width, height = image.size
+            image_sizes[image_path.replace(os.path.splitext(image_path)[1], "")] = {
+                "image_file_path": image_path,
+                "size": [width, height],
+            }
+
+        return image_sizes
+
+    def __get_yolo_format_annotations(self, dataset_folder_path: str) -> dict:
+        """
+        return data format
+        {
+            annotaion_file_path_without_ext:
+                [
+                    yolo_class_id,
+                    yolo_center_x_ratio,
+                    yolo_center_y_ratio,
+                    yolo_anno_width_ratio,
+                    yolo_anno_height_ratio
+                ],
+            ...
+        }
+        """
+        yolo_annotations = {}
+        annotaion_file_paths = [
+            p for p in glob.glob(os.path.join(dataset_folder_path, "**/*.txt"), recursive=True)
+            if re.search(("/*\.txt"), str(p))
+        ]
+        for annotaion_file_path in annotaion_file_paths:
+            with open(annotaion_file_path, "r") as f:
+                anno_lines = f.readlines()
+                annotaion_key = annotaion_file_path.replace(".txt", "")
+                yolo_annotations[annotaion_key] = []
+                for anno_line in anno_lines:
+                    yolo_annotations[annotaion_key].append(
+                        anno_line.strip().split(" "))
+        return yolo_annotations
 
     # Task Convert
 

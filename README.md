@@ -22,6 +22,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [Pascal VOC](#pascal-voc)
   - [labelme](#labelme)
   - [Segmentation](#segmentation)
+- [Converter to FastLabel format](#converter-to-fastlabel-format)
 
 ## Installation
 
@@ -940,6 +941,303 @@ client.export_instance_segmentation(tasks)
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 client.export_semantic_segmentation(tasks)
+```
+
+## Converter to FastLabel format
+
+### Response
+
+Example of a converted annotations
+
+```python
+{
+  'sample1.jpg':  [
+    {
+      'points': [
+        100,
+        100,
+        200,
+        200
+      ],
+      'type': 'bbox',
+      'value': 'cat'
+    }
+  ],
+  'sample2.jpg':  [
+    {
+      'points': [
+        100,
+        100,
+        200,
+        200
+      ],
+      'type': 'bbox',
+      'value': 'cat'
+    }
+  ]
+}
+```
+
+In the case of YOLO, Pascal VOC, and labelme, the key is the tree structure if the tree structure is multi-level.
+
+```
+dataset
+├── sample1.jpg
+├── sample1.txt
+└── sample_dir
+    ├── sample2.jpg
+    └── sample2.txt
+```
+
+```python
+{
+  'sample1.jpg':  [
+    {
+      'points': [
+        100,
+        100,
+        200,
+        200
+      ],
+      'type': 'bbox',
+      'value': 'cat'
+    }
+  ],
+  'sample_dir/sample2.jpg':  [
+    {
+      'points': [
+        100,
+        100,
+        200,
+        200
+      ],
+      'type': 'bbox',
+      'value': 'cat'
+    }
+  ]
+}
+```
+
+### COCO
+
+Supported bbox or polygon annotation type.
+
+Convert annotation file of [COCO format](https://cocodataset.org/#format-data) as a Fastlabel format and create task.
+
+file_path: COCO annotation json file path
+
+```python
+annotations_map = client.convert_coco_to_fastlabel(file_path="./sample.json")
+task_id = client.create_image_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.jpg",
+    file_path="./sample.jpg",
+    annotations=annotations_map.get("sample.jpg")
+)
+```
+
+Example of converting annotations to create multiple tasks.
+
+In the case of the following tree structure.
+
+```
+dataset
+├── annotation.json
+├── sample1.jpg
+└── sample2.jpg
+```
+
+Example source code.
+
+```python
+import fastlabel
+
+project = "YOUR_PROJECT_SLUG"
+input_file_path = "./dataset/annotation.json"
+input_dataset_path = "./dataset/"
+
+annotations_map = client.convert_coco_to_fastlabel(file_path=input_file_path)
+for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"), recursive=True):
+    time.sleep(1)
+    name = image_file_path.replace(os.path.join(*[input_dataset_path, ""]), "")
+    file_path = image_file_path
+    annotations = annotations_map.get(name) if annotations_map.get(name) is not None else []
+    task_id = client.create_image_task(
+        project=project,
+        name=name,
+        file_path=file_path,
+        annotations=annotations
+    )
+```
+
+### YOLO
+
+Supported bbox annotation type.
+
+Convert annotation file of YOLO format as a Fastlabel format and create task.
+
+classes_file_path: YOLO classes text file path  
+dataset_folder_path: Folder path containing YOLO Images and annotation
+
+```python
+annotations_map = client.convert_yolo_to_fastlabel(
+    classes_file_path="./classes.txt",
+    dataset_folder_path="./dataset/"
+)
+task_id = client.create_image_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.jpg",
+    file_path="./dataset/sample.jpg",
+    annotations=annotations_map.get("sample.jpg")
+)
+```
+
+Example of converting annotations to create multiple tasks.
+
+In the case of the following tree structure.
+
+```
+yolo
+├── classes.txt
+└── dataset
+    ├── sample1.jpg
+    ├── sample1.txt
+    ├── sample2.jpg
+    └── sample2.txt
+```
+
+Example source code.
+
+```python
+import fastlabel
+
+project = "YOUR_PROJECT_SLUG"
+input_file_path = "./classes.txt"
+input_dataset_path = "./dataset/"
+annotations_map = client.convert_yolo_to_fastlabel(
+    classes_file_path=input_file_path,
+    dataset_folder_path=input_dataset_path
+)
+for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"), recursive=True):
+    time.sleep(1)
+    name = image_file_path.replace(os.path.join(*[input_dataset_path, ""]), "")
+    file_path = image_file_path
+    annotations = annotations_map.get(name) if annotations_map.get(name) is not None else []
+    task_id = client.create_image_task(
+        project=project,
+        name=name,
+        file_path=file_path,
+        annotations=annotations
+    )
+```
+
+### Pascal VOC
+
+Supported bbox annotation type.
+
+Convert annotation file of Pascal VOC format as a Fastlabel format and create task.
+
+folder_path: Folder path including pascal VOC format annotation files
+
+```python
+annotations_map = client.convert_pascalvoc_to_fastlabel(folder_path="./dataset/")
+task_id = client.create_image_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.jpg",
+    file_path="./dataset/sample.jpg",
+    annotations=annotations_map.get("sample.jpg")
+)
+```
+
+Example of converting annotations to create multiple tasks.
+
+In the case of the following tree structure.
+
+```
+dataset
+├── sample1.jpg
+├── sample1.xml
+├── sample2.jpg
+└── sample2.xml
+```
+
+Example source code.
+
+```python
+import fastlabel
+
+project = "YOUR_PROJECT_SLUG"
+input_dataset_path = "./dataset/"
+
+annotations_map = client.convert_pascalvoc_to_fastlabel(folder_path=input_dataset_path)
+for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"), recursive=True):
+    time.sleep(1)
+    name = image_file_path.replace(os.path.join(*[input_dataset_path, ""]), "")
+    file_path = image_file_path
+    annotations = annotations_map.get(name) if annotations_map.get(name) is not None else []
+    task_id = client.create_image_task(
+        project=project,
+        name=name,
+        file_path=file_path,
+        annotations=annotations
+    )
+```
+
+### labelme
+
+support the following annotation types.
+
+- bbox
+- polygon
+- points
+- line
+
+Convert annotation file of labelme format as a Fastlabel format and create task.
+
+folder_path: Folder path including labelme format annotation files
+
+```python
+annotations_map = client.convert_labelme_to_fastlabel(folder_path="./dataset/")
+task_id = client.create_image_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.jpg",
+    file_path="./sample.jpg",
+    annotations=annotations_map.get("sample.jpg")
+)
+```
+
+Example of converting annotations to create multiple tasks.
+
+In the case of the following tree structure.
+
+```
+dataset
+├── sample1.jpg
+├── sample1.json
+├── sample2.jpg
+└── sample2.json
+```
+
+Example source code.
+
+```python
+import fastlabel
+
+project = "YOUR_PROJECT_SLUG"
+input_dataset_path = "./dataset/"
+
+annotations_map = client.convert_labelme_to_fastlabel(folder_path=input_dataset_path)
+for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"), recursive=True):
+    time.sleep(1)
+    name = image_file_path.replace(os.path.join(*[input_dataset_path, ""]), "")
+    file_path = image_file_path
+    annotations = annotations_map.get(name) if annotations_map.get(name) is not None else []
+    task_id = client.create_image_task(
+        project=project,
+        name=name,
+        file_path=file_path,
+        annotations=annotations
+    )
 ```
 
 > Please check const.COLOR_PALLETE for index colors.
