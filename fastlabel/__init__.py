@@ -532,7 +532,8 @@ class Client:
         """
         endpoint = "tasks/video/classification"
         if not utils.is_video_supported_ext(file_path):
-            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
+            raise FastLabelInvalidException(
+                "Supported extensions are mp4.", 422)
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
         if status:
@@ -648,31 +649,31 @@ class Client:
         file_path is a COCO format annotation file. (Required)
 
         In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
-        
+
         output format example.
         {
             'sample1.jpg':  [
                 {
-                'points': [
-                    100,
-                    100,
-                    200,
-                    200
-                ],
-                'type': 'bbox',
-                'value': 'cat'
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
                 }
             ],
             'sample2.jpg':  [
                 {
-                'points': [
-                    100,
-                    100,
-                    200,
-                    200
-                ],
-                'type': 'bbox',
-                'value': 'cat'
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
                 }
             ]
         }
@@ -692,7 +693,7 @@ class Client:
 
         output format example.
         In the case of labelme, the key is the tree structure if the tree structure is multi-level.
-        
+
         [tree structure]
         dataset
         ├── sample1.jpg
@@ -705,27 +706,27 @@ class Client:
         {
             'sample1.jpg':  [
                 {
-                'points': [
-                    100,
-                    100,
-                    200,
-                    200
-                ],
-                'type': 'bbox',
-                'value': 'cat'
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
                 }
             ],
             'sample_dir/sample2.jpg':  [
                 {
-                'points': [
-                    100,
-                    100,
-                    200,
-                    200
-                ],
-                'type': 'bbox',
-                'value': 'cat'
-                }
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
+                    }
             ]
         }
         """
@@ -765,26 +766,26 @@ class Client:
         {
             'sample1.jpg':  [
                 {
-                'points': [
-                    100,
-                    100,
-                    200,
-                    200
-                ],
-                'type': 'bbox',
-                'value': 'cat'
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
                 }
             ],
             'sample_dir/sample2.jpg':  [
                 {
-                'points': [
-                    100,
-                    100,
-                    200,
-                    200
-                ],
-                'type': 'bbox',
-                'value': 'cat'
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
                 }
             ]
         }
@@ -810,7 +811,7 @@ class Client:
 
         classes_file_path is YOLO format class file. (Required)
         dataset_folder_path is the folder that contains the image file and YOLO format files with the txt extension. (Required)
-        
+
         In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
         If the tree has multiple hierarchies, the key is the relative path rooted at the specified folder name.
 
@@ -829,33 +830,34 @@ class Client:
         {
             'sample1.jpg':  [
                 {
-                'points': [
-                    100,
-                    100,
-                    200,
-                    200
-                ],
-                'type': 'bbox',
-                'value': 'cat'
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
                 }
             ],
             'sample_dir/sample2.jpg':  [
                 {
-                'points': [
-                    100,
-                    100,
-                    200,
-                    200
-                ],
-                'type': 'bbox',
-                'value': 'cat'
+                    'points': [
+                        100,
+                        100,
+                        200,
+                        200
+                    ],
+                    'type': 'bbox',
+                    'value': 'cat'
                 }
             ]
         }
         """
         classes = self.__get_yolo_format_classes(classes_file_path)
         image_sizes = self.__get_yolo_image_sizes(dataset_folder_path)
-        yolo_annotations = self.__get_yolo_format_annotations(dataset_folder_path)
+        yolo_annotations = self.__get_yolo_format_annotations(
+            dataset_folder_path)
 
         return converters.execute_yolo_to_fastlabel(
             classes,
@@ -933,9 +935,9 @@ class Client:
                 annotaion_key = annotaion_file_path.replace(".txt", "")
                 yolo_annotations[annotaion_key] = []
                 for anno_line in anno_lines:
-                    yolo_annotations[annotaion_key].append(anno_line.strip().split(" "))
+                    yolo_annotations[annotaion_key].append(
+                        anno_line.strip().split(" "))
         return yolo_annotations
-
 
     # Task Convert
 
@@ -1013,8 +1015,8 @@ class Client:
             with open(file_path, 'w') as f:
                 json.dump(labelme, f, indent=4, ensure_ascii=False)
 
-
     # Instance / Semantic Segmetation
+
     def export_instance_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "instance_segmentation"), pallete: List[int] = const.COLOR_PALETTE) -> None:
         """
         Convert tasks to index color instance segmentation (PNG files).
@@ -1027,8 +1029,9 @@ class Client:
         """
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
-            self.__export_index_color_image(task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=True)
-    
+            self.__export_index_color_image(
+                task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=True)
+
     def export_semantic_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "semantic_segmentation"), pallete: List[int] = const.COLOR_PALETTE) -> None:
         """
         Convert tasks to index color semantic segmentation (PNG files).
@@ -1048,7 +1051,8 @@ class Client:
 
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
-            self.__export_index_color_image(task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=False, classes=classes)
+            self.__export_index_color_image(
+                task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=False, classes=classes)
 
     def __export_index_color_image(self, task: list, output_dir: str, pallete: List[int], is_instance_segmentation: bool = True, classes: list = []) -> None:
         image = Image.new("RGB", (task["width"], task["height"]), 0)
@@ -1057,28 +1061,36 @@ class Client:
 
         index = 1
         for annotation in task["annotations"]:
-            color = index if is_instance_segmentation else classes.index(annotation["value"]) + 1
+            color = index if is_instance_segmentation else classes.index(
+                annotation["value"]) + 1
             if annotation["type"] == AnnotationType.segmentation.value:
                 for region in annotation["points"]:
                     count = 0
                     for points in region:
                         cv_draw_points = self.__get_cv_draw_points(points)
                         if count == 0:
-                            cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
+                            cv2.fillPoly(
+                                image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
                         else:
-                            cv2.fillPoly(image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
+                            cv2.fillPoly(
+                                image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
                         count += 1
             elif annotation["type"] == AnnotationType.polygon.value:
-                cv_draw_points = self.__get_cv_draw_points(annotation["points"])
-                cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
+                cv_draw_points = self.__get_cv_draw_points(
+                    annotation["points"])
+                cv2.fillPoly(image, [cv_draw_points], color,
+                             lineType=cv2.LINE_8, shift=0)
             elif annotation["type"] == AnnotationType.bbox.value:
-                cv_draw_points = self.__get_cv_draw_points(annotation["points"])
-                cv2.fillPoly(image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
+                cv_draw_points = self.__get_cv_draw_points(
+                    annotation["points"])
+                cv2.fillPoly(image, [cv_draw_points], color,
+                             lineType=cv2.LINE_8, shift=0)
             else:
                 continue
             index += 1
 
-        image_path = os.path.join(output_dir, utils.get_basename(task["name"]) + ".png")
+        image_path = os.path.join(
+            output_dir, utils.get_basename(task["name"]) + ".png")
         os.makedirs(os.path.dirname(image_path), exist_ok=True)
         image = Image.fromarray(image)
         image = image.convert('P')
@@ -1126,7 +1138,6 @@ class Client:
         for i in range(int(len(new_points) / 2)):
             cv_points.append((new_points[i * 2], new_points[i * 2 + 1]))
         return np.array(cv_points)
-
 
     # Annotation
 
