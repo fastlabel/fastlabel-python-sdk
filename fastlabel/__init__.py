@@ -352,6 +352,7 @@ class Client:
         external_status: str = None,
         annotations: list = [],
         tags: list = [],
+        **kwargs
     ) -> str:
         """
         Create a single image task.
@@ -363,6 +364,12 @@ class Client:
         external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
+        assignee is slug of assigned user. (Optional)
+        reviewer is slug of review user. (Optional)
+        approver is slug of approve user. (Optional)
+        external_assignee is slug of external assigned user. (Optional)
+        external_reviewer is slug of external review user. (Optional)
+        external_approver is slug of external approve user. (Optional)
         """
         endpoint = "tasks/image"
         if not utils.is_image_supported_ext(file_path):
@@ -380,6 +387,9 @@ class Client:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
         return self.api.post_request(endpoint, payload=payload)
 
     def create_image_classification_task(
@@ -391,6 +401,7 @@ class Client:
         external_status: str = None,
         attributes: list = [],
         tags: list = [],
+        **kwargs,
     ) -> str:
         """
         Create a single image classification task.
@@ -402,6 +413,12 @@ class Client:
         external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
+        assignee is slug of assigned user. (Optional)
+        reviewer is slug of review user. (Optional)
+        approver is slug of approve user. (Optional)
+        external_assignee is slug of external assigned user. (Optional)
+        external_reviewer is slug of external review user. (Optional)
+        external_approver is slug of external approve user. (Optional)
         """
         endpoint = "tasks/image/classification"
         if not utils.is_image_supported_ext(file_path):
@@ -417,6 +434,9 @@ class Client:
             payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
         return self.api.post_request(endpoint, payload=payload)
 
     def create_multi_image_task(
@@ -428,6 +448,7 @@ class Client:
         external_status: str = None,
         annotations: list = [],
         tags: list = [],
+        **kwargs,
     ) -> str:
         """
         Create a single multi image task.
@@ -439,6 +460,12 @@ class Client:
         external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
+        assignee is slug of assigned user. (Optional)
+        reviewer is slug of review user. (Optional)
+        approver is slug of approve user. (Optional)
+        external_assignee is slug of external assigned user. (Optional)
+        external_reviewer is slug of external review user. (Optional)
+        external_approver is slug of external approve user. (Optional)
         """
         if not os.path.isdir(folder_path):
             raise FastLabelInvalidException(
@@ -468,6 +495,9 @@ class Client:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
         return self.api.post_request(endpoint, payload=payload)
 
     def create_video_task(
@@ -479,6 +509,7 @@ class Client:
         external_status: str = None,
         annotations: list = [],
         tags: list = [],
+        **kwargs,
     ) -> str:
         """
         Create a single video task.
@@ -490,6 +521,12 @@ class Client:
         external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         annotations is a list of annotation to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
+        assignee is slug of assigned user. (Optional)
+        reviewer is slug of review user. (Optional)
+        approver is slug of approve user. (Optional)
+        external_assignee is slug of external assigned user. (Optional)
+        external_reviewer is slug of external review user. (Optional)
+        external_approver is slug of external approve user. (Optional)
         """
         endpoint = "tasks/video"
         if not utils.is_video_supported_ext(file_path):
@@ -507,6 +544,9 @@ class Client:
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
         return self.api.post_request(endpoint, payload=payload)
 
     def create_video_classification_task(
@@ -518,6 +558,7 @@ class Client:
         external_status: str = None,
         attributes: list = [],
         tags: list = [],
+        **kwargs,
     ) -> str:
         """
         Create a single video classification task.
@@ -529,6 +570,12 @@ class Client:
         external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
+        assignee is slug of assigned user. (Optional)
+        reviewer is slug of review user. (Optional)
+        approver is slug of approve user. (Optional)
+        external_assignee is slug of external assigned user. (Optional)
+        external_reviewer is slug of external review user. (Optional)
+        external_approver is slug of external approve user. (Optional)
         """
         endpoint = "tasks/video/classification"
         if not utils.is_video_supported_ext(file_path):
@@ -544,6 +591,9 @@ class Client:
             payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
         return self.api.post_request(endpoint, payload=payload)
 
     # Task Update
@@ -554,6 +604,7 @@ class Client:
         status: str = None,
         external_status: str = None,
         tags: list = [],
+        **kwargs,
     ) -> str:
         """
         Update a single task.
@@ -562,6 +613,12 @@ class Client:
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
         external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set. (Optional)
+        assignee is slug of assigned user. (Optional)
+        reviewer is slug of review user. (Optional)
+        approver is slug of approve user. (Optional)
+        external_assignee is slug of external assigned user. (Optional)
+        external_reviewer is slug of external review user. (Optional)
+        external_approver is slug of external approve user. (Optional)
         """
         endpoint = "tasks/" + task_id
         payload = {}
@@ -571,6 +628,9 @@ class Client:
             payload["externalStatus"] = external_status
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
         return self.api.put_request(endpoint, payload=payload)
 
     def update_image_classification_task(
@@ -580,6 +640,7 @@ class Client:
         external_status: str = None,
         attributes: list = [],
         tags: list = [],
+        **kwargs,
     ) -> str:
         """
         Create a single image classification task.
@@ -589,6 +650,12 @@ class Client:
         external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
+        assignee is slug of assigned user. (Optional)
+        reviewer is slug of review user. (Optional)
+        approver is slug of approve user. (Optional)
+        external_assignee is slug of external assigned user. (Optional)
+        external_reviewer is slug of external review user. (Optional)
+        external_approver is slug of external approve user. (Optional)
         """
         endpoint = "tasks/image/classification/" + task_id
         payload = {}
@@ -600,6 +667,9 @@ class Client:
             payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
         return self.api.put_request(endpoint, payload=payload)
 
     def update_video_classification_task(
@@ -609,6 +679,7 @@ class Client:
         external_status: str = None,
         attributes: list = [],
         tags: list = [],
+        **kwargs,
     ) -> str:
         """
         Create a single video classification task.
@@ -618,6 +689,12 @@ class Client:
         external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         attributes is a list of attribute to be set in advance. (Optional)
         tags is a list of tag to be set in advance. (Optional)
+        assignee is slug of assigned user. (Optional)
+        reviewer is slug of review user. (Optional)
+        approver is slug of approve user. (Optional)
+        external_assignee is slug of external assigned user. (Optional)
+        external_reviewer is slug of external review user. (Optional)
+        external_approver is slug of external approve user. (Optional)
         """
         endpoint = "tasks/video/classification/" + task_id
         payload = {}
@@ -629,6 +706,9 @@ class Client:
             payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
         return self.api.put_request(endpoint, payload=payload)
 
     # Task Delete
@@ -1020,7 +1100,7 @@ class Client:
     def export_instance_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "instance_segmentation"), pallete: List[int] = const.COLOR_PALETTE) -> None:
         """
         Convert tasks to index color instance segmentation (PNG files).
-        Supports only bbox, polygon and segmentation annotation types. Hollowed points are not supported.
+        Supports only bbox, polygon and segmentation annotation types.
         Supports up to 57 instances in default colors palette. Check const.COLOR_PALETTE for more details.
 
         tasks is a list of tasks. (Required)
@@ -1035,7 +1115,7 @@ class Client:
     def export_semantic_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "semantic_segmentation"), pallete: List[int] = const.COLOR_PALETTE) -> None:
         """
         Convert tasks to index color semantic segmentation (PNG files).
-        Supports only bbox, polygon and segmentation annotation types. Hollowed points are not supported.
+        Supports only bbox, polygon and segmentation annotation types.
         Check const.COLOR_PALETTE for color pallete.
 
         tasks is a list of tasks. (Required)
@@ -1067,11 +1147,14 @@ class Client:
                 for region in annotation["points"]:
                     count = 0
                     for points in region:
-                        cv_draw_points = self.__get_cv_draw_points(points)
                         if count == 0:
+                            cv_draw_points = self.__get_cv_draw_points(points)
                             cv2.fillPoly(
                                 image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
                         else:
+                            # Reverse hollow points for opencv because this points are counter clockwise
+                            cv_draw_points = self.__get_cv_draw_points(
+                                utils.reverse_points(points))
                             cv2.fillPoly(
                                 image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
                         count += 1
@@ -1432,3 +1515,18 @@ class Client:
         """
         endpoint = "projects/" + project_id
         self.api.delete_request(endpoint)
+
+    @staticmethod
+    def __fill_assign_users(payload: dict, **kwargs):
+        if "assignee" in kwargs:
+            payload["assignee"] = kwargs.get("assignee")
+        if "reviewer" in kwargs:
+            payload["reviewer"] = kwargs.get("reviewer")
+        if "approver" in kwargs:
+            payload["approver"] = kwargs.get("approver")
+        if "external_assignee" in kwargs:
+            payload["externalAssignee"] = kwargs.get("external_assignee")
+        if "external_reviewer" in kwargs:
+            payload["externalReviewer"] = kwargs.get("external_reviewer")
+        if "external_approver" in kwargs:
+            payload["externalApprover"] = kwargs.get("external_approver")
