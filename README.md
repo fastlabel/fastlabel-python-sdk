@@ -943,6 +943,19 @@ tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 client.export_semantic_segmentation(tasks)
 ```
 
+### Videos with annotations
+
+Get tasks and export videos with annotations.
+Only support the following project types.
+
+- Video - Bounding Box
+
+```python
+tasks = client.get_video_tasks(project="YOUR_PROJECT_SLUG")
+client.export_videos_with_annotations(tasks)
+```
+
+
 ## Converter to FastLabel format
 
 ### Response

@@ -1,5 +1,6 @@
 import glob
 import json
+import shutil
 import os
 import re
 from logging import getLogger
@@ -7,6 +8,7 @@ from typing import List
 
 import cv2
 import numpy as np
+import urllib.request
 import xmltodict
 from PIL import Image
 
@@ -1221,6 +1223,25 @@ class Client:
         for i in range(int(len(new_points) / 2)):
             cv_points.append((new_points[i * 2], new_points[i * 2 + 1]))
         return np.array(cv_points)
+
+    def export_videos_with_annotations(self, tasks: list, output_dir: str = os.path.join("output", "with_annotations")) -> None:
+        """
+        Convert video tasks to videos with annotations.
+
+        tasks is a list of tasks. (Required)
+        output_dir is output directory(default: output/with_annotations). (Optional)
+        """
+        original_folder_dir = os.path.join(output_dir, "originals")
+        os.makedirs(original_folder_dir, exist_ok=True)
+        # Download original video
+        for task in tasks:
+            original_file_path = os.path.join(original_folder_dir, task["name"])
+            os.makedirs(os.path.dirname(original_file_path), exist_ok=True)
+            urllib.request.urlretrieve(
+                task["url"], os.path.join(original_folder_dir, task["name"]))
+        converters.create_videos_with_annotations(
+            tasks, original_folder_dir, output_dir)
+        shutil.rmtree(original_folder_dir)
 
     # Annotation
 

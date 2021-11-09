@@ -41,3 +41,14 @@ def reverse_points(points: List[int]) -> List[int]:
             reversed_points.insert(
                 0, points[index])
     return reversed_points
+
+def color_code_to_rgb(color_code: str) -> tuple[int, int, int]:
+    R = int(color_code[1:3], 16)
+    G = int(color_code[3:5], 16)
+    B = int(color_code[5:7], 16)
+    return (R, G, B)
+
+
+def color_code_to_bgr(color_code: str) -> tuple[int, int, int]:
+    R, G, B = color_code_to_rgb(color_code)
+    return (B, G, R)

@@ -1,10 +1,13 @@
 from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import as_completed
 from typing import List
 
 import copy
+import cv2
 import geojson
 import numpy as np
 import math
+from fastlabel import const, utils
 from fastlabel.const import AnnotationType
 import os
 
@@ -684,3 +687,76 @@ def __get_annotation_type_by_labelme(shape_type: str) -> str:
     if shape_type == "line":
         return "line"
     return None
+
+def create_videos_with_annotations(tasks: list, original_folder_dir: str, output_dir: str):
+    is_all_process_success = True
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = {executor.submit(__write_annotations_to_video, original_folder_dir,
+                                   output_dir, task): task for task in tasks}
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                print(e)
+                is_all_process_success = False
+    if not is_all_process_success:
+        raise Exception(
+            "Error is occured during multi thread process __write_annotations_to_video. For detail, please check above logs.")
+
+
+def __write_annotations_to_video(original_folder_dir: str, output_dir: str, task: dict) -> str:
+    try:
+        # Get task annotations and create map for write annotations
+        task_name = task["name"]
+        task_annotations: list = task["annotations"]
+        frame_points_map = {}
+        for task_annotation in task_annotations:
+            color = task_annotation["color"]
+            for frame_num, obj in task_annotation["points"].items():
+                points = obj["value"]
+                if frame_points_map.get(frame_num):
+                    frame_points_map.get(frame_num).append(
+                        {"points": points, "color": color})
+                else:
+                    frame_points_map[frame_num] = [
+                        {"points": points, "color": color}]
+        cap = cv2.VideoCapture(os.path.join(
+            original_folder_dir, task_name))
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        file_path = os.path.join(
+            output_dir, task_name)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        width = int(task["width"])
+        height = int(task["height"])
+        out = cv2.VideoWriter(
+            file_path, fourcc, int(task["fps"]), (width, height))
+        stroke_width = __get_stroke_width(width, height)
+        # Write each task annotations per frame
+        for i in range(1, task["frameCount"] + 1):
+            if cap.isOpened():
+                ret, frame = cap.read()
+                if ret:
+                    if frame_points_map.get(str(i)):
+                        for obj in frame_points_map[str(i)]:
+                            points = obj["points"]
+                            x1 = int(points[0])
+                            y1 = int(points[1])
+                            x2 = int(points[2])
+                            y2 = int(points[3])
+                            cv2.rectangle(frame, (x1, y1), (x2, y2),
+                                          color=utils.color_code_to_bgr(obj["color"]), lineType=cv2.LINE_8, thickness=stroke_width)
+                    out.write(frame)
+        out.release()
+        cap.release()
+        return file_path
+    except Exception as e:
+        raise Exception(
+            f"Error is occured while write annotations to video. target task name:{task_name},{e}")
+
+
+def __get_stroke_width(width: int, height: int) -> int:
+    if width > height:
+        stroke_width = int(height / 100)
+    else:
+        stroke_width = int(width / 100)
+    return stroke_width if stroke_width > const.MIN_STROKE_WIDTH else const.MIN_STROKE_WIDTH
