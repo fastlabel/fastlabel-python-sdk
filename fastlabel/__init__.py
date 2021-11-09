@@ -1232,7 +1232,6 @@ class Client:
         output_dir is output directory(default: output/with_annotations). (Optional)
         """
         original_folder_dir = os.path.join(output_dir, "originals")
-        os.makedirs(original_folder_dir, exist_ok=True)
         # Download original video
         for task in tasks:
             original_file_path = os.path.join(original_folder_dir, task["name"])
