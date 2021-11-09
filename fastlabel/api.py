@@ -5,6 +5,7 @@ from .exceptions import FastLabelException, FastLabelInvalidException
 
 FASTLABEL_ENDPOINT = "https://api.fastlabel.ai/v1/"
 
+
 class Api:
 
     access_token = None
