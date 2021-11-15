@@ -1276,6 +1276,7 @@ class Client:
         value: str,
         title: str,
         color: str = None,
+        order: int = None,
         attributes: list = []
     ) -> str:
         """
@@ -1297,6 +1298,8 @@ class Client:
         }
         if color:
             payload["color"] = color
+        if order:
+            payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
         return self.api.post_request(endpoint, payload=payload)
@@ -1322,6 +1325,7 @@ class Client:
         value: str = None,
         title: str = None,
         color: str = None,
+        order: int = None,
         attributes: list = []
     ) -> str:
         """
@@ -1341,6 +1345,8 @@ class Client:
             payload["title"] = title
         if color:
             payload["color"] = color
+        if order:
+            payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
         return self.api.put_request(endpoint, payload=payload)
