@@ -1024,8 +1024,10 @@ class Client:
     def export_coco(self, tasks: list, annotations: list = [], output_dir: str = os.path.join("output", "coco")) -> None:
         """
         Convert tasks to COCO format and export as a file.
+        If you pass annotations, you can export Pose Estimation type annotations.
 
         tasks is a list of tasks. (Required)
+        annotations is a list of annotations. (Optional)
         output_dir is output directory(default: output/coco). (Optional)
         """
         coco = converters.to_coco(tasks, annotations)
