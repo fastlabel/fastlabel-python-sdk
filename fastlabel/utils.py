@@ -1,5 +1,6 @@
 import os
 import base64
+import sys
 from typing import List
 
 
@@ -13,7 +14,7 @@ def is_image_supported_ext(file_path: str) -> bool:
 
 
 def is_video_supported_ext(file_path: str) -> bool:
-    return file_path.lower().endswith(('.mp4'))
+    return file_path.lower().endswith('.mp4')
 
 
 def get_basename(file_path: str) -> str:
@@ -41,3 +42,15 @@ def reverse_points(points: List[int]) -> List[int]:
             reversed_points.insert(
                 0, points[index])
     return reversed_points
+
+
+def get_size(value) -> int:
+    if isinstance(value, list):
+        size = sum(map(get_size, iter(value)))
+    elif isinstance(value, dict):
+        size = sum(map(get_size, value.keys()))
+        size += sum(map(get_size, value.values()))
+    else:
+        size = sys.getsizeof(value)
+
+    return size

@@ -477,6 +477,7 @@ class Client:
             raise FastLabelInvalidException(
                 "Folder does not have any file.", 422)
         contents = []
+        contents_size = 0
         for file_path in file_paths:
             if not utils.is_image_supported_ext(file_path):
                 raise FastLabelInvalidException(
@@ -486,6 +487,11 @@ class Client:
                 "name": os.path.basename(file_path),
                 "file": file
             })
+            contents_size += utils.get_size(contents[-1])
+            if contents_size > const.SUPPORTED_CONTENTS_SIZE:
+                raise FastLabelInvalidException(
+                    f"Supported contents size is under {const.SUPPORTED_CONTENTS_SIZE}.", 422)
+
         payload = {"project": project, "name": name, "contents": contents}
         if status:
             payload["status"] = status
@@ -533,6 +539,11 @@ class Client:
             raise FastLabelInvalidException(
                 "Supported extensions are mp4.", 422)
         file = utils.base64_encode(file_path)
+        contents_size = utils.get_size(file)
+        if contents_size > const.SUPPORTED_CONTENTS_SIZE:
+            raise FastLabelInvalidException(
+                f"Supported contents size is under {const.SUPPORTED_CONTENTS_SIZE}.", 422)
+
         payload = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
@@ -582,6 +593,10 @@ class Client:
             raise FastLabelInvalidException(
                 "Supported extensions are mp4.", 422)
         file = utils.base64_encode(file_path)
+        contents_size = utils.get_size(file)
+        if contents_size > const.SUPPORTED_CONTENTS_SIZE:
+            raise FastLabelInvalidException(
+                f"Supported contents size is under {const.SUPPORTED_CONTENTS_SIZE}.", 422)
         payload = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
