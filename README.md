@@ -221,9 +221,7 @@ Example when the project type is Image - Pose Estimation
           "title":"jesture",
           "value":"jesture",
           "color":"#10c414",
-          "attributes":[
-
-          ],
+          "attributes": [],
           "keypoints":[
              {
                 "name":"頭",
@@ -826,9 +824,7 @@ Example when the annotation type is Pose Estimation
    "value":"jesture",
    "color":"#10c414",
    "order":1,
-   "attributes":[
-      
-   ],
+   "attributes": [],
    "keypoints":[
       {
          "id":"b03ea998-a2f1-4733-b7e9-78cdf73bd38a",
@@ -839,9 +835,7 @@ Example when the annotation type is Pose Estimation
             "195f5852-c516-498b-b392-24513ce3ea67",
             "06b5c968-1786-4d75-a719-951e915e5557"
          ],
-         "value":[
-            
-         ]
+         "value": []
       },
       {
          "id":"195f5852-c516-498b-b392-24513ce3ea67",
@@ -851,9 +845,7 @@ Example when the annotation type is Pose Estimation
          "edges":[
             "b03ea998-a2f1-4733-b7e9-78cdf73bd38a"
          ],
-         "value":[
-            
-         ]
+         "value": []
       },
       {
          "id":"06b5c968-1786-4d75-a719-951e915e5557",
@@ -863,9 +855,7 @@ Example when the annotation type is Pose Estimation
          "edges":[
             "b03ea998-a2f1-4733-b7e9-78cdf73bd38a"
          ],
-         "value":[
-            
-         ]
+         "value": []
       }
    ],
    "createdAt":"2021-11-21T09:59:46.714Z",
@@ -1000,7 +990,8 @@ client.delete_project(project_id="YOUR_PROJECT_ID")
 ## Converter
 
 ### COCO
-support the following annotation types.
+
+Support the following annotation types.
 
 - bbox
 - polygon
@@ -1030,7 +1021,7 @@ client.export_coco(tasks=tasks, annotations=annotations, output_dir="YOUR_DIRECT
 
 ### YOLO
 
-support the following annotation types.
+Support the following annotation types.
 
 - bbox
 - polygon
@@ -1055,7 +1046,7 @@ client.export_yolo(tasks=tasks, classes=classes, output_dir="YOUR_DIRECTROY")
 
 ### Pascal VOC
 
-support the following annotation types.
+Support the following annotation types.
 
 - bbox
 - polygon
@@ -1069,7 +1060,7 @@ client.export_pascalvoc(tasks)
 
 ### labelme
 
-support the following annotation types.
+Support the following annotation types.
 
 - bbox
 - polygon
@@ -1345,7 +1336,7 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
 
 ### labelme
 
-support the following annotation types.
+Support the following annotation types.
 
 - bbox
 - polygon
