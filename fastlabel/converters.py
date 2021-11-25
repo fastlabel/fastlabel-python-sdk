@@ -157,6 +157,7 @@ def __get_coco_annotation_keypoints(keypoints: list) -> list:
         value = keypoint["value"]
         if not value:
             coco_annotation_keypoints.extend([0, 0, 0])
+            continue
         # Adjust fastlabel data definition to coco format
         visibility = 2 if value[2] == 1 else 1
         coco_annotation_keypoints.extend([value[0], value[1], visibility])
