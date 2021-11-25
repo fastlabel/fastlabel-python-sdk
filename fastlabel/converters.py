@@ -11,9 +11,9 @@ import os
 # COCO
 
 
-def to_coco(tasks: list) -> dict:
+def to_coco(tasks: list, annotations: list) -> dict:
     # Get categories
-    categories = __get_categories(tasks)
+    categories = __get_categories(tasks, annotations)
 
     # Get images and annotations
     images = []
@@ -52,22 +52,72 @@ def to_coco(tasks: list) -> dict:
     }
 
 
-def __get_categories(tasks: list) -> list:
+def __get_coco_skelton(keypoints: list) -> list:
+    keypoint_id_skelton_index_map = {}
+    for index, keypoint in enumerate(keypoints, 1):
+        keypoint_id_skelton_index_map[keypoint["id"]] = index
+
+    skelton = []
+    filtered_skelton_indexes = []
+    for keypoint in keypoints:
+        id = keypoint["id"]
+        skelton_index = keypoint_id_skelton_index_map[id]
+        edges = keypoint["edges"]
+        for edge in edges:
+            edge_skelton_index = keypoint_id_skelton_index_map[edge]
+            if not edge_skelton_index in filtered_skelton_indexes:
+                skelton.append([skelton_index, edge_skelton_index])
+            filtered_skelton_indexes.append(skelton_index)
+    return skelton
+
+
+def __get_categories(tasks: list, annotations: list) -> list:
+    categories = []
     values = []
     for task in tasks:
-        for annotation in task["annotations"]:
-            if annotation["type"] != AnnotationType.bbox.value and annotation["type"] != AnnotationType.polygon.value:
+        for task_annotation in task["annotations"]:
+            if task_annotation["type"] != AnnotationType.bbox.value and task_annotation["type"] != AnnotationType.polygon.value and task_annotation["type"] != AnnotationType.pose_estimation.value:
                 continue
-            values.append(annotation["value"])
+            values.append(task_annotation["value"])
     values = list(set(values))
 
-    categories = []
-    for index, value in enumerate(values):
-        category = {
-            "supercategory": value,
-            "id": index + 1,
-            "name": value
-        }
+    # Create categories from task annotations (not support pose esitimation)
+    if not annotations:
+        for index, value in enumerate(values, 1):
+            category = {
+                "skelton": [],
+                "keypoints": [],
+                "keypoint_colors": [],
+                "color": task_annotation["color"],
+                "supercategory": value,
+                "id": index,
+                "name": value
+            }
+            categories.append(category)
+        return categories
+
+    # Create categories from passed annotations (support pose esitimation)
+    index = 1
+    for annotation in annotations:
+        if not annotation["value"] in values:
+            continue
+        coco_skelton = []
+        coco_keypoints = []
+        coco_keypoint_colors = []
+        if annotation["type"] == AnnotationType.pose_estimation.value:
+            keypoints = annotation["keypoints"]
+            for keypoint in keypoints:
+                coco_keypoints.append(keypoint["key"])
+                coco_keypoint_colors.append(keypoint["color"])
+            coco_skelton = __get_coco_skelton(keypoints)
+        category = {"skelton": coco_skelton,
+                    "keypoints": coco_keypoints,
+                    "keypoint_colors": coco_keypoint_colors,
+                    "color": annotation["color"],
+                    "supercategory": annotation["value"],
+                    "id": index,
+                    "name": annotation["value"]}
+        index += 1
         categories.append(category)
     return categories
 
@@ -76,13 +126,14 @@ def __to_annotation(data: dict) -> dict:
     annotation = data["annotation"]
     categories = data["categories"]
     image = data["image"]
-    points = annotation["points"]
+    points = annotation.get("points")
+    keypoints = annotation.get("keypoints")
     annotation_type = annotation["type"]
     annotation_id = 0
 
-    if annotation_type != AnnotationType.bbox.value and annotation_type != AnnotationType.polygon.value:
+    if annotation_type != AnnotationType.bbox.value and annotation_type != AnnotationType.polygon.value and annotation_type != AnnotationType.pose_estimation.value:
         return None
-    if not points or len(points) == 0:
+    if annotation_type != AnnotationType.pose_estimation.value and (not points or len(points)) == 0:
         return None
     if annotation_type == AnnotationType.bbox.value and (int(points[0]) == int(points[2]) or int(points[1]) == int(points[3])):
         return None
@@ -90,7 +141,8 @@ def __to_annotation(data: dict) -> dict:
     category = __get_category_by_name(categories, annotation["value"])
 
     return __get_annotation(
-        annotation_id, points, category["id"], image, annotation_type)
+        annotation_id, points, keypoints, category["id"], image, annotation_type)
+
 
 
 def __get_category_by_name(categories: list, name: str) -> str:
@@ -99,13 +151,29 @@ def __get_category_by_name(categories: list, name: str) -> str:
     return category
 
 
-def __get_annotation(id_: int, points: list, category_id: int, image: dict, annotation_type: str) -> dict:
+def __get_coco_annotation_keypoints(keypoints: list) -> list:
+    coco_annotation_keypoints = []
+    for keypoint in keypoints:
+        value = keypoint["value"]
+        if not value:
+            coco_annotation_keypoints.extend([0, 0, 0])
+            continue
+        # Adjust fastlabel data definition to coco format
+        visibility = 2 if value[2] == 1 else 1
+        coco_annotation_keypoints.extend([value[0], value[1], visibility])
+    return coco_annotation_keypoints
+
+
+def __get_annotation(id_: int, points: list, keypoints: list, category_id: int, image: dict, annotation_type: str) -> dict:
     annotation = {}
-    annotation["segmentation"] = [points]
+    annotation["num_keypoints"] = len(keypoints) if keypoints else 0
+    annotation["keypoints"] = __get_coco_annotation_keypoints(
+        keypoints) if keypoints else []
+    annotation["segmentation"] = [points] if points else []
     annotation["iscrowd"] = 0
-    annotation["area"] = __calc_area(annotation_type, points)
+    annotation["area"] = __calc_area(annotation_type, points) if points else 0
     annotation["image_id"] = image["id"]
-    annotation["bbox"] = __to_bbox(points)
+    annotation["bbox"] = __to_bbox(points) if points else []
     annotation["category_id"] = category_id
     annotation["id"] = id_
     return annotation
