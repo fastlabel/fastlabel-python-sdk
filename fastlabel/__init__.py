@@ -1142,24 +1142,39 @@ class Client:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         index = 1
+        # In case segmentation, to avoid hollowed points overwrite other segmentation in them, segmentation rendering process is different from other annotation type
+        seg_mask_images = []
         for annotation in task["annotations"]:
             color = index if is_instance_segmentation else classes.index(
                 annotation["value"]) + 1
             if annotation["type"] == AnnotationType.segmentation.value:
+                # Create each annotation's masks and merge them finally
+                seg_mask_ground = Image.new(
+                    "RGB", (task["width"], task["height"]), 0)
+                seg_mask_image = np.array(seg_mask_ground)
+                seg_mask_image = cv2.cvtColor(seg_mask_image, cv2.COLOR_BGR2GRAY)
+
                 for region in annotation["points"]:
                     count = 0
                     for points in region:
                         if count == 0:
-                            cv_draw_points = self.__get_cv_draw_points(points)
+                            cv_draw_points = []
+                            if utils.is_clockwise(points):
+                                cv_draw_points = self.__get_cv_draw_points(
+                                    points)
+                            else:
+                                cv_draw_points = self.__get_cv_draw_points(
+                                    utils.reverse_points(points))
                             cv2.fillPoly(
-                                image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
+                                seg_mask_image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
                         else:
                             # Reverse hollow points for opencv because this points are counter clockwise
                             cv_draw_points = self.__get_cv_draw_points(
                                 utils.reverse_points(points))
                             cv2.fillPoly(
-                                image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
+                                seg_mask_image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
                         count += 1
+                seg_mask_images.append(seg_mask_image)
             elif annotation["type"] == AnnotationType.polygon.value:
                 cv_draw_points = self.__get_cv_draw_points(
                     annotation["points"])
@@ -1173,6 +1188,10 @@ class Client:
             else:
                 continue
             index += 1
+
+        # For segmentation, merge each mask images
+        for seg_mask_image in seg_mask_images:
+            image = image | seg_mask_image
 
         image_path = os.path.join(
             output_dir, utils.get_basename(task["name"]) + ".png")
