@@ -159,6 +159,34 @@ while True:
 
 > Please wait a second before sending another requests!
 
+#### Update Tasks
+
+Update a signle task.
+
+```python
+task_id = client.update_image_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"],
+    annotations=[
+        {
+            "type": "bbox",
+            "value": "cat"
+            "attributes": [
+                { "key": "kind", "value": "Scottish field" }
+            ],
+            "points": [
+                100,  # top-left x
+                100,  # top-left y
+                200,  # bottom-right x
+                200   # bottom-right y
+            ]
+        }
+    ],
+)
+```
+
 #### Response
 
 Example of a single image task object
@@ -678,13 +706,14 @@ APIs for update and delete are same over all tasks.
 
 #### Update Task
 
-Update a single task status and tags.
+Update a single task status, tags and assignee.
 
 ```python
 task_id = client.update_task(
     task_id="YOUR_TASK_ID",
     status="approved",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
+    assignee="USER_SLUG"
 )
 ```
 
