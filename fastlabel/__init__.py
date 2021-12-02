@@ -667,6 +667,7 @@ class Client:
             payload["tags"] = tags
         if annotations:
             for annotation in annotations:
+                # Since the content name is not passed in the sdk update api, the content will be filled on the server side.
                 annotation["content"] = ""
             payload["annotations"] = annotations
 
