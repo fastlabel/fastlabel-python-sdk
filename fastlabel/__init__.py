@@ -633,6 +633,48 @@ class Client:
 
         return self.api.put_request(endpoint, payload=payload)
 
+    def update_image_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        annotations: list[dict] = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single image task.
+
+        task_id is an id of the task. (Required)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        tags is a list of tag to be set. (Optional)
+        annotations is a list of annotation to be set. (Optional)
+        assignee is slug of assigned user. (Optional)
+        reviewer is slug of review user. (Optional)
+        approver is slug of approve user. (Optional)
+        external_assignee is slug of external assigned user. (Optional)
+        external_reviewer is slug of external review user. (Optional)
+        external_approver is slug of external approve user. (Optional)
+        """
+        endpoint = "tasks/image/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            for annotation in annotations:
+                # Since the content name is not passed in the sdk update api, the content will be filled on the server side.
+                annotation["content"] = ""
+            payload["annotations"] = annotations
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
     def update_image_classification_task(
         self,
         task_id: str,
