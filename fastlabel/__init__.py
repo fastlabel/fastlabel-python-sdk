@@ -481,6 +481,11 @@ class Client:
             if not utils.is_image_supported_ext(file_path):
                 raise FastLabelInvalidException(
                     "Supported extensions are png, jpg, jpeg.", 422)
+
+            if len(contents) == 250:
+                raise FastLabelInvalidException(
+                    "The count of files should be under 250", 422)
+
             file = utils.base64_encode(file_path)
             contents.append({
                 "name": os.path.basename(file_path),
@@ -639,7 +644,7 @@ class Client:
         status: str = None,
         external_status: str = None,
         tags: list = [],
-        annotations: list[dict] = [],
+        annotations: List[dict] = [],
         **kwargs,
     ) -> str:
         """
