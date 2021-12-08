@@ -432,6 +432,9 @@ task = client.create_multi_image_task(
 )
 ```
 
+##### Limitation
+* You can upload up to a total size of about 380 MB.
+
 #### Find Task
 
 Find a single task.
