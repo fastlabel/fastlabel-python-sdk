@@ -14,3 +14,4 @@ class AnnotationType(Enum):
     line = "line"
     segmentation = "segmentation"
     classification = "classification"
+    pose_estimation = "pose_estimation"

@@ -62,6 +62,7 @@ Supported following project types:
 - Image - Keypoint
 - Image - Line
 - Image - Segmentation
+- Image - Pose Estimation(not support Create Task)
 - Image - All
 
 #### Create Task
@@ -158,6 +159,34 @@ while True:
 
 > Please wait a second before sending another requests!
 
+#### Update Tasks
+
+Update a signle task.
+
+```python
+task_id = client.update_image_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"],
+    annotations=[
+        {
+            "type": "bbox",
+            "value": "cat"
+            "attributes": [
+                { "key": "kind", "value": "Scottish field" }
+            ],
+            "points": [
+                100,  # top-left x
+                100,  # top-left y
+                200,  # bottom-right x
+                200   # bottom-right y
+            ]
+        }
+    ],
+)
+```
+
 #### Response
 
 Example of a single image task object
@@ -197,6 +226,76 @@ Example of a single image task object
     "updatedAt": "2021-02-22T11:25:27.158Z"
 }
 ```
+
+Example when the project type is Image - Pose Estimation
+
+```python
+{
+    "id": "YOUR_TASK_ID",
+    "name": "person.jpg",
+    "width": 255,   # image width
+    "height": 255,  # image height
+    "url": "YOUR_TASK_URL",
+    "status": "registered",
+    "externalStatus": "registered",
+    "tags": [],
+    "assignee": "ASSIGNEE_NAME",
+    "reviewer": "REVIEWER_NAME",
+    "externalAssignee": "EXTERNAL_ASSIGNEE_NAME",
+    "externalReviewer": "EXTERNAL_REVIEWER_NAME",
+    "annotations":[
+       {
+          "type":"pose_estimation",
+          "title":"jesture",
+          "value":"jesture",
+          "color":"#10c414",
+          "attributes": [],
+          "keypoints":[
+             {
+                "name":"頭",
+                "key":"head",
+                "value":[
+                   102.59, # x
+                   23.04,  # y
+                   1       # 0:invisible, 1:visible
+                ],
+                "edges":[
+                   "right_shoulder",
+                   "left_shoulder"
+                ]
+             },
+             {
+                "name":"右肩",
+                "key":"right_shoulder",
+                "value":[
+                   186.69,
+                   114.11,
+                   1
+                ],
+                "edges":[
+                   "head"
+                ]
+             },
+             {
+                "name":"左肩",
+                "key":"left_shoulder",
+                "value":[
+                   37.23,
+                   109.29,
+                   1
+                ],
+                "edges":[
+                   "head"
+                ]
+             }
+          ]
+       }
+    ],
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
+```
+
 
 ### Image Classification
 
@@ -607,13 +706,14 @@ APIs for update and delete are same over all tasks.
 
 #### Update Task
 
-Update a single task status and tags.
+Update a single task status, tags and assignee.
 
 ```python
 task_id = client.update_task(
     task_id="YOUR_TASK_ID",
     status="approved",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
+    assignee="USER_SLUG"
 )
 ```
 
@@ -744,6 +844,55 @@ Example of an annotation object
 }
 ```
 
+Example when the annotation type is Pose Estimation
+```python
+{
+   "id":"b12c81c3-ddec-4f98-b41b-cef7f77d26a4",
+   "type":"pose_estimation",
+   "title":"jesture",
+   "value":"jesture",
+   "color":"#10c414",
+   "order":1,
+   "attributes": [],
+   "keypoints":[
+      {
+         "id":"b03ea998-a2f1-4733-b7e9-78cdf73bd38a",
+         "name":"頭",
+         "key":"head",
+         "color":"#0033CC",
+         "edges":[
+            "195f5852-c516-498b-b392-24513ce3ea67",
+            "06b5c968-1786-4d75-a719-951e915e5557"
+         ],
+         "value": []
+      },
+      {
+         "id":"195f5852-c516-498b-b392-24513ce3ea67",
+         "name":"右肩",
+         "key":"right_shoulder",
+         "color":"#0033CC",
+         "edges":[
+            "b03ea998-a2f1-4733-b7e9-78cdf73bd38a"
+         ],
+         "value": []
+      },
+      {
+         "id":"06b5c968-1786-4d75-a719-951e915e5557",
+         "name":"左肩",
+         "key":"left_shoulder",
+         "color":"#0033CC",
+         "edges":[
+            "b03ea998-a2f1-4733-b7e9-78cdf73bd38a"
+         ],
+         "value": []
+      }
+   ],
+   "createdAt":"2021-11-21T09:59:46.714Z",
+   "updatedAt":"2021-11-21T09:59:46.714Z"
+}
+```
+
+
 ### Update Annotation
 
 Update an annotation.
@@ -869,9 +1018,13 @@ client.delete_project(project_id="YOUR_PROJECT_ID")
 
 ## Converter
 
-Supporting bbox or polygon annotation type.
-
 ### COCO
+
+Support the following annotation types.
+
+- bbox
+- polygon
+- pose estimation
 
 Get tasks and export as a [COCO format](https://cocodataset.org/#format-data) file.
 
@@ -886,7 +1039,21 @@ Export with specifying output directory.
 client.export_coco(tasks=tasks, output_dir="YOUR_DIRECTROY")
 ```
 
+If you would like to export pose estimation type annotations, please pass annotations.
+
+```python
+project_slug = "YOUR_PROJECT_SLUG"
+tasks = client.get_image_tasks(project=project_slug)
+annotations = client.get_annotations(project=project_slug)
+client.export_coco(tasks=tasks, annotations=annotations, output_dir="YOUR_DIRECTROY")
+```
+
 ### YOLO
+
+Support the following annotation types.
+
+- bbox
+- polygon
 
 Get tasks and export as YOLO format files.
 
@@ -908,6 +1075,11 @@ client.export_yolo(tasks=tasks, classes=classes, output_dir="YOUR_DIRECTROY")
 
 ### Pascal VOC
 
+Support the following annotation types.
+
+- bbox
+- polygon
+
 Get tasks and export as Pascal VOC format files.
 
 ```python
@@ -916,6 +1088,14 @@ client.export_pascalvoc(tasks)
 ```
 
 ### labelme
+
+Support the following annotation types.
+
+- bbox
+- polygon
+- points
+- line
+
 
 Get tasks and export as labelme format files.
 
@@ -1185,7 +1365,7 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
 
 ### labelme
 
-support the following annotation types.
+Support the following annotation types.
 
 - bbox
 - polygon

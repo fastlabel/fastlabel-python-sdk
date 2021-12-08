@@ -482,6 +482,11 @@ class Client:
             if not utils.is_image_supported_ext(file_path):
                 raise FastLabelInvalidException(
                     "Supported extensions are png, jpg, jpeg.", 422)
+
+            if len(contents) == 250:
+                raise FastLabelInvalidException(
+                    "The count of files should be under 250", 422)
+
             file = utils.base64_encode(file_path)
             contents.append({
                 "name": os.path.basename(file_path),
@@ -643,6 +648,48 @@ class Client:
             payload["externalStatus"] = external_status
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_image_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        annotations: List[dict] = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single image task.
+
+        task_id is an id of the task. (Required)
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        tags is a list of tag to be set. (Optional)
+        annotations is a list of annotation to be set. (Optional)
+        assignee is slug of assigned user. (Optional)
+        reviewer is slug of review user. (Optional)
+        approver is slug of approve user. (Optional)
+        external_assignee is slug of external assigned user. (Optional)
+        external_reviewer is slug of external review user. (Optional)
+        external_approver is slug of external approve user. (Optional)
+        """
+        endpoint = "tasks/image/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            for annotation in annotations:
+                # Since the content name is not passed in the sdk update api, the content will be filled on the server side.
+                annotation["content"] = ""
+            payload["annotations"] = annotations
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1036,14 +1083,16 @@ class Client:
 
     # Task Convert
 
-    def export_coco(self, tasks: list, output_dir: str = os.path.join("output", "coco")) -> None:
+    def export_coco(self, tasks: list, annotations: list = [], output_dir: str = os.path.join("output", "coco")) -> None:
         """
         Convert tasks to COCO format and export as a file.
+        If you pass annotations, you can export Pose Estimation type annotations.
 
         tasks is a list of tasks. (Required)
+        annotations is a list of annotations. (Optional)
         output_dir is output directory(default: output/coco). (Optional)
         """
-        coco = converters.to_coco(tasks)
+        coco = converters.to_coco(tasks, annotations)
         os.makedirs(output_dir, exist_ok=True)
         file_path = os.path.join(output_dir, "annotations.json")
         with open(file_path, 'w') as f:
@@ -1155,24 +1204,39 @@ class Client:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         index = 1
+        # In case segmentation, to avoid hollowed points overwrite other segmentation in them, segmentation rendering process is different from other annotation type
+        seg_mask_images = []
         for annotation in task["annotations"]:
             color = index if is_instance_segmentation else classes.index(
                 annotation["value"]) + 1
             if annotation["type"] == AnnotationType.segmentation.value:
+                # Create each annotation's masks and merge them finally
+                seg_mask_ground = Image.new(
+                    "RGB", (task["width"], task["height"]), 0)
+                seg_mask_image = np.array(seg_mask_ground)
+                seg_mask_image = cv2.cvtColor(seg_mask_image, cv2.COLOR_BGR2GRAY)
+
                 for region in annotation["points"]:
                     count = 0
                     for points in region:
                         if count == 0:
-                            cv_draw_points = self.__get_cv_draw_points(points)
+                            cv_draw_points = []
+                            if utils.is_clockwise(points):
+                                cv_draw_points = self.__get_cv_draw_points(
+                                    points)
+                            else:
+                                cv_draw_points = self.__get_cv_draw_points(
+                                    utils.reverse_points(points))
                             cv2.fillPoly(
-                                image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
+                                seg_mask_image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
                         else:
                             # Reverse hollow points for opencv because this points are counter clockwise
                             cv_draw_points = self.__get_cv_draw_points(
                                 utils.reverse_points(points))
                             cv2.fillPoly(
-                                image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
+                                seg_mask_image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
                         count += 1
+                seg_mask_images.append(seg_mask_image)
             elif annotation["type"] == AnnotationType.polygon.value:
                 cv_draw_points = self.__get_cv_draw_points(
                     annotation["points"])
@@ -1186,6 +1250,10 @@ class Client:
             else:
                 continue
             index += 1
+
+        # For segmentation, merge each mask images
+        for seg_mask_image in seg_mask_images:
+            image = image | seg_mask_image
 
         image_path = os.path.join(
             output_dir, utils.get_basename(task["name"]) + ".png")
