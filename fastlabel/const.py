@@ -7,6 +7,9 @@ COLOR_PALETTE = [0, 0, 0, 228, 26, 28, 55, 126, 184, 77, 175, 74, 152, 78, 163, 
 # Because of V8's limitation, API only can accept the JSON string that length is under this.
 SUPPORTED_CONTENTS_SIZE = 536870000
 
+# API can accept under 250 MB ( 250 * 1024 * 1024 )
+SUPPORTED_VIDEO_SIZE = 262144000
+
 
 class AnnotationType(Enum):
     bbox = "bbox"

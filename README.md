@@ -564,6 +564,9 @@ task_id = client.create_video_task(
 )
 ```
 
+##### Limitation
+* You can upload up to a size of about 250 MB.
+
 #### Find Task
 
 Find a single task.
@@ -667,6 +670,9 @@ task_id = client.create_video_classification_task(
     ],
 )
 ```
+
+##### Limitation
+* You can upload up to a size of about 250 MB.
 
 #### Find Task
 

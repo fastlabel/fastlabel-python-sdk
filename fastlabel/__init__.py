@@ -543,12 +543,11 @@ class Client:
         if not utils.is_video_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are mp4.", 422)
-        file = utils.base64_encode(file_path)
-        contents_size = utils.get_json_length(file)
-        if contents_size > const.SUPPORTED_CONTENTS_SIZE:
+        if os.path.getsize(file_path) > const.SUPPORTED_VIDEO_SIZE:
             raise FastLabelInvalidException(
-                f"Supported contents size is under {const.SUPPORTED_CONTENTS_SIZE}.", 422)
+                f"Supported video size is under 250 MB.", 422)
 
+        file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
@@ -597,11 +596,11 @@ class Client:
         if not utils.is_video_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are mp4.", 422)
-        file = utils.base64_encode(file_path)
-        contents_size = utils.get_json_length(file)
-        if contents_size > const.SUPPORTED_CONTENTS_SIZE:
+        if os.path.getsize(file_path) > const.SUPPORTED_VIDEO_SIZE:
             raise FastLabelInvalidException(
-                f"Supported contents size is under {const.SUPPORTED_CONTENTS_SIZE}.", 422)
+                f"Supported video size is under 250 MB.", 422)
+
+        file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
