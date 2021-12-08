@@ -639,7 +639,7 @@ class Client:
         status: str = None,
         external_status: str = None,
         tags: list = [],
-        annotations: list = [],
+        annotations: List[dict] = [],
         **kwargs,
     ) -> str:
         """
