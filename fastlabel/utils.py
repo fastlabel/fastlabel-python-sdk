@@ -2,6 +2,7 @@ import os
 import base64
 import numpy as np
 import geojson
+import json
 from typing import List
 
 
@@ -69,21 +70,7 @@ def is_clockwise(points: list) -> bool:
     return False
 
 
-def get_length(value) -> int:
-    if isinstance(value, list):
-        length = sum(map(get_length, iter(value)))
-        length += 2
-    elif isinstance(value, dict):
-        length = sum(map(get_length, value.keys()))
-        length += sum(map(get_length, value.values()))
-        length += len(value.keys()) * 2
-        length += (len(value.keys()) - 1) * 2
-        length += 2
-    else:
-        if isinstance(value, str):
-            length = len(value)
-            length += 2
-        else:
-            length = len(str(value))
+def get_json_length(value) -> int:
+    json_str = json.dumps(value)
+    return len(json_str)
 
-    return length
