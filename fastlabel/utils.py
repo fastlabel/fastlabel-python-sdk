@@ -2,7 +2,6 @@ import os
 import base64
 import numpy as np
 import geojson
-import sys
 from typing import List
 
 
@@ -45,6 +44,7 @@ def reverse_points(points: List[int]) -> List[int]:
                 0, points[index])
     return reversed_points
 
+
 def is_clockwise(points: list) -> bool:
     """
     points: [x1, y1, x2, y2, x3, y3, ... xn, yn]
@@ -69,13 +69,21 @@ def is_clockwise(points: list) -> bool:
     return False
 
 
-def get_size(value) -> int:
+def get_length(value) -> int:
     if isinstance(value, list):
-        size = sum(map(get_size, iter(value)))
+        length = sum(map(get_length, iter(value)))
+        length += 2
     elif isinstance(value, dict):
-        size = sum(map(get_size, value.keys()))
-        size += sum(map(get_size, value.values()))
+        length = sum(map(get_length, value.keys()))
+        length += sum(map(get_length, value.values()))
+        length += len(value.keys()) * 2
+        length += (len(value.keys()) - 1) * 2
+        length += 2
     else:
-        size = sys.getsizeof(value)
+        if isinstance(value, str):
+            length = len(value)
+            length += 2
+        else:
+            length = len(str(value))
 
-    return size
+    return length

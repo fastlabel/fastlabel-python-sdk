@@ -492,7 +492,7 @@ class Client:
                 "name": os.path.basename(file_path),
                 "file": file
             })
-            contents_size += utils.get_size(contents[-1])
+            contents_size += utils.get_length(contents[-1])
             if contents_size > const.SUPPORTED_CONTENTS_SIZE:
                 raise FastLabelInvalidException(
                     f"Supported contents size is under {const.SUPPORTED_CONTENTS_SIZE}.", 422)
@@ -544,7 +544,7 @@ class Client:
             raise FastLabelInvalidException(
                 "Supported extensions are mp4.", 422)
         file = utils.base64_encode(file_path)
-        contents_size = utils.get_size(file)
+        contents_size = utils.get_length(file)
         if contents_size > const.SUPPORTED_CONTENTS_SIZE:
             raise FastLabelInvalidException(
                 f"Supported contents size is under {const.SUPPORTED_CONTENTS_SIZE}.", 422)
@@ -598,7 +598,7 @@ class Client:
             raise FastLabelInvalidException(
                 "Supported extensions are mp4.", 422)
         file = utils.base64_encode(file_path)
-        contents_size = utils.get_size(file)
+        contents_size = utils.get_length(file)
         if contents_size > const.SUPPORTED_CONTENTS_SIZE:
             raise FastLabelInvalidException(
                 f"Supported contents size is under {const.SUPPORTED_CONTENTS_SIZE}.", 422)
