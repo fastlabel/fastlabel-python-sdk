@@ -432,6 +432,10 @@ task = client.create_multi_image_task(
 )
 ```
 
+##### Limitation
+
+* You can upload up to 250 files in total.
+
 #### Find Task
 
 Find a single task.
