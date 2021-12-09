@@ -2,6 +2,7 @@ import os
 import base64
 import numpy as np
 import geojson
+import json
 from typing import List
 
 
@@ -15,7 +16,7 @@ def is_image_supported_ext(file_path: str) -> bool:
 
 
 def is_video_supported_ext(file_path: str) -> bool:
-    return file_path.lower().endswith(('.mp4'))
+    return file_path.lower().endswith('.mp4')
 
 
 def get_basename(file_path: str) -> str:
@@ -44,13 +45,14 @@ def reverse_points(points: List[int]) -> List[int]:
                 0, points[index])
     return reversed_points
 
+
 def is_clockwise(points: list) -> bool:
     """
     points: [x1, y1, x2, y2, x3, y3, ... xn, yn]
-    Sum over the edges, (x2 − x1)(y2 + y1). 
+    Sum over the edges, (x2 − x1)(y2 + y1).
     If the result is positive the curve is clockwise, if it's negative the curve is counter-clockwise.
-    
-    The above is assumes a normal Cartesian coordinate system. 
+
+    The above is assumes a normal Cartesian coordinate system.
     HTML5 canvas, use an inverted Y-axis.
     Therefore If the area is negative, the curve is clockwise.
     """
@@ -65,4 +67,10 @@ def is_clockwise(points: list) -> bool:
 
     if sum_edges < 0:
         return True
-    return False 
+    return False
+
+
+def get_json_length(value) -> int:
+    json_str = json.dumps(value)
+    return len(json_str)
+

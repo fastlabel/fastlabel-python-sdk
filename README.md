@@ -432,6 +432,10 @@ task = client.create_multi_image_task(
 )
 ```
 
+##### Limitation
+* You can upload up to a total size of 512 MB.
+* You can upload up to 250 files in total.
+
 #### Find Task
 
 Find a single task.
@@ -561,6 +565,9 @@ task_id = client.create_video_task(
 )
 ```
 
+##### Limitation
+* You can upload up to a size of 250 MB.
+
 #### Find Task
 
 Find a single task.
@@ -664,6 +671,9 @@ task_id = client.create_video_classification_task(
     ],
 )
 ```
+
+##### Limitation
+* You can upload up to a size of 250 MB.
 
 #### Find Task
 

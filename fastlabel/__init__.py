@@ -477,15 +477,26 @@ class Client:
             raise FastLabelInvalidException(
                 "Folder does not have any file.", 422)
         contents = []
+        contents_size = 0
         for file_path in file_paths:
             if not utils.is_image_supported_ext(file_path):
                 raise FastLabelInvalidException(
                     "Supported extensions are png, jpg, jpeg.", 422)
+
+            if len(contents) == 250:
+                raise FastLabelInvalidException(
+                    "The count of files should be under 250", 422)
+
             file = utils.base64_encode(file_path)
             contents.append({
                 "name": os.path.basename(file_path),
                 "file": file
             })
+            contents_size += utils.get_json_length(contents[-1])
+            if contents_size > const.SUPPORTED_CONTENTS_SIZE:
+                raise FastLabelInvalidException(
+                    f"Supported contents size is under {const.SUPPORTED_CONTENTS_SIZE}.", 422)
+
         payload = {"project": project, "name": name, "contents": contents}
         if status:
             payload["status"] = status
@@ -532,6 +543,10 @@ class Client:
         if not utils.is_video_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are mp4.", 422)
+        if os.path.getsize(file_path) > const.SUPPORTED_VIDEO_SIZE:
+            raise FastLabelInvalidException(
+                f"Supported video size is under 250 MB.", 422)
+
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
         if status:
@@ -581,6 +596,10 @@ class Client:
         if not utils.is_video_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are mp4.", 422)
+        if os.path.getsize(file_path) > const.SUPPORTED_VIDEO_SIZE:
+            raise FastLabelInvalidException(
+                f"Supported video size is under 250 MB.", 422)
+
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
         if status:
@@ -639,7 +658,7 @@ class Client:
         status: str = None,
         external_status: str = None,
         tags: list = [],
-        annotations: list[dict] = [],
+        annotations: List[dict] = [],
         **kwargs,
     ) -> str:
         """
