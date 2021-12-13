@@ -19,6 +19,10 @@ def is_video_supported_ext(file_path: str) -> bool:
     return file_path.lower().endswith('.mp4')
 
 
+def is_json_ext(file_name: str) -> bool:
+    return file_name.lower().endswith('.json')
+
+
 def get_basename(file_path: str) -> str:
     """
     e.g.) file.jpg -> file
