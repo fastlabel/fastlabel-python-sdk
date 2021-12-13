@@ -1082,7 +1082,7 @@ class Client:
 
     # Task Convert
 
-    def export_coco(self, tasks: list, annotations: list = [], output_dir: str = os.path.join("output", "coco")) -> None:
+    def export_coco(self, tasks: list, annotations: list = [], output_dir: str = os.path.join("output", "coco"), output_file_name: str = "annotations.json") -> None:
         """
         Convert tasks to COCO format and export as a file.
         If you pass annotations, you can export Pose Estimation type annotations.
@@ -1090,10 +1090,14 @@ class Client:
         tasks is a list of tasks. (Required)
         annotations is a list of annotations. (Optional)
         output_dir is output directory(default: output/coco). (Optional)
+        output_file_name is output file name(default: annotations.json). (Optional)
         """
+        if not utils.is_json_ext(output_file_name):
+            raise FastLabelInvalidException(
+                "Output file name must have a json extension", 422)
         coco = converters.to_coco(tasks, annotations)
         os.makedirs(output_dir, exist_ok=True)
-        file_path = os.path.join(output_dir, "annotations.json")
+        file_path = os.path.join(output_dir, output_file_name)
         with open(file_path, 'w') as f:
             json.dump(coco, f, indent=4, ensure_ascii=False)
 

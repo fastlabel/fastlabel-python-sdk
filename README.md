@@ -1043,10 +1043,10 @@ tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
 client.export_coco(tasks)
 ```
 
-Export with specifying output directory.
+Export with specifying output directory and file name.
 
 ```python
-client.export_coco(tasks=tasks, output_dir="YOUR_DIRECTROY")
+client.export_coco(tasks=tasks, output_dir="YOUR_DIRECTROY", output_file_name="YOUR_FILE_NAME")
 ```
 
 If you would like to export pose estimation type annotations, please pass annotations.
@@ -1055,7 +1055,7 @@ If you would like to export pose estimation type annotations, please pass annota
 project_slug = "YOUR_PROJECT_SLUG"
 tasks = client.get_image_tasks(project=project_slug)
 annotations = client.get_annotations(project=project_slug)
-client.export_coco(tasks=tasks, annotations=annotations, output_dir="YOUR_DIRECTROY")
+client.export_coco(tasks=tasks, annotations=annotations, output_dir="YOUR_DIRECTROY", output_file_name="YOUR_FILE_NAME")
 ```
 
 ### YOLO
