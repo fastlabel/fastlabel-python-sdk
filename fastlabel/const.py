@@ -10,6 +10,9 @@ SUPPORTED_CONTENTS_SIZE = 536870000
 # API can accept under 250 MB ( 250 * 1024 * 1024 )
 SUPPORTED_VIDEO_SIZE = 262144000
 
+# API can accept under 20 MB ( 20 * 1024 * 1024 )
+SUPPORTED_IMAGE_SIZE = 20971520
+
 
 class AnnotationType(Enum):
     bbox = "bbox"
