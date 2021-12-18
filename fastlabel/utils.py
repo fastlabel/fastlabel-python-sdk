@@ -4,7 +4,7 @@ import numpy as np
 import geojson
 import json
 from typing import List
-import const
+from fastlabel import const
 
 
 def base64_encode(file_path: str) -> str:
