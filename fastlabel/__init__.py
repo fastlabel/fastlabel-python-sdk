@@ -608,7 +608,7 @@ class Client:
         if not utils.is_video_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are mp4.", 422)
-        if os.path.getsize(file_path) > const.SUPPORTED_VIDEO_SIZE:
+        if not utils.is_video_supported_size(file_path):
             raise FastLabelInvalidException(
                 f"Supported video size is under 250 MB.", 422)
 
