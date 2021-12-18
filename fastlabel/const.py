@@ -1,3 +1,4 @@
+import math
 from enum import Enum
 
 # only 57 types
@@ -7,11 +8,11 @@ COLOR_PALETTE = [0, 0, 0, 228, 26, 28, 55, 126, 184, 77, 175, 74, 152, 78, 163, 
 # Because of V8's limitation, API only can accept the JSON string that length is under this.
 SUPPORTED_CONTENTS_SIZE = 536870000
 
-# API can accept under 250 MB ( 250 * 1024 * 1024 )
-SUPPORTED_VIDEO_SIZE = 262144000
+# API can accept under 250 MB
+SUPPORTED_VIDEO_SIZE = 250 * math.pow(1024, 2)
 
-# API can accept under 20 MB ( 20 * 1024 * 1024 )
-SUPPORTED_IMAGE_SIZE = 20971520
+# API can accept under 20 MB
+SUPPORTED_IMAGE_SIZE = 20 * math.pow(1024, 2)
 
 
 class AnnotationType(Enum):
