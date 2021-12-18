@@ -105,6 +105,9 @@ task_id = client.create_image_task(
 
 > Check [examples/create_image_task.py](/examples/create_image_task.py).
 
+##### Limitation
+* You can upload up to a size of 20 MB.
+
 #### Find Task
 
 Find a single task.
@@ -321,6 +324,9 @@ task_id = client.create_image_classification_task(
 )
 ```
 
+##### Limitation
+* You can upload up to a size of 20 MB.
+
 #### Find Task
 
 Find a single task.
@@ -433,6 +439,7 @@ task = client.create_multi_image_task(
 ```
 
 ##### Limitation
+* You can upload up to a size of 20 MB.
 * You can upload up to a total size of 512 MB.
 * You can upload up to 250 files in total.
 
