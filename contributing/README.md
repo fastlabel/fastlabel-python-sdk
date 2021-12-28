@@ -18,5 +18,22 @@ $ pip install -r contributing/requirements.txt
 ### Run Formatter and Linter
 
 ```bash
-make all
+$ make all
 ```
+
+### Enable pre-commit hook
+
+```bash
+$ pre-commit install
+```
+
+Basically, `pre-commit` will only run on the changed files.
+But if you execute the bellow command, you can run on all of files.
+
+```bash
+$ pre-commit run --all-files
+```
+
+#### How to enable on your IDE
+
+* [VS code](https://marketplace.visualstudio.com/items?itemName=MarkLarah.pre-commit-vscode)
