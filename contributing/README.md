@@ -33,10 +33,3 @@ But if you execute the bellow command, you can run on all files.
 ```bash
 $ pre-commit run --all-files
 ```
-
-#### How to enable on your IDE
-
-`pre-commit` will only run when you commit the file by manual.
-So, you should do additional settings if you want to commit the file using IDE.
-
-* [VS code](https://marketplace.visualstudio.com/items?itemName=MarkLarah.pre-commit-vscode)
