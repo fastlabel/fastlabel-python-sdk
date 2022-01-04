@@ -1,0 +1,21 @@
+repos:
+-   repo: https://github.com/psf/black
+    rev: 20.8b1
+    hooks:
+      -   id: black
+          files: '^.*\.py'
+          types: [file]
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.4
+    hooks:
+      -   id: flake8
+          args: ['--extend-ignore=E203', '--max-line-length=88']
+          files: '^.*\.py'
+          types: [file]
+-   repo: https://github.com/pycqa/isort
+    rev: 5.6.4
+    hooks:
+      -   id: isort
+          args: ['--profile', 'black']
+          files: '^.*\.py'
+          types: [file]
