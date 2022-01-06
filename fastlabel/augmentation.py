@@ -5,9 +5,11 @@ import random
 import numpy as np
 import math
 import skimage
+import copy
 
 
 class Augmentation:
+
     AUGMENTATION_LIST = [
         "90_degree_rotation_image_level",
         "crop_image_level",
@@ -15,7 +17,11 @@ class Augmentation:
         "brightness_image_level",
         "blur_image_level",
         "noise_image_level",
-        "exposure_image_level"
+        "exposure_image_level",
+        "brightness_bounding_box_level",
+        "exposure_bounding_box_level",
+        "blur_bounding_box_level",
+        "noise_bounding_box_level"
     ]
 
     @classmethod
@@ -37,7 +43,7 @@ class Augmentation:
                 os.makedirs(f"{augmentation_dir_path}/debugs", exist_ok=True)
 
             processed_annotation_list = []
-            for annotation in annotation_list:
+            for annotation in copy.deepcopy(annotation_list):
                 image_name = annotation["name"]
                 image_path = f"{image_dir_path}/{image_name}"
 
@@ -197,7 +203,101 @@ class Augmentation:
         return processed_image, processed_annotation
 
     def _brightness_image_level(self, image, annotation):
+        return self._random_brightness(image.copy()), annotation
 
+    def _blur_image_level(self, image, annotation):
+        return self._random_blur(image.copy()), annotation
+
+    def _noise_image_level(self, image, annotation):
+        return self._random_noise(image.copy()), annotation
+
+    def _exposure_image_level(self, image, annotation):
+        return self._random_exposure(image.copy()), annotation
+
+    def _brightness_bounding_box_level(self, image, annotation):
+        processed_image = image.copy()
+
+        for annotation_object in annotation["annotations"]:
+            point_list_flatten = annotation_object["points"]
+
+            if annotation_object["type"] == "bbox":
+                x_min, y_min, x_max, y_max = point_list_flatten
+            else:
+                x_min, y_min, x_max, y_max = self._get_bbox(point_list_flatten)
+
+            cropped_image = processed_image[y_min: y_max, x_min: x_max]
+
+            cropped_image_brightness = self._random_brightness(cropped_image)
+
+            processed_image[y_min: y_max, x_min: x_max] = cropped_image_brightness
+
+        return processed_image, annotation
+
+    def _exposure_bounding_box_level(self, image, annotation):
+        processed_image = image.copy()
+
+        for annotation_object in annotation["annotations"]:
+            point_list_flatten = annotation_object["points"]
+
+            if annotation_object["type"] == "bbox":
+                x_min, y_min, x_max, y_max = point_list_flatten
+            else:
+                x_min, y_min, x_max, y_max = self._get_bbox(point_list_flatten)
+
+            cropped_image = processed_image[y_min: y_max, x_min: x_max]
+
+            cropped_image_brightness = self._random_exposure(cropped_image)
+
+            processed_image[y_min: y_max, x_min: x_max] = cropped_image_brightness
+
+        return processed_image, annotation
+
+    def _blur_bounding_box_level(self, image, annotation):
+        processed_image = image.copy()
+
+        for annotation_object in annotation["annotations"]:
+            point_list_flatten = annotation_object["points"]
+
+            if annotation_object["type"] == "bbox":
+                x_min, y_min, x_max, y_max = point_list_flatten
+            else:
+                x_min, y_min, x_max, y_max = self._get_bbox(point_list_flatten)
+
+            cropped_image = processed_image[y_min: y_max, x_min: x_max]
+
+            cropped_image_brightness = self._random_blur(cropped_image)
+
+            processed_image[y_min: y_max, x_min: x_max] = cropped_image_brightness
+
+        return processed_image, annotation
+
+    def _noise_bounding_box_level(self, image, annotation):
+        processed_image = image.copy()
+
+        for annotation_object in annotation["annotations"]:
+            point_list_flatten = annotation_object["points"]
+
+            if annotation_object["type"] == "bbox":
+                x_min, y_min, x_max, y_max = point_list_flatten
+            else:
+                x_min, y_min, x_max, y_max = self._get_bbox(point_list_flatten)
+
+            cropped_image = processed_image[y_min: y_max, x_min: x_max]
+
+            cropped_image_brightness = self._random_noise(cropped_image)
+
+            processed_image[y_min: y_max, x_min: x_max] = cropped_image_brightness
+
+        return processed_image, annotation
+
+    @staticmethod
+    def _random_blur(image):
+        # https://blog.roboflow.com/using-blur-in-computer-vision-preprocessing/
+        kernel_size = random.randint(0, 12) * 2 + 1
+        return cv2.blur(image.copy(), (kernel_size, kernel_size))
+
+    @staticmethod
+    def _random_brightness(image):
         # https://pystyle.info/opencv-change-contrast-and-brightness/
 
         alpha = random.uniform(0.2, 2)
@@ -207,21 +307,22 @@ class Augmentation:
 
         processed_image = np.clip(processed_image, 0, 255).astype(np.uint8)
 
-        return processed_image, annotation
+        return processed_image
 
-    def _blur_image_level(self, image, annotation):
-        # https://blog.roboflow.com/using-blur-in-computer-vision-preprocessing/
+    @staticmethod
+    def _random_exposure(image):
+        # https://docs.roboflow.com/image-transformations/image-augmentation#exposure
+        # https://scikit-image.org/docs/stable/api/skimage.exposure.html#skimage.exposure.adjust_gamma
 
-        kernel_size = random.randint(0, 12) * 2 + 1
+        gamma = random.uniform(0, 1)
 
-        processed_image = cv2.blur(image.copy(), (kernel_size, kernel_size))
+        processed_image = skimage.exposure.adjust_gamma(image.copy(), gamma=gamma)
 
-        return processed_image, annotation
+        return processed_image
 
-    def _noise_image_level(self, image, annotation):
+    @staticmethod
+    def _random_noise(image):
         # https://blog.roboflow.com/why-to-add-noise-to-images-for-machine-learning/
-
-        processed_image = image.copy()
 
         r = np.random.rand(1)
 
@@ -235,22 +336,24 @@ class Augmentation:
             processed_image = skimage.util.random_noise(image.copy(), mode='speckle', var=0.01)
         elif r < 0.75:
             processed_image = skimage.util.random_noise(image.copy(), mode='poisson')
-        elif r < 0.95:
+        else:
             processed_image = skimage.util.random_noise(image.copy(), mode='gaussian', var=0.01)
 
         processed_image = processed_image * 255
         processed_image = processed_image.astype(np.uint8)
 
-        return processed_image, annotation
+        return processed_image
 
-    def _exposure_image_level(self, image, annotation):
-        # https://docs.roboflow.com/image-transformations/image-augmentation#exposure
-        # https://scikit-image.org/docs/stable/api/skimage.exposure.html#skimage.exposure.adjust_gamma
 
-        gamma = random.uniform(0, 1)
+    @staticmethod
+    def _get_bbox(point_list_flatten):
+        x_list = []
+        y_list = []
+        for point_index in range(0, len(point_list_flatten) - 1, 2):
+            x_list.append(point_list_flatten[point_index])
+            y_list.append(point_list_flatten[point_index + 1])
+        return min(x_list), min(y_list), max(x_list), max(y_list)
 
-        processed_image = skimage.exposure.adjust_gamma(image.copy(), gamma=gamma)
-        return processed_image, annotation
 
     @staticmethod
     def _rotation_image(image, angle_degree):
