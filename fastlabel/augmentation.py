@@ -31,7 +31,7 @@ class Augmentation:
     ]
 
     AUGMENTATION_LIST = [
-        "shear_bounding_box_level"
+        "crop_bounding_box_level",
     ]
 
     def __init__(self):
@@ -380,14 +380,13 @@ class Augmentation:
                 if rotation_angle == 180:
                     processed_image[y_min: y_max, x_min: x_max] = cropped_image_90_degree_rotation
                 else:
-                    processed_image[x_min: x_max, y_min: y_max] = cropped_image_90_degree_rotation
-                    point_list_flatten = annotation_object["points"]
-                    processed_point_list_flatten = []
-                    for point_index in range(0, len(point_list_flatten) - 1, 2):
-                        x, y = point_list_flatten[point_index], point_list_flatten[point_index + 1]
-                        processed_point_list_flatten.append(y)
-                        processed_point_list_flatten.append(x)
-                        annotation_object["points"] = processed_point_list_flatten
+                    x_center, y_center = (x_max + x_min)/2, (y_max + y_min)/2
+                    rotation_x_min = int(x_center - (y_max - y_min) / 2)
+                    rotation_x_max = int(x_center + (y_max - y_min) / 2)
+                    rotation_y_min = int(y_center - (x_max - x_min) / 2)
+                    rotation_y_max = int(y_center + (x_max - x_min) / 2)
+                    processed_image[rotation_y_min: rotation_y_max,rotation_x_min: rotation_x_max] = cropped_image_90_degree_rotation
+                    annotation_object["points"] = [rotation_x_min, rotation_y_min, rotation_x_max, rotation_y_max]
             else:
                 point_list_flatten = annotation_object["points"]
                 processed_point_list_flatten = []
@@ -451,10 +450,10 @@ class Augmentation:
             else:
                 fill_color = (0, 0, 0)
 
-            processed_image[y_min: y_max, x_min: start_point[0]] = fill_color
-            processed_image[y_min: y_max, start_point[0] + cropped_image_size[0]: x_max] = fill_color
-            processed_image[y_min: start_point[1], x_min: x_max] = fill_color
-            processed_image[start_point[1] + cropped_image_size[1]: y_max, x_min: x_max] = fill_color
+            processed_image[y_min: y_max, x_min: x_min + start_point[0]] = fill_color
+            processed_image[y_min: y_max, x_min + start_point[0] + cropped_image_size[0]: x_max] = fill_color
+            processed_image[y_min: y_min + start_point[1], x_min: x_max] = fill_color
+            processed_image[y_min + start_point[1] + cropped_image_size[1]: y_max, x_min: x_max] = fill_color
 
             if annotation_object["type"] == "polygon":
                 point_list_flatten = annotation_object["points"]
@@ -598,9 +597,8 @@ class Augmentation:
                 processed_point_list_flatten = []
                 for point_index in range(0, len(point_list_flatten) - 1, 2):
                     x, y = point_list_flatten[point_index], point_list_flatten[point_index + 1]
-
-                    x, y = self._shear_point((x, y), shear_matrix)
-
+                    origin_before = origin_after = ((x_max + x_min) / 2, (y_max + y_min) / 2)
+                    x, y = self._shear_point(origin_before, origin_after, (x, y), shear_matrix)
                     processed_point_list_flatten.append(x)
                     processed_point_list_flatten.append(y)
 
@@ -624,20 +622,17 @@ class Augmentation:
 
         direction = random.choice(["horizontal", "vertical"])
 
-        shear_angle = random.uniform(-200, 200)
+        shear_angle = random.uniform(0, 200)
         h, w = image.shape[:2]
-        src = np.array([[0.0, 0.0], [0.0, 1.0], [1.0, 0.0]], np.float32)
-        dest = src.copy()
 
         if direction == "horizontal":
-            dest[:, 0] += (shear_angle / h * (h - src[:, 1])).astype(np.float32)
+            mat = np.array([[1, np.radians(shear_angle), 0], [0, 1, 0]], dtype=np.float32)
+            shear_image = cv2.warpAffine(image, mat, (int(w + h * np.radians(shear_angle)), h))
         else:
-            dest[:, 1] += (shear_angle / w * (w - src[:, 0])).astype(np.float32)
-        affine = cv2.getAffineTransform(src, dest)
+            mat = np.array([[1, 0, 0], [np.radians(shear_angle), 1, 0]], dtype=np.float32)
+            shear_image = cv2.warpAffine(image, mat, (w, int(h + w * np.radians(shear_angle))))
 
-        shear_image = cv2.warpAffine(image, affine, (w, h))
-
-        return shear_image, affine
+        return shear_image, mat
 
     @staticmethod
     def _random_crop(image):
@@ -839,9 +834,9 @@ class Augmentation:
             json.dump(annotation, f, indent=4, ensure_ascii=False)
 
     @staticmethod
-    def _shear_point(point, shear_matrix):
-        x = shear_matrix[0][0] * point[0] + shear_matrix[0][1] * point[1] + shear_matrix[0][2]
-        y = shear_matrix[1][0] * point[0] + shear_matrix[1][1] * point[1] + shear_matrix[1][2]
+    def _shear_point(origin_before, origin_after, point, shear_matrix):
+        x = shear_matrix[0][0] * (point[0] - origin_before[0]) + shear_matrix[0][1] * (point[1] - origin_before[1]) + shear_matrix[0][2] + origin_after[0]
+        y = shear_matrix[1][0] * (point[0] - origin_before[0]) + shear_matrix[1][1] * (point[1] - origin_before[1]) + shear_matrix[1][2] + origin_after[1]
 
         return int(x), int(y)
 
