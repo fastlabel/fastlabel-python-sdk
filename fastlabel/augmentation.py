@@ -7,6 +7,7 @@ import math
 import skimage
 import copy
 import codecs
+from typing import Tuple, Dict, Any, List
 
 
 class Augmentation:
@@ -30,12 +31,24 @@ class Augmentation:
         "noise_bounding_box_level"
     ]
 
-    AUGMENTATION_LIST = [
-        "crop_bounding_box_level",
-    ]
-
-    def __init__(self):
-        self.is_fill_average_color = True
+    def __init__(
+            self,
+            max_rotation_angle: int = 360,
+            max_kernel_size_for_blur: int = 25,
+            keep_image_ratio_for_crop: float = 0.5,
+            shear_angle_range: Tuple[int, int] = (0, 200),
+            alpha_range_for_brightness: Tuple[float, float] = (0.2, 2),
+            beta_range_for_brightness: Tuple[int, int] = (-100, 100),
+            gamma_range_for_exposure: Tuple[float, float]=(0, 1),
+            is_fill_average_color: bool = True) -> None:
+        self._max_rotation_angle = max_rotation_angle
+        self._max_kernel_size_for_blur = max_kernel_size_for_blur
+        self._keep_image_ratio_for_crop = keep_image_ratio_for_crop
+        self._shear_angle_range = shear_angle_range
+        self._alpha_range_for_brightness = alpha_range_for_brightness
+        self._beta_range_for_brightness = beta_range_for_brightness
+        self._gamma_range_for_exposure = gamma_range_for_exposure
+        self._is_fill_average_color = is_fill_average_color
 
     def execute(
             self,
@@ -49,10 +62,7 @@ class Augmentation:
         for augmentation_name in self.AUGMENTATION_LIST:
             augmentation_method = getattr(self, f"_{augmentation_name}")
 
-            augmentation_dir_path = f"{output_dir_path}/{augmentation_name}"
-            os.makedirs(f"{augmentation_dir_path}/images", exist_ok=True)
-            if is_debug:
-                os.makedirs(f"{augmentation_dir_path}/debugs", exist_ok=True)
+            self._create_output_image_dir(f"{output_dir_path}/{augmentation_name}", is_debug)
 
             processed_annotation_list = []
             for annotation in copy.deepcopy(annotation_list):
@@ -78,7 +88,10 @@ class Augmentation:
 
             self._save_json(processed_annotation_list, output_dir_path, augmentation_name)
 
-    def _90_degree_rotation_image_level(self, image, annotation):
+    def _90_degree_rotation_image_level(
+            self,
+            image: np.ndarray,
+            annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         rotation_angle = random.choice([90, 180, 270])
         processed_image = self._rotation_image(image, rotation_angle)
 
@@ -110,8 +123,8 @@ class Augmentation:
 
         return processed_image, processed_annotation
 
-    def _rotation_image_level(self, image, annotation):
-        rotation_angle = random.randint(0, 359)
+    def _rotation_image_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
+        rotation_angle = random.randint(0, self._max_rotation_angle)
         processed_image = self._rotation_image(image, rotation_angle)
 
         processed_annotation = annotation.copy()
@@ -159,7 +172,7 @@ class Augmentation:
 
         return processed_image, processed_annotation
 
-    def _crop_image_level(self, image, annotation):
+    def _crop_image_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         processed_image, cropped_image_size, start_point = self._random_crop(
             image)
 
@@ -201,19 +214,19 @@ class Augmentation:
 
         return processed_image, processed_annotation
 
-    def _brightness_image_level(self, image, annotation):
+    def _brightness_image_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         return self._random_brightness(image.copy()), annotation
 
-    def _blur_image_level(self, image, annotation):
+    def _blur_image_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         return self._random_blur(image.copy()), annotation
 
-    def _noise_image_level(self, image, annotation):
+    def _noise_image_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         return self._random_noise(image.copy()), annotation
 
-    def _exposure_image_level(self, image, annotation):
+    def _exposure_image_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         return self._random_exposure(image.copy()), annotation
 
-    def _brightness_bounding_box_level(self, image, annotation):
+    def _brightness_bounding_box_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         processed_image = image.copy()
 
         for annotation_object in annotation["annotations"]:
@@ -236,7 +249,7 @@ class Augmentation:
 
         return processed_image, annotation
 
-    def _exposure_bounding_box_level(self, image, annotation):
+    def _exposure_bounding_box_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         processed_image = image.copy()
 
         for annotation_object in annotation["annotations"]:
@@ -259,7 +272,7 @@ class Augmentation:
 
         return processed_image, annotation
 
-    def _blur_bounding_box_level(self, image, annotation):
+    def _blur_bounding_box_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         processed_image = image.copy()
 
         for annotation_object in annotation["annotations"]:
@@ -282,7 +295,7 @@ class Augmentation:
 
         return processed_image, annotation
 
-    def _noise_bounding_box_level(self, image, annotation):
+    def _noise_bounding_box_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         processed_image = image.copy()
 
         for annotation_object in annotation["annotations"]:
@@ -305,7 +318,7 @@ class Augmentation:
 
         return processed_image, annotation
 
-    def _flip_bounding_box_level(self, image, annotation):
+    def _flip_bounding_box_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         processed_image = image.copy()
 
         processed_annotation = annotation.copy()
@@ -356,7 +369,7 @@ class Augmentation:
 
         return processed_image, processed_annotation
 
-    def _90_degree_rotation_bounding_box_level(self, image, annotation):
+    def _90_degree_rotation_bounding_box_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         processed_image = image.copy()
         image_height, image_width = processed_image.shape[:2]
 
@@ -422,7 +435,7 @@ class Augmentation:
 
         return processed_image, processed_annotation
 
-    def _crop_bounding_box_level(self, image, annotation):
+    def _crop_bounding_box_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         processed_image = image.copy()
 
         processed_annotation = annotation.copy()
@@ -445,7 +458,7 @@ class Augmentation:
                 y_min + start_point[1]: y_min + start_point[1] + cropped_image_size[1],
                 x_min + start_point[0]: x_min + start_point[0] + cropped_image_size[0]] = cropped_image
 
-            if self.is_fill_average_color:
+            if self._is_fill_average_color:
                 fill_color = np.average(cropped_image, axis=(0, 1))
             else:
                 fill_color = (0, 0, 0)
@@ -484,7 +497,7 @@ class Augmentation:
 
         return processed_image, processed_annotation
 
-    def _rotation_bounding_box_level(self, image, annotation):
+    def _rotation_bounding_box_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         processed_image = image.copy()
 
         processed_annotation = annotation.copy()
@@ -500,7 +513,7 @@ class Augmentation:
 
             cropped_image = processed_image[y_min: y_max, x_min: x_max]
 
-            rotation_angle = random.randint(0, 359)
+            rotation_angle = random.randint(0, self._max_rotation_angle)
             cropped_rotation_image = self._rotation_image(cropped_image, rotation_angle)
 
             rotation_x_min = int(x_min - (cropped_rotation_image.shape[1] - cropped_image.shape[1]) / 2)
@@ -549,7 +562,7 @@ class Augmentation:
 
         return processed_image, processed_annotation
 
-    def _shear_bounding_box_level(self, image, annotation):
+    def _shear_bounding_box_level(self, image: np.ndarray, annotation: Dict[str, Any]) -> Tuple[np.ndarray, Dict[str, Any]]:
         processed_image = image.copy()
 
         processed_annotation = annotation.copy()
@@ -610,19 +623,19 @@ class Augmentation:
 
         return processed_image, processed_annotation
 
-    @staticmethod
-    def _random_blur(image):
+    def _random_blur(self, image: np.ndarray) -> np.ndarray:
         # https://blog.roboflow.com/using-blur-in-computer-vision-preprocessing/
-        kernel_size = random.randint(0, 12) * 2 + 1
+        kernel_size = random.randint(1, self._max_kernel_size_for_blur)
+        if kernel_size % 2 == 0:
+            kernel_size = kernel_size + 1
         return cv2.blur(image.copy(), (kernel_size, kernel_size))
 
-    @staticmethod
-    def _random_shear(image):
+    def _random_shear(self, image: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         # https://qiita.com/koshian2/items/c133e2e10c261b8646bf#%E3%81%9B%E3%82%93%E6%96%ADshear
 
         direction = random.choice(["horizontal", "vertical"])
 
-        shear_angle = random.uniform(0, 200)
+        shear_angle = random.uniform(self._shear_angle_range[0], self._shear_angle_range[1])
         h, w = image.shape[:2]
 
         if direction == "horizontal":
@@ -634,18 +647,14 @@ class Augmentation:
 
         return shear_image, mat
 
-    @staticmethod
-    def _random_crop(image):
+    def _random_crop(self, image: np.ndarray) -> Tuple[np.ndarray, Tuple[int, int], Tuple[int, int]]:
         # https://blog.roboflow.com/why-and-how-to-implement-random-crop-data-augmentation/
-
-        keep_image_ratio = 0.5
-
         height, width = image.shape[:2]
-        start_point_x = random.randint(0, int(width * keep_image_ratio))
-        start_point_y = random.randint(0, int(height * keep_image_ratio))
+        start_point_x = random.randint(0, int(width * self._keep_image_ratio_for_crop))
+        start_point_y = random.randint(0, int(height * self._keep_image_ratio_for_crop))
 
-        cropped_width = random.randint(int(width * keep_image_ratio), (width - start_point_x))
-        cropped_height = random.randint(int(height * keep_image_ratio), (height - start_point_y))
+        cropped_width = random.randint(int(width * self._keep_image_ratio_for_crop), (width - start_point_x))
+        cropped_height = random.randint(int(height * self._keep_image_ratio_for_crop), (height - start_point_y))
 
         processed_image = image[
                           start_point_y: start_point_y + cropped_height,
@@ -654,7 +663,7 @@ class Augmentation:
         return processed_image, (cropped_width, cropped_height), (start_point_x, start_point_y)
 
     @staticmethod
-    def _random_flip(image):
+    def _random_flip(image: np.ndarray) -> Tuple[np.ndarray, str]:
         rotation_flip_direction = random.choice(["horizontal", "vertical"])
         if rotation_flip_direction == "horizontal":
             processed_image = np.fliplr(image)
@@ -663,13 +672,10 @@ class Augmentation:
 
         return processed_image, rotation_flip_direction
 
-    @staticmethod
-    def _random_brightness(image):
+    def _random_brightness(self, image: np.ndarray) -> np.ndarray:
         # https://pystyle.info/opencv-change-contrast-and-brightness/
-
-        #alpha = random.uniform(0.2, 2)
-        alpha = random.uniform(0.4, 0.6)
-        beta = random.uniform(-100, 100)
+        alpha = random.uniform(self._alpha_range_for_brightness[0], self._alpha_range_for_brightness[1])
+        beta = random.uniform(self._beta_range_for_brightness[0], self._beta_range_for_brightness[1])
 
         processed_image = alpha * image.copy() + beta
 
@@ -677,7 +683,9 @@ class Augmentation:
 
         return processed_image
 
-    def _update_polygon_area(self, processed_image, cropped_image_brightness, point_list_flatten):
+    def _update_polygon_area(
+            self, processed_image: np.ndarray,
+            cropped_image_brightness: np.ndarray, point_list_flatten: List[int]) -> np.ndarray:
 
         x_min, y_min, x_max, y_max = self._get_bbox(point_list_flatten)
 
@@ -709,19 +717,16 @@ class Augmentation:
 
         return processed_image
 
-    @staticmethod
-    def _random_exposure(image):
+    def _random_exposure(self, image: np.ndarray) -> np.ndarray:
         # https://docs.roboflow.com/image-transformations/image-augmentation#exposure
         # https://scikit-image.org/docs/stable/api/skimage.exposure.html#skimage.exposure.adjust_gamma
-
-        gamma = random.uniform(0, 1)
-
+        gamma = random.uniform(self._gamma_range_for_exposure [0], self._gamma_range_for_exposure [1])
         processed_image = skimage.exposure.adjust_gamma(image.copy(), gamma=gamma)
 
         return processed_image
 
     @staticmethod
-    def _random_noise(image):
+    def _random_noise(image: np.ndarray) -> np.ndarray:
         # https://blog.roboflow.com/why-to-add-noise-to-images-for-machine-learning/
 
         r = np.random.rand(1)
@@ -746,17 +751,16 @@ class Augmentation:
 
 
     @staticmethod
-    def _get_bbox(point_list_flatten):
+    def _get_bbox(point_list_flatten: List[int]) -> List[int]:
         x_list = []
         y_list = []
         for point_index in range(0, len(point_list_flatten) - 1, 2):
             x_list.append(point_list_flatten[point_index])
             y_list.append(point_list_flatten[point_index + 1])
-        return min(x_list), min(y_list), max(x_list), max(y_list)
+        return [min(x_list), min(y_list), max(x_list), max(y_list)]
 
 
-    @staticmethod
-    def _rotation_image(image, angle_degree):
+    def _rotation_image(self, image: np.ndarray, angle_degree: float) -> np.ndarray:
 
         if angle_degree == 0:
             processed_image = image.copy()
@@ -780,14 +784,18 @@ class Augmentation:
             M[0, 2] += (nW / 2) - cX
             M[1, 2] += (nH / 2) - cY
 
-            processed_image = cv2.warpAffine(image, M, (nW, nH))
+            if self._is_fill_average_color :
+                fill_color = np.average(image, axis=(0, 1))
+            else:
+                fill_color = (0, 0, 0)
+
+            processed_image = cv2.warpAffine(image, M, (nW, nH), borderValue=fill_color)
 
         return processed_image
 
     @staticmethod
-    def _debugger(image, annotation):
+    def _debugger(image: np.ndarray, annotation: Dict[str, Any]) -> np.ndarray:
         image_draw = image.copy()
-        draw_line_thinness = 10
         label_color_dict = {}
         for annotation_object in annotation["annotations"]:
             point_list_flatten = annotation_object["points"]
@@ -803,7 +811,7 @@ class Augmentation:
                 image_draw = cv2.rectangle(
                     image_draw,
                     (point_list_flatten[0], point_list_flatten[1]),
-                    (point_list_flatten[2], point_list_flatten[3]), color, draw_line_thinness)
+                    (point_list_flatten[2], point_list_flatten[3]), color, 10)
             else:
                 point_list = []
                 for point_index in range(0, len(point_list_flatten) - 1, 2):
@@ -811,37 +819,27 @@ class Augmentation:
                     point_list.append([x, y])
                 points = np.array(point_list, np.int32)
                 points = points.reshape((-1, 1, 2))
-                image_draw = cv2.polylines(image_draw, [points], True, color, draw_line_thinness)
+                image_draw = cv2.polylines(image_draw, [points], True, color, 10)
 
         return image_draw
 
     @staticmethod
-    def _save_image(image, image_name, output_dir_path, augmentation_name):
-        cv2.imwrite(f"{output_dir_path}/{augmentation_name}/images/{image_name}", image)
-
-    @staticmethod
-    def _save_debug_image(image, image_name, output_dir_path, augmentation_name):
-        cv2.imwrite(f"{output_dir_path}/{augmentation_name}/debugs/{image_name}", image)
-
-    @staticmethod
-    def _save_json(annotation, output_dir_path, augmentation_name):
-
-        augmentation_dir_path = f"{output_dir_path}/{augmentation_name}"
-
-        os.makedirs(f"{augmentation_dir_path}", exist_ok=True)
-
-        with codecs.open(f"{augmentation_dir_path}/annotation.json", 'w', 'utf-8') as f:
-            json.dump(annotation, f, indent=4, ensure_ascii=False)
-
-    @staticmethod
-    def _shear_point(origin_before, origin_after, point, shear_matrix):
+    def _shear_point(
+            origin_before: Tuple[int, int],
+            origin_after: Tuple[int, int],
+            point: Tuple[int, int],
+            shear_matrix: np.ndarray) -> Tuple[int, int]:
         x = shear_matrix[0][0] * (point[0] - origin_before[0]) + shear_matrix[0][1] * (point[1] - origin_before[1]) + shear_matrix[0][2] + origin_after[0]
         y = shear_matrix[1][0] * (point[0] - origin_before[0]) + shear_matrix[1][1] * (point[1] - origin_before[1]) + shear_matrix[1][2] + origin_after[1]
 
         return int(x), int(y)
 
     @staticmethod
-    def _rotate_point(origin_before, origin_after, point, angle_degree):
+    def _rotate_point(
+            origin_before: Tuple[int, int],
+            origin_after: Tuple[int, int],
+            point: Tuple[int, int],
+            angle_degree: float) -> Tuple[int, int]:
         ox_before, oy_before = origin_before
         ox_after, oy_after = origin_after
         px, py = point
@@ -851,3 +849,27 @@ class Augmentation:
         qx = ox_after + math.cos(angle_radian) * (px - ox_before) - math.sin(angle_radian) * (py - oy_before)
         qy = oy_after + math.sin(angle_radian) * (px - ox_before) + math.cos(angle_radian) * (py - oy_before)
         return int(qx), int(qy)
+
+    @staticmethod
+    def _create_output_image_dir(augmentation_dir_path: str, is_debug: bool) -> None:
+        os.makedirs(f"{augmentation_dir_path}/images", exist_ok=True)
+        if is_debug:
+            os.makedirs(f"{augmentation_dir_path}/debugs", exist_ok=True)
+
+    @staticmethod
+    def _save_image(image: np.ndarray, image_name: str, output_dir_path: str, augmentation_name: str) -> None:
+        cv2.imwrite(f"{output_dir_path}/{augmentation_name}/images/{image_name}", image)
+
+    @staticmethod
+    def _save_debug_image(image: np.ndarray, image_name: str, output_dir_path: str, augmentation_name: str) -> None:
+        cv2.imwrite(f"{output_dir_path}/{augmentation_name}/debugs/{image_name}", image)
+
+    @staticmethod
+    def _save_json(annotation: List[Dict[str, Any]], output_dir_path: str, augmentation_name: str) -> None:
+
+        augmentation_dir_path = f"{output_dir_path}/{augmentation_name}"
+
+        os.makedirs(f"{augmentation_dir_path}", exist_ok=True)
+
+        with codecs.open(f"{augmentation_dir_path}/annotation.json", 'w', 'utf-8') as f:
+            json.dump(annotation, f, indent=4, ensure_ascii=False)
