@@ -1,4 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+from decimal import Decimal
 from typing import List
 
 import copy
@@ -76,7 +78,7 @@ def __get_categories(tasks: list, annotations: list) -> list:
     values = []
     for task in tasks:
         for task_annotation in task["annotations"]:
-            if task_annotation["type"] != AnnotationType.bbox.value and task_annotation["type"] != AnnotationType.polygon.value and task_annotation["type"] != AnnotationType.pose_estimation.value:
+            if task_annotation["type"] not in [AnnotationType.bbox.value, AnnotationType.polygon.value, AnnotationType.segmentation.value, AnnotationType.pose_estimation.value]:
                 continue
             values.append(task_annotation["value"])
     values = list(set(values))
@@ -131,7 +133,7 @@ def __to_annotation(data: dict) -> dict:
     annotation_type = annotation["type"]
     annotation_id = 0
 
-    if annotation_type != AnnotationType.bbox.value and annotation_type != AnnotationType.polygon.value and annotation_type != AnnotationType.pose_estimation.value:
+    if annotation_type not in [AnnotationType.bbox.value, AnnotationType.polygon.value, AnnotationType.segmentation.value, AnnotationType.pose_estimation.value]:
         return None
     if annotation_type != AnnotationType.pose_estimation.value and (not points or len(points)) == 0:
         return None
@@ -142,7 +144,6 @@ def __to_annotation(data: dict) -> dict:
 
     return __get_annotation(
         annotation_id, points, keypoints, category["id"], image, annotation_type)
-
 
 
 def __get_category_by_name(categories: list, name: str) -> str:
@@ -169,46 +170,104 @@ def __get_annotation(id_: int, points: list, keypoints: list, category_id: int, 
     annotation["num_keypoints"] = len(keypoints) if keypoints else 0
     annotation["keypoints"] = __get_coco_annotation_keypoints(
         keypoints) if keypoints else []
-    annotation["segmentation"] = [points] if points else []
+    annotation["segmentation"] = __to_coco_segmentation(
+        annotation_type, points)
     annotation["iscrowd"] = 0
-    annotation["area"] = __calc_area(annotation_type, points) if points else 0
+    annotation["area"] = __to_area(annotation_type, points)
     annotation["image_id"] = image["id"]
-    annotation["bbox"] = __to_bbox(points) if points else []
+    annotation["bbox"] = __to_bbox(annotation_type, points)
     annotation["category_id"] = category_id
     annotation["id"] = id_
     return annotation
 
 
-def __to_bbox(points: list) -> list:
-    points_splitted = [points[idx:idx + 2]
-                       for idx in range(0, len(points), 2)]
+def __get_without_hollowed_points(points: list) -> list:
+    return [region[0] for region in points]
+
+
+def __to_coco_segmentation(annotation_type: str, points: list) -> list:
+    if not points:
+        return []
+    if annotation_type == AnnotationType.segmentation.value:
+        # Remove hollowed points
+        return __get_without_hollowed_points(points)
+    return [points]
+
+
+def __to_bbox(annotation_type: str, points: list) -> list:
+    if not points:
+        return []
+    base_points = []
+    if annotation_type == AnnotationType.segmentation.value:
+        base_points = sum(__get_without_hollowed_points(points), [])
+    else:
+        base_points = points
+    points_splitted = [
+        base_points[idx: idx + 2] for idx in range(0, len(base_points), 2)
+    ]
     polygon_geo = geojson.Polygon(points_splitted)
     coords = np.array(list(geojson.utils.coords(polygon_geo)))
     left_top_x = coords[:, 0].min()
     left_top_y = coords[:, 1].min()
     right_bottom_x = coords[:, 0].max()
     right_bottom_y = coords[:, 1].max()
+    width = right_bottom_x - left_top_x
+    height = right_bottom_y - left_top_y
+    return [__serialize(point) for point in [left_top_x, left_top_y, width, height]]
 
-    return [
-        left_top_x,  # x
-        left_top_y,  # y
-        right_bottom_x - left_top_x,  # width
-        right_bottom_y - left_top_y,  # height
-    ]
+
+def __to_area(annotation_type: str, points: list) -> float:
+    if not points:
+        return 0
+    area = 0
+    if annotation_type == AnnotationType.segmentation.value:
+        for region in __get_without_hollowed_points(points):
+            area += __calc_area(annotation_type, region)
+    else:
+        area = __calc_area(annotation_type, points)
+    return __serialize(area)
 
 
 def __calc_area(annotation_type: str, points: list) -> float:
-    area = 0
+    if not points:
+        return 0
     if annotation_type == AnnotationType.bbox.value:
         width = points[0] - points[2]
         height = points[1] - points[3]
-        area = width * height
-    elif annotation_type == AnnotationType.polygon.value:
+        return width * height
+    elif annotation_type in [AnnotationType.polygon.value, AnnotationType.segmentation.value]:
         x = points[0::2]
         y = points[1::2]
-        area = 0.5 * np.abs(np.dot(x, np.roll(y, 1)) -
-                            np.dot(y, np.roll(x, 1)))
-    return area
+        return 0.5 * np.abs(
+            np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1))
+        )
+    else:
+        raise Exception(f"Unsupported annotation type: {annotation_type}")
+
+
+def __serialize(value: any) -> any:
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, Decimal):
+        float_value = float(value)
+        if float_value.is_integer():
+            return int(value)
+        else:
+            return float_value
+    if isinstance(value, float):
+        if value.is_integer():
+            return int(value)
+    if isinstance(value, np.integer):
+        return int(value)
+    if isinstance(value, np.floating):
+        float_value = float(value)
+        if float_value.is_integer():
+            return int(value)
+        else:
+            return float_value
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    return value
 
 
 # YOLO
@@ -373,6 +432,7 @@ def to_pascalvoc(tasks: list) -> list:
         pascalvoc.append(voc)
     return pascalvoc
 
+
 def __get_pascalvoc_obj(data: dict) -> dict:
     annotation = data["annotation"]
     points = annotation["points"]
@@ -403,6 +463,7 @@ def __get_pascalvoc_obj(data: dict) -> dict:
         },
     }
 
+
 def __get_pascalvoc_tag_value(annotation: dict, target_tag_name: str) -> int:
     attributes = annotation["attributes"]
     if not attributes:
@@ -416,43 +477,45 @@ def __get_pascalvoc_tag_value(annotation: dict, target_tag_name: str) -> int:
 
 
 def to_labelme(tasks: list) -> list:
-    labelmes =[]
+    labelmes = []
     for task in tasks:
         shapes = []
         for annotation in task["annotations"]:
-                shape_type = __to_labelme_shape_type(annotation["type"])
-                if not shape_type:
-                    continue
-                points = annotation["points"]
-                if len(points) == 0:
-                    continue
+            shape_type = __to_labelme_shape_type(annotation["type"])
+            if not shape_type:
+                continue
+            points = annotation["points"]
+            if len(points) == 0:
+                continue
 
-                shape_points = []
-                if annotation["type"] == "segmentation":
-                    for i in range(int(len(points[0][0]) / 2)):
-                        shape_points.append([points[0][0][i * 2], points[0][0][(i * 2) + 1]]) 
-                else:
-                    for i in range(int(len(points) / 2)):
-                        shape_points.append([points[i * 2], points[(i * 2) + 1]]) 
+            shape_points = []
+            if annotation["type"] == "segmentation":
+                for i in range(int(len(points[0][0]) / 2)):
+                    shape_points.append(
+                        [points[0][0][i * 2], points[0][0][(i * 2) + 1]])
+            else:
+                for i in range(int(len(points) / 2)):
+                    shape_points.append([points[i * 2], points[(i * 2) + 1]])
 
-                shape = {
-                        "label": annotation["value"],
-                        "points": shape_points,
-                        "group_id": None,
-                        "shape_type": shape_type,
-                        "flags": {}
-                }
-                shapes.append(shape)
+            shape = {
+                "label": annotation["value"],
+                "points": shape_points,
+                "group_id": None,
+                "shape_type": shape_type,
+                "flags": {}
+            }
+            shapes.append(shape)
         labelmes.append({
-                "version": "4.5.9",
-                "flags": {},
-                "shapes": shapes,
-                "imagePath": task["name"],
-                "imageData": None,
-                "imageHeight": task["height"],
-                "imageWidth": task["width"],
+            "version": "4.5.9",
+            "flags": {},
+            "shapes": shapes,
+            "imagePath": task["name"],
+            "imageData": None,
+            "imageHeight": task["height"],
+            "imageWidth": task["width"],
         })
     return labelmes
+
 
 def __to_labelme_shape_type(annotation_type: str) -> str:
     if annotation_type == "polygon" or annotation_type == "segmentation":
@@ -515,9 +578,11 @@ def to_pixel_coordinates(tasks: list) -> list:
                     new_regions.append(new_region)
                 annotation["points"] = new_regions
             elif annotation["type"] == AnnotationType.polygon.value:
-                new_points = __remove_duplicated_coordinates(annotation["points"])
+                new_points = __remove_duplicated_coordinates(
+                    annotation["points"])
                 annotation["points"] = new_points
     return tasks
+
 
 def __remove_duplicated_coordinates(points: List[int]) -> List[int]:
     """
@@ -553,6 +618,7 @@ def __remove_duplicated_coordinates(points: List[int]) -> List[int]:
                 new_points.append(points[i*2])
                 new_points.append(points[i*2 + 1])
     return new_points
+
 
 def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
     """
@@ -632,6 +698,7 @@ def execute_coco_to_fastlabel(coco: dict) -> dict:
         results[coco_images[coco_image_key]] = annotations
     return results
 
+
 def execute_labelme_to_fastlabel(labelme: dict, file_path: str = None) -> tuple:
     file_name = ""
     if file_path:
@@ -657,6 +724,7 @@ def execute_labelme_to_fastlabel(labelme: dict, file_path: str = None) -> tuple:
         )
 
     return (file_name, annotations)
+
 
 def execute_pascalvoc_to_fastlabel(pascalvoc: dict, file_path: str = None) -> tuple:
     target_pascalvoc = pascalvoc["annotation"]
@@ -713,16 +781,24 @@ def execute_yolo_to_fastlabel(
 
             classs_name = classes[str(yolo_class_id)]
 
-            yolo_center_x_point = float(image_width) * float(yolo_center_x_ratio)
-            yolo_center_y_point = float(image_height) * float(yolo_center_y_ratio)
-            yolo_anno_width_size = float(image_width) * float(yolo_anno_width_ratio)
-            yolo_anno_height_size = float(image_height) * float(yolo_anno_height_ratio)
+            yolo_center_x_point = float(
+                image_width) * float(yolo_center_x_ratio)
+            yolo_center_y_point = float(
+                image_height) * float(yolo_center_y_ratio)
+            yolo_anno_width_size = float(
+                image_width) * float(yolo_anno_width_ratio)
+            yolo_anno_height_size = float(
+                image_height) * float(yolo_anno_height_ratio)
 
             points = []
-            points.append(yolo_center_x_point - (yolo_anno_width_size / 2))  # x1
-            points.append(yolo_center_y_point - (yolo_anno_height_size / 2))  # y1
-            points.append(yolo_center_x_point + (yolo_anno_width_size / 2))  # x2
-            points.append(yolo_center_y_point + (yolo_anno_height_size / 2))  # y2
+            points.append(yolo_center_x_point -
+                          (yolo_anno_width_size / 2))  # x1
+            points.append(yolo_center_y_point -
+                          (yolo_anno_height_size / 2))  # y1
+            points.append(yolo_center_x_point +
+                          (yolo_anno_width_size / 2))  # x2
+            points.append(yolo_center_y_point +
+                          (yolo_anno_height_size / 2))  # y2
             annotations.append(
                 {
                     "value": classs_name,
@@ -741,6 +817,7 @@ def execute_yolo_to_fastlabel(
         results[file_path] = annotations
 
     return results
+
 
 def __get_annotation_type_by_labelme(shape_type: str) -> str:
     if shape_type == "rectangle":

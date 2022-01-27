@@ -4,6 +4,7 @@ import numpy as np
 import geojson
 import json
 from typing import List
+from fastlabel import const
 
 
 def base64_encode(file_path: str) -> str:
@@ -17,6 +18,14 @@ def is_image_supported_ext(file_path: str) -> bool:
 
 def is_video_supported_ext(file_path: str) -> bool:
     return file_path.lower().endswith('.mp4')
+
+
+def is_image_supported_size(file_path: str) -> bool:
+    return os.path.getsize(file_path) <= const.SUPPORTED_IMAGE_SIZE
+
+
+def is_video_supported_size(file_path: str) -> bool:
+    return os.path.getsize(file_path) <= const.SUPPORTED_VIDEO_SIZE
 
 
 def is_json_ext(file_name: str) -> bool:
