@@ -13,7 +13,7 @@ import os
 # COCO
 
 
-def to_coco(tasks: list, annotations: list) -> dict:
+def to_coco(tasks: list, annotations: list = []) -> dict:
     # Get categories
     categories = __get_categories(tasks, annotations)
 
