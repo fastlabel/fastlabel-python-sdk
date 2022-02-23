@@ -16,7 +16,6 @@ from fastlabel.const import AnnotationType
 from .api import Api
 from .exceptions import FastLabelInvalidException
 
-
 logger = getLogger(__name__)
 
 
@@ -31,17 +30,17 @@ class Client:
 
     def find_image_task(self, task_id: str) -> dict:
         """
-        Find a signle image task.
+        Find a single image task.
         """
         endpoint = "tasks/image/" + task_id
         return self.api.get_request(endpoint)
 
     def find_image_task_by_name(self, project: str, task_name: str) -> dict:
         """
-        Find a signle image task by name.
+        Find a single image task by name.
 
-        project is slug of your project. (Required)
-        task_name is a task name. (Required)
+        project is slug of your project (Required).
+        task_name is a task name (Required).
         """
         tasks = self.get_image_tasks(project=project, task_name=task_name)
         if not tasks:
@@ -50,67 +49,68 @@ class Client:
 
     def find_image_classification_task(self, task_id: str) -> dict:
         """
-        Find a signle image classification task.
+        Find a single image classification task.
         """
         endpoint = "tasks/image/classification/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_image_classification_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_image_classification_task_by_name(
+        self, project: str, task_name: str
+    ) -> dict:
         """
-        Find a signle image classification task by name.
+        Find a single image classification task by name.
 
-        project is slug of your project. (Required)
-        task_name is a task name. (Required)
+        project is slug of your project (Required).
+        task_name is a task name (Required).
         """
         tasks = self.get_image_classification_tasks(
-            project=project, task_name=task_name)
+            project=project, task_name=task_name
+        )
         if not tasks:
             return None
         return tasks[0]
 
     def find_multi_image_task(self, task_id: str) -> dict:
         """
-        Find a signle multi image task.
+        Find a single multi image task.
         """
         endpoint = "tasks/multi-image/" + task_id
         return self.api.get_request(endpoint)
 
     def find_multi_image_task_by_name(self, project: str, task_name: str) -> dict:
         """
-        Find a signle multi image task by name.
+        Find a single multi image task by name.
 
-        project is slug of your project. (Required)
-        task_name is a task name. (Required)
+        project is slug of your project (Required).
+        task_name is a task name (Required).
         """
-        tasks = self.get_multi_image_tasks(
-            project=project, task_name=task_name)
+        tasks = self.get_multi_image_tasks(project=project, task_name=task_name)
         if not tasks:
             return None
         return tasks[0]
 
     def find_video_task(self, task_id: str) -> dict:
         """
-        Find a signle video task.
+        Find a single video task.
         """
         endpoint = "tasks/video/" + task_id
         return self.api.get_request(endpoint)
 
     def find_video_classification_task(self, task_id: str) -> dict:
         """
-        Find a signle video classification task.
+        Find a single video classification task.
         """
         endpoint = "tasks/video/classification/" + task_id
         return self.api.get_request(endpoint)
 
     def find_video_task_by_name(self, project: str, task_name: str) -> dict:
         """
-        Find a signle video task by name.
+        Find a single video task by name.
 
-        project is slug of your project. (Required)
-        task_name is a task name. (Required)
+        project is slug of your project (Required).
+        task_name is a task name (Required).
         """
-        tasks = self.get_video_tasks(
-            project=project, task_name=task_name)
+        tasks = self.get_video_tasks(project=project, task_name=task_name)
         if not tasks:
             return None
         return tasks[0]
@@ -129,19 +129,24 @@ class Client:
     ) -> list:
         """
         Returns a list of image tasks.
-        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+        Returns up to 1000 at a time, to get more,
+        set offset as the starting position to fetch.
 
-        project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        tags is a list of tag. (Optional)
-        task_name is a task name. (Optional)
-        offset is the starting position number to fetch. (Optional)
-        limit is the max number to fetch. (Optional)
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined',
+        'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        task_name is a task name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
         """
         if limit > 1000:
             raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422)
+                "Limit must be less than or equal to 1000.", 422
+            )
         endpoint = "tasks/image"
         params = {"project": project}
         if status:
@@ -170,14 +175,17 @@ class Client:
     ) -> list:
         """
         Returns a list of image classification tasks.
-        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+        Returns up to 1000 at a time, to get more,
+        set offset as the starting position to fetch.
 
-        project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        tags is a list of tag. (Optional)
-        offset is the starting position number to fetch. (Optional)
-        limit is the max number to fetch. (Optional)
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/image/classification"
         params = {"project": project}
@@ -207,18 +215,22 @@ class Client:
     ) -> list:
         """
         Returns a list of multi image tasks.
-        Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
+        Returns up to 10 at a time, to get more, set offset as the starting position
+        to fetch.
 
-        project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        tags is a list of tag. (Optional)
-        offset is the starting position number to fetch. (Optional)
-        limit is the max number to fetch. (Optional)
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
         """
         if limit > 10:
             raise FastLabelInvalidException(
-                "Limit must be less than or equal to 10.", 422)
+                "Limit must be less than or equal to 10.", 422
+            )
         endpoint = "tasks/multi-image"
         params = {"project": project}
         if status:
@@ -247,19 +259,23 @@ class Client:
     ) -> list:
         """
         Returns a list of video tasks.
-        Returns up to 10 at a time, to get more, set offset as the starting position to fetch.
+        Returns up to 10 at a time, to get more, set offset as the starting position
+        to fetch.
 
-        project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        tags is a list of tag. (Optional)
-        task_name is a task name. (Optional)
-        offset is the starting position number to fetch. (Optional)
-        limit is the max number to fetch. (Optional)
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        task_name is a task name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
         """
         if limit > 10:
             raise FastLabelInvalidException(
-                "Limit must be less than or equal to 10.", 422)
+                "Limit must be less than or equal to 10.", 422
+            )
         endpoint = "tasks/video"
         params = {"project": project}
         if status:
@@ -288,14 +304,17 @@ class Client:
     ) -> list:
         """
         Returns a list of video classification tasks.
-        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
 
-        project is slug of your project. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        tags is a list of tag. (Optional)
-        offset is the starting position number to fetch. (Optional)
-        limit is the max number to fetch. (Optional)
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        tags is a list of tag (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/video/classification"
         params = {"project": project}
@@ -314,7 +333,8 @@ class Client:
         return self.api.get_request(endpoint, params=params)
 
     def get_task_id_name_map(
-        self, project: str,
+        self,
+        project: str,
         offset: int = None,
         limit: int = 1000,
     ) -> dict:
@@ -324,15 +344,17 @@ class Client:
                 "88e74507-07b5-4607-a130-cb6316ca872c", "01_cat.jpg",
                 "fe2c24a4-8270-46eb-9c78-bb7281c8bdgs", "02_cat.jpg"
               }
-        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
 
-        project is slug of your project. (Required)
-        offset is the starting position number to fetch. (Optional)
-        limit is the max number to fetch. (Optional)
+        project is slug of your project (Required).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
         """
         if limit > 1000:
             raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422)
+                "Limit must be less than or equal to 1000.", 422
+            )
         endpoint = "tasks/map/id-name"
         params = {"project": project}
         if offset:
@@ -352,32 +374,34 @@ class Client:
         external_status: str = None,
         annotations: list = [],
         tags: list = [],
-        **kwargs
+        **kwargs,
     ) -> str:
         """
         Create a single image task.
 
-        project is slug of your project. (Required)
-        name is an unique identifier of task in your project. (Required)
-        file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        annotations is a list of annotation to be set in advance. (Optional)
-        tags is a list of tag to be set in advance. (Optional)
-        assignee is slug of assigned user. (Optional)
-        reviewer is slug of review user. (Optional)
-        approver is slug of approve user. (Optional)
-        external_assignee is slug of external assigned user. (Optional)
-        external_reviewer is slug of external review user. (Optional)
-        external_approver is slug of external approve user. (Optional)
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        annotations is a list of annotation to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/image"
         if not utils.is_image_supported_ext(file_path):
             raise FastLabelInvalidException(
-                "Supported extensions are png, jpg, jpeg.", 422)
+                "Supported extensions are png, jpg, jpeg.", 422
+            )
         if not utils.is_image_supported_size(file_path):
-            raise FastLabelInvalidException(
-                f"Supported image size is under 20 MB.", 422)
+            raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -410,27 +434,29 @@ class Client:
         """
         Create a single image classification task.
 
-        project is slug of your project. (Required)
-        name is an unique identifier of task in your project. (Required)
-        file_path is a path to data. Supported extensions are png, jpg, jpeg. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        attributes is a list of attribute to be set in advance. (Optional)
-        tags is a list of tag to be set in advance. (Optional)
-        assignee is slug of assigned user. (Optional)
-        reviewer is slug of review user. (Optional)
-        approver is slug of approve user. (Optional)
-        external_assignee is slug of external assigned user. (Optional)
-        external_reviewer is slug of external review user. (Optional)
-        external_approver is slug of external approve user. (Optional)
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/image/classification"
         if not utils.is_image_supported_ext(file_path):
             raise FastLabelInvalidException(
-                "Supported extensions are png, jpg, jpeg.", 422)
+                "Supported extensions are png, jpg, jpeg.", 422
+            )
         if not utils.is_image_supported_size(file_path):
-            raise FastLabelInvalidException(
-                f"Supported image size is under 20 MB.", 422)
+            raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -461,53 +487,58 @@ class Client:
         """
         Create a single multi image task.
 
-        project is slug of your project. (Required)
-        name is an unique identifier of task in your project. (Required)
-        folder_path is a path to data folder. Files should be under the folder. Nested folder structure is not supported. Supported extensions of files are png, jpg, jpeg. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        annotations is a list of annotation to be set in advance. (Optional)
-        tags is a list of tag to be set in advance. (Optional)
-        assignee is slug of assigned user. (Optional)
-        reviewer is slug of review user. (Optional)
-        approver is slug of approve user. (Optional)
-        external_assignee is slug of external assigned user. (Optional)
-        external_reviewer is slug of external review user. (Optional)
-        external_approver is slug of external approve user. (Optional)
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        folder_path is a path to data folder. Files should be under the folder.
+        Nested folder structure is not supported. Supported extensions of files
+        are png, jpg, jpeg (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        annotations is a list of annotation to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
         """
         if not os.path.isdir(folder_path):
-            raise FastLabelInvalidException(
-                "Folder does not exist.", 422)
+            raise FastLabelInvalidException("Folder does not exist.", 422)
 
         endpoint = "tasks/multi-image"
         file_paths = glob.glob(os.path.join(folder_path, "*"))
         if not file_paths:
-            raise FastLabelInvalidException(
-                "Folder does not have any file.", 422)
+            raise FastLabelInvalidException("Folder does not have any file.", 422)
         contents = []
         contents_size = 0
         for file_path in file_paths:
             if not utils.is_image_supported_ext(file_path):
                 raise FastLabelInvalidException(
-                    "Supported extensions are png, jpg, jpeg.", 422)
+                    "Supported extensions are png, jpg, jpeg.", 422
+                )
 
             if not utils.is_image_supported_size(file_path):
                 raise FastLabelInvalidException(
-                    f"Supported image size is under 20 MB.", 422)
+                    "Supported image size is under 20 MB.", 422
+                )
 
             if len(contents) == 250:
                 raise FastLabelInvalidException(
-                    "The count of files should be under 250", 422)
+                    "The count of files should be under 250", 422
+                )
 
             file = utils.base64_encode(file_path)
-            contents.append({
-                "name": os.path.basename(file_path),
-                "file": file
-            })
+            contents.append({"name": os.path.basename(file_path), "file": file})
             contents_size += utils.get_json_length(contents[-1])
             if contents_size > const.SUPPORTED_CONTENTS_SIZE:
                 raise FastLabelInvalidException(
-                    f"Supported contents size is under {const.SUPPORTED_CONTENTS_SIZE}.", 422)
+                    "Supported contents size is under"
+                    f" {const.SUPPORTED_CONTENTS_SIZE}.",
+                    422,
+                )
 
         payload = {"project": project, "name": name, "contents": contents}
         if status:
@@ -537,27 +568,29 @@ class Client:
         """
         Create a single video task.
 
-        project is slug of your project. (Required)
-        name is an unique identifier of task in your project. (Required)
-        file_path is a path to data. Supported extensions are mp4. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        annotations is a list of annotation to be set in advance. (Optional)
-        tags is a list of tag to be set in advance. (Optional)
-        assignee is slug of assigned user. (Optional)
-        reviewer is slug of review user. (Optional)
-        approver is slug of approve user. (Optional)
-        external_assignee is slug of external assigned user. (Optional)
-        external_reviewer is slug of external review user. (Optional)
-        external_approver is slug of external approve user. (Optional)
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        file_path is a path to data. Supported extensions are mp4 (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        annotations is a list of annotation to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/video"
         if not utils.is_video_supported_ext(file_path):
-            raise FastLabelInvalidException(
-                "Supported extensions are mp4.", 422)
+            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
         if not utils.is_video_supported_size(file_path):
             raise FastLabelInvalidException(
-                f"Supported video size is under 250 MB.", 422)
+                "Supported video size is under 250 MB.", 422
+            )
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -590,27 +623,29 @@ class Client:
         """
         Create a single video classification task.
 
-        project is slug of your project. (Required)
-        name is an unique identifier of task in your project. (Required)
-        file_path is a path to data. Supported extensions are mp4. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        attributes is a list of attribute to be set in advance. (Optional)
-        tags is a list of tag to be set in advance. (Optional)
-        assignee is slug of assigned user. (Optional)
-        reviewer is slug of review user. (Optional)
-        approver is slug of approve user. (Optional)
-        external_assignee is slug of external assigned user. (Optional)
-        external_reviewer is slug of external review user. (Optional)
-        external_approver is slug of external approve user. (Optional)
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        file_path is a path to data. Supported extensions are mp4 (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/video/classification"
         if not utils.is_video_supported_ext(file_path):
-            raise FastLabelInvalidException(
-                "Supported extensions are mp4.", 422)
+            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
         if not utils.is_video_supported_size(file_path):
             raise FastLabelInvalidException(
-                f"Supported video size is under 250 MB.", 422)
+                "Supported video size is under 250 MB.", 422
+            )
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -640,16 +675,18 @@ class Client:
         """
         Update a single task.
 
-        task_id is an id of the task. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        tags is a list of tag to be set. (Optional)
-        assignee is slug of assigned user. (Optional)
-        reviewer is slug of review user. (Optional)
-        approver is slug of approve user. (Optional)
-        external_assignee is slug of external assigned user. (Optional)
-        external_reviewer is slug of external review user. (Optional)
-        external_approver is slug of external approve user. (Optional)
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        tags is a list of tag to be set (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/" + task_id
         payload = {}
@@ -676,17 +713,19 @@ class Client:
         """
         Update a single image task.
 
-        task_id is an id of the task. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        tags is a list of tag to be set. (Optional)
-        annotations is a list of annotation to be set. (Optional)
-        assignee is slug of assigned user. (Optional)
-        reviewer is slug of review user. (Optional)
-        approver is slug of approve user. (Optional)
-        external_assignee is slug of external assigned user. (Optional)
-        external_reviewer is slug of external review user. (Optional)
-        external_approver is slug of external approve user. (Optional)
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        tags is a list of tag to be set (Optional).
+        annotations is a list of annotation to be set (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/image/" + task_id
         payload = {}
@@ -698,7 +737,8 @@ class Client:
             payload["tags"] = tags
         if annotations:
             for annotation in annotations:
-                # Since the content name is not passed in the sdk update api, the content will be filled on the server side.
+                # Since the content name is not passed in the sdk update api,
+                # the content will be filled on the server side.
                 annotation["content"] = ""
             payload["annotations"] = annotations
 
@@ -718,17 +758,19 @@ class Client:
         """
         Create a single image classification task.
 
-        task_id is an id of the task. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        attributes is a list of attribute to be set in advance. (Optional)
-        tags is a list of tag to be set in advance. (Optional)
-        assignee is slug of assigned user. (Optional)
-        reviewer is slug of review user. (Optional)
-        approver is slug of approve user. (Optional)
-        external_assignee is slug of external assigned user. (Optional)
-        external_reviewer is slug of external review user. (Optional)
-        external_approver is slug of external approve user. (Optional)
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/image/classification/" + task_id
         payload = {}
@@ -745,6 +787,90 @@ class Client:
 
         return self.api.put_request(endpoint, payload=payload)
 
+    def update_multi_image_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        annotations: List[dict] = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a multi image task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        tags is a list of tag to be set (Optional).
+        annotations is a list of annotation to be set (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/multi-image/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            payload["annotations"] = annotations
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_video_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        annotations: List[dict] = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single video task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag to be set (Optional).
+        annotations is a list of annotation to be set (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/video/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            for annotation in annotations:
+                annotation["content"] = ""
+            payload["annotations"] = annotations
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
     def update_video_classification_task(
         self,
         task_id: str,
@@ -755,19 +881,21 @@ class Client:
         **kwargs,
     ) -> str:
         """
-        Create a single video classification task.
+        Update a single video classification task.
 
-        task_id is an id of the task. (Required)
-        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
-        attributes is a list of attribute to be set in advance. (Optional)
-        tags is a list of tag to be set in advance. (Optional)
-        assignee is slug of assigned user. (Optional)
-        reviewer is slug of review user. (Optional)
-        approver is slug of approve user. (Optional)
-        external_assignee is slug of external assigned user. (Optional)
-        external_reviewer is slug of external review user. (Optional)
-        external_approver is slug of external approve user. (Optional)
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/video/classification/" + task_id
         payload = {}
@@ -799,9 +927,10 @@ class Client:
         """
         Convert COCO format to FastLabel format as annotation file.
 
-        file_path is a COCO format annotation file. (Required)
+        file_path is a COCO format annotation file (Required).
 
-        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
+        In the output file, the key is the image file name and the value is a list of
+        annotations in FastLabel format, which is returned in dict format.
 
         output format example.
         {
@@ -839,13 +968,17 @@ class Client:
         """
         Convert labelme format to FastLabel format as annotation files.
 
-        folder_path is the folder that contains the labelme format files with the json extension. (Required)
+        folder_path is the folder that contains the labelme format files
+        with the json extension (Required).
 
-        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
-        If the tree has multiple hierarchies, the key is the relative path rooted at the specified folder name.
+        In the output file, the key is the image file name and the value is a
+        list of annotations in FastLabel format, which is returned in dict format.
+        If the tree has multiple hierarchies, the key is the relative path rooted
+        at the specified folder name.
 
         output format example.
-        In the case of labelme, the key is the tree structure if the tree structure is multi-level.
+        In the case of labelme, the key is the tree structure
+        if the tree structure is multi-level.
 
         [tree structure]
         dataset
@@ -899,13 +1032,17 @@ class Client:
         """
         Convert PascalVOC format to FastLabel format as annotation files.
 
-        folder_path is the folder that contains the PascalVOC format files with the xml extension. (Required)
+        folder_path is the folder that contains the PascalVOC format files with
+        the xml extension (Required).
 
-        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
-        If the tree has multiple hierarchies, the key is the relative path rooted at the specified folder name.
+        In the output file, the key is the image file name and the value is
+        a list of annotations in FastLabel format, which is returned in dict format.
+        If the tree has multiple hierarchies, the key is the relative path
+        rooted at the specified folder name.
 
         output format example.
-        In the case of PascalVOC, the key is the tree structure if the tree structure is multi-level.
+        In the case of PascalVOC, the key is the tree structure
+        if the tree structure is multi-level.
 
         [tree structure]
         dataset
@@ -962,14 +1099,18 @@ class Client:
         """
         Convert YOLO format to FastLabel format as annotation files.
 
-        classes_file_path is YOLO format class file. (Required)
-        dataset_folder_path is the folder that contains the image file and YOLO format files with the txt extension. (Required)
+        classes_file_path is YOLO format class file (Required).
+        dataset_folder_path is the folder that contains the image file and
+        YOLO format files with the txt extension (Required).
 
-        In the output file, the key is the image file name and the value is a list of annotations in FastLabel format, which is returned in dict format.
-        If the tree has multiple hierarchies, the key is the relative path rooted at the specified folder name.
+        In the output file, the key is the image file name and the value is a
+        list of annotations in FastLabel format, which is returned in dict format.
+        If the tree has multiple hierarchies, the key is the relative path
+        rooted at the specified folder name.
 
         output format example.
-        In the case of YOLO, the key is the tree structure if the tree structure is multi-level.
+        In the case of YOLO, the key is the tree structure
+        if the tree structure is multi-level.
 
         [tree structure]
         dataset
@@ -1009,8 +1150,7 @@ class Client:
         """
         classes = self.__get_yolo_format_classes(classes_file_path)
         image_sizes = self.__get_yolo_image_sizes(dataset_folder_path)
-        yolo_annotations = self.__get_yolo_format_annotations(
-            dataset_folder_path)
+        yolo_annotations = self.__get_yolo_format_annotations(dataset_folder_path)
 
         return converters.execute_yolo_to_fastlabel(
             classes,
@@ -1023,7 +1163,7 @@ class Client:
         """
         return data format
         {
-            id: classs_name
+            id: class_name
             ...
         }
         """
@@ -1042,14 +1182,17 @@ class Client:
         {
             image_file_path_without_ext: {
                 "image_file_path": image file full path
-                "size": [whdth, height]
+                "size": [width, height]
             ...
         }
         """
         image_types = utils.get_supported_image_ext()
         image_paths = [
-            p for p in glob.glob(os.path.join(dataset_folder_path, "**/*"), recursive=True)
-            if re.search("/*\.({})".format("|".join(image_types)), str(p))
+            p
+            for p in glob.glob(
+                os.path.join(dataset_folder_path, "**/*"), recursive=True
+            )
+            if re.search(r"/*\.({})".format("|".join(image_types)), str(p))
         ]
         image_sizes = {}
         for image_path in image_paths:
@@ -1066,7 +1209,7 @@ class Client:
         """
         return data format
         {
-            annotaion_file_path_without_ext:
+            annotation_file_path_without_ext:
                 [
                     yolo_class_id,
                     yolo_center_x_ratio,
@@ -1078,75 +1221,93 @@ class Client:
         }
         """
         yolo_annotations = {}
-        annotaion_file_paths = [
-            p for p in glob.glob(os.path.join(dataset_folder_path, "**/*.txt"), recursive=True)
-            if re.search(("/*\.txt"), str(p))
+        annotation_file_paths = [
+            p
+            for p in glob.glob(
+                os.path.join(dataset_folder_path, "**/*.txt"), recursive=True
+            )
+            if re.search(r"/*\.txt", str(p))
         ]
-        for annotaion_file_path in annotaion_file_paths:
-            with open(annotaion_file_path, "r") as f:
+        for annotation_file_path in annotation_file_paths:
+            with open(annotation_file_path, "r") as f:
                 anno_lines = f.readlines()
-                annotaion_key = annotaion_file_path.replace(".txt", "")
-                yolo_annotations[annotaion_key] = []
+                annotation_key = annotation_file_path.replace(".txt", "")
+                yolo_annotations[annotation_key] = []
                 for anno_line in anno_lines:
-                    yolo_annotations[annotaion_key].append(
-                        anno_line.strip().split(" "))
+                    yolo_annotations[annotation_key].append(
+                        anno_line.strip().split(" ")
+                    )
         return yolo_annotations
 
     # Task Convert
 
-    def export_coco(self, tasks: list, annotations: list = [], output_dir: str = os.path.join("output", "coco"), output_file_name: str = "annotations.json") -> None:
+    def export_coco(
+        self,
+        tasks: list,
+        annotations: list = [],
+        output_dir: str = os.path.join("output", "coco"),
+        output_file_name: str = "annotations.json",
+    ) -> None:
         """
         Convert tasks to COCO format and export as a file.
         If you pass annotations, you can export Pose Estimation type annotations.
 
-        tasks is a list of tasks. (Required)
-        annotations is a list of annotations. (Optional)
-        output_dir is output directory(default: output/coco). (Optional)
-        output_file_name is output file name(default: annotations.json). (Optional)
+        tasks is a list of tasks (Required).
+        annotations is a list of annotations (Optional).
+        output_dir is output directory(default: output/coco) (Optional).
+        output_file_name is output file name(default: annotations.json) (Optional).
         """
         if not utils.is_json_ext(output_file_name):
             raise FastLabelInvalidException(
-                "Output file name must have a json extension", 422)
+                "Output file name must have a json extension", 422
+            )
         coco = converters.to_coco(tasks, annotations)
         os.makedirs(output_dir, exist_ok=True)
         file_path = os.path.join(output_dir, output_file_name)
-        with open(file_path, 'w') as f:
+        with open(file_path, "w") as f:
             json.dump(coco, f, indent=4, ensure_ascii=False)
 
-    def export_yolo(self, tasks: list, classes: list = [], output_dir: str = os.path.join("output", "yolo")) -> None:
+    def export_yolo(
+        self,
+        tasks: list,
+        classes: list = [],
+        output_dir: str = os.path.join("output", "yolo"),
+    ) -> None:
         """
         Convert tasks to YOLO format and export as files.
         If you pass classes, classes.txt will be generated based on it .
-        If not , classes.txt will be generated based on passed tasks .(Annotations never used in your project will not be exported.)
+        If not , classes.txt will be generated based on passed tasks .
+        (Annotations never used in your project will not be exported.)
 
-        tasks is a list of tasks. (Required)
-        classes is a list of annotation values.  e.g. ['dog','bird'] (Optional)
-        output_dir is output directory(default: output/yolo). (Optional)
+        tasks is a list of tasks (Required).
+        classes is a list of annotation values.  e.g. ['dog','bird'] (Optional).
+        output_dir is output directory(default: output/yolo) (Optional).
         """
         annos, categories = converters.to_yolo(tasks, classes)
         for anno in annos:
             file_name = anno["filename"]
             basename = utils.get_basename(file_name)
-            file_path = os.path.join(
-                output_dir, "annotations", basename + ".txt")
+            file_path = os.path.join(output_dir, "annotations", basename + ".txt")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            with open(file_path, 'w', encoding="utf8") as f:
+            with open(file_path, "w", encoding="utf8") as f:
                 for obj in anno["object"]:
                     f.write(obj)
                     f.write("\n")
         classes_file_path = os.path.join(output_dir, "classes.txt")
         os.makedirs(os.path.dirname(classes_file_path), exist_ok=True)
-        with open(classes_file_path, 'w', encoding="utf8") as f:
+        with open(classes_file_path, "w", encoding="utf8") as f:
             for category in categories:
                 f.write(category["name"])
                 f.write("\n")
 
-    def export_pascalvoc(self, tasks: list, output_dir: str = os.path.join("output", "pascalvoc")) -> None:
+    def export_pascalvoc(
+        self, tasks: list, output_dir: str = os.path.join("output", "pascalvoc")
+    ) -> None:
         """
         Convert tasks to Pascal VOC format as files.
 
-        tasks is a list of tasks. (Required)
-        output_dir is output directory(default: output/pascalvoc). (Optional)
+        tasks is a list of tasks (Required).
+        output_dir is output directory(default: output/pascalvoc) (Optional).
         """
         pascalvoc = converters.to_pascalvoc(tasks)
         for voc in pascalvoc:
@@ -1155,15 +1316,17 @@ class Client:
             file_path = os.path.join(output_dir, basename + ".xml")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             xml = xmltodict.unparse(voc, pretty=True, full_document=False)
-            with open(file_path, 'w', encoding="utf8") as f:
+            with open(file_path, "w", encoding="utf8") as f:
                 f.write(xml)
 
-    def export_labelme(self, tasks: list, output_dir: str = os.path.join("output", "labelme")) -> None:
+    def export_labelme(
+        self, tasks: list, output_dir: str = os.path.join("output", "labelme")
+    ) -> None:
         """
         Convert tasks to labelme format as files.
 
-        tasks is a list of tasks. (Required)
-        output_dir is output directory(default: output/labelme). (Optional)
+        tasks is a list of tasks (Required).
+        output_dir is output directory(default: output/labelme) (Optional).
         """
         labelmes = converters.to_labelme(tasks)
         for labelme in labelmes:
@@ -1171,35 +1334,50 @@ class Client:
             basename = utils.get_basename(file_name)
             file_path = os.path.join(output_dir, basename + ".json")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            with open(file_path, 'w') as f:
+            with open(file_path, "w") as f:
                 json.dump(labelme, f, indent=4, ensure_ascii=False)
 
     # Instance / Semantic Segmetation
 
-    def export_instance_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "instance_segmentation"), pallete: List[int] = const.COLOR_PALETTE) -> None:
+    def export_instance_segmentation(
+        self,
+        tasks: list,
+        output_dir: str = os.path.join("output", "instance_segmentation"),
+        pallete: List[int] = const.COLOR_PALETTE,
+    ) -> None:
         """
         Convert tasks to index color instance segmentation (PNG files).
         Supports only bbox, polygon and segmentation annotation types.
-        Supports up to 57 instances in default colors palette. Check const.COLOR_PALETTE for more details.
+        Supports up to 57 instances in default colors palette.
+        Check const.COLOR_PALETTE for more details.
 
-        tasks is a list of tasks. (Required)
-        output_dir is output directory(default: output/instance_segmentation). (Optional)
-        pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional)
+        tasks is a list of tasks (Required).
+        output_dir is output directory(default: output/instance_segmentation)(Optional).
+        pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
         """
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
             self.__export_index_color_image(
-                task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=True)
+                task=task,
+                output_dir=output_dir,
+                pallete=pallete,
+                is_instance_segmentation=True,
+            )
 
-    def export_semantic_segmentation(self, tasks: list, output_dir: str = os.path.join("output", "semantic_segmentation"), pallete: List[int] = const.COLOR_PALETTE) -> None:
+    def export_semantic_segmentation(
+        self,
+        tasks: list,
+        output_dir: str = os.path.join("output", "semantic_segmentation"),
+        pallete: List[int] = const.COLOR_PALETTE,
+    ) -> None:
         """
         Convert tasks to index color semantic segmentation (PNG files).
         Supports only bbox, polygon and segmentation annotation types.
         Check const.COLOR_PALETTE for color pallete.
 
-        tasks is a list of tasks. (Required)
-        output_dir is output directory(default: output/semantic_segmentation). (Optional)
-        pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional)
+        tasks is a list of tasks (Required).
+        output_dir is output directory(default: output/semantic_segmentation)(Optional).
+        pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
         """
         classes = []
         for task in tasks:
@@ -1211,23 +1389,39 @@ class Client:
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
             self.__export_index_color_image(
-                task=task, output_dir=output_dir, pallete=pallete, is_instance_segmentation=False, classes=classes)
+                task=task,
+                output_dir=output_dir,
+                pallete=pallete,
+                is_instance_segmentation=False,
+                classes=classes,
+            )
 
-    def __export_index_color_image(self, task: list, output_dir: str, pallete: List[int], is_instance_segmentation: bool = True, classes: list = []) -> None:
+    def __export_index_color_image(
+        self,
+        task: list,
+        output_dir: str,
+        pallete: List[int],
+        is_instance_segmentation: bool = True,
+        classes: list = [],
+    ) -> None:
         image = Image.new("RGB", (task["width"], task["height"]), 0)
         image = np.array(image)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         index = 1
-        # In case segmentation, to avoid hollowed points overwrite other segmentation in them, segmentation rendering process is different from other annotation type
+        # In case segmentation, to avoid hollowed points overwrite other segmentation
+        # in them, segmentation rendering process is different from
+        # other annotation type
         seg_mask_images = []
         for annotation in task["annotations"]:
-            color = index if is_instance_segmentation else classes.index(
-                annotation["value"]) + 1
+            color = (
+                index
+                if is_instance_segmentation
+                else classes.index(annotation["value"]) + 1
+            )
             if annotation["type"] == AnnotationType.segmentation.value:
                 # Create each annotation's masks and merge them finally
-                seg_mask_ground = Image.new(
-                    "RGB", (task["width"], task["height"]), 0)
+                seg_mask_ground = Image.new("RGB", (task["width"], task["height"]), 0)
                 seg_mask_image = np.array(seg_mask_ground)
                 seg_mask_image = cv2.cvtColor(seg_mask_image, cv2.COLOR_BGR2GRAY)
 
@@ -1237,31 +1431,43 @@ class Client:
                         if count == 0:
                             cv_draw_points = []
                             if utils.is_clockwise(points):
-                                cv_draw_points = self.__get_cv_draw_points(
-                                    points)
+                                cv_draw_points = self.__get_cv_draw_points(points)
                             else:
                                 cv_draw_points = self.__get_cv_draw_points(
-                                    utils.reverse_points(points))
+                                    utils.reverse_points(points)
+                                )
                             cv2.fillPoly(
-                                seg_mask_image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0)
+                                seg_mask_image,
+                                [cv_draw_points],
+                                color,
+                                lineType=cv2.LINE_8,
+                                shift=0,
+                            )
                         else:
-                            # Reverse hollow points for opencv because this points are counter clockwise
+                            # Reverse hollow points for opencv because these points are
+                            # counterclockwise
                             cv_draw_points = self.__get_cv_draw_points(
-                                utils.reverse_points(points))
+                                utils.reverse_points(points)
+                            )
                             cv2.fillPoly(
-                                seg_mask_image, [cv_draw_points], 0, lineType=cv2.LINE_8, shift=0)
+                                seg_mask_image,
+                                [cv_draw_points],
+                                0,
+                                lineType=cv2.LINE_8,
+                                shift=0,
+                            )
                         count += 1
                 seg_mask_images.append(seg_mask_image)
             elif annotation["type"] == AnnotationType.polygon.value:
-                cv_draw_points = self.__get_cv_draw_points(
-                    annotation["points"])
-                cv2.fillPoly(image, [cv_draw_points], color,
-                             lineType=cv2.LINE_8, shift=0)
+                cv_draw_points = self.__get_cv_draw_points(annotation["points"])
+                cv2.fillPoly(
+                    image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0
+                )
             elif annotation["type"] == AnnotationType.bbox.value:
-                cv_draw_points = self.__get_cv_draw_points(
-                    annotation["points"])
-                cv2.fillPoly(image, [cv_draw_points], color,
-                             lineType=cv2.LINE_8, shift=0)
+                cv_draw_points = self.__get_cv_draw_points(annotation["points"])
+                cv2.fillPoly(
+                    image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0
+                )
             else:
                 continue
             index += 1
@@ -1270,11 +1476,10 @@ class Client:
         for seg_mask_image in seg_mask_images:
             image = image | seg_mask_image
 
-        image_path = os.path.join(
-            output_dir, utils.get_basename(task["name"]) + ".png")
+        image_path = os.path.join(output_dir, utils.get_basename(task["name"]) + ".png")
         os.makedirs(os.path.dirname(image_path), exist_ok=True)
         image = Image.fromarray(image)
-        image = image.convert('P')
+        image = image.convert("P")
         image.putpalette(pallete)
         image.save(image_path)
 
@@ -1347,16 +1552,18 @@ class Client:
     ) -> list:
         """
         Returns a list of annotations.
-        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
 
-        project is slug of your project. (Required)
-        value is an unique identifier of annotation in your project. (Required)
-        offset is the starting position number to fetch. (Optional)
-        limit is the max number to fetch. (Optional)
+        project is slug of your project (Required).
+        value is a unique identifier of annotation in your project (Required).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
         """
         if limit > 1000:
             raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422)
+                "Limit must be less than or equal to 1000.", 422
+            )
         endpoint = "annotations"
         params = {"project": project}
         if value:
@@ -1375,17 +1582,18 @@ class Client:
         title: str,
         color: str = None,
         order: int = None,
-        attributes: list = []
+        attributes: list = [],
     ) -> str:
         """
         Create an annotation.
 
-        project is slug of your project. (Required)
-        type can be 'bbox', 'polygon', 'keypoint', 'classification', 'line', 'segmentation'. (Required)
-        value is an unique identifier of annotation in your project. (Required)
-        title is a display name of value. (Required)
-        color is hex color code like #ffffff. (Optional)
-        attributes is a list of attribute. (Optional)
+        project is slug of your project (Required).
+        type can be 'bbox', 'polygon', 'keypoint', 'classification', 'line',
+        'segmentation' (Required).
+        value is a unique identifier of annotation in your project (Required).
+        title is a display name of value (Required).
+        color is hex color code like #ffffff (Optional).
+        attributes is a list of attribute (Optional).
         """
         endpoint = "annotations"
         payload = {
@@ -1402,16 +1610,12 @@ class Client:
             payload["attributes"] = attributes
         return self.api.post_request(endpoint, payload=payload)
 
-    def create_classification_annotation(
-        self,
-        project: str,
-        attributes: list
-    ) -> str:
+    def create_classification_annotation(self, project: str, attributes: list) -> str:
         """
         Create a classification annotation.
 
-        project is slug of your project. (Required)
-        attributes is a list of attribute. (Required)
+        project is slug of your project (Required).
+        attributes is a list of attribute (Required).
         """
         endpoint = "annotations/classification"
         payload = {"project": project, "attributes": attributes}
@@ -1424,16 +1628,16 @@ class Client:
         title: str = None,
         color: str = None,
         order: int = None,
-        attributes: list = []
+        attributes: list = [],
     ) -> str:
         """
         Update an annotation.
 
-        annotation_id is an id of the annotation. (Required)
-        value is an unique identifier of annotation in your project. (Optional)
-        title is a display name of value. (Optional)
-        color is hex color code like #ffffff. (Optional)
-        attributes is a list of attribute. (Optional)
+        annotation_id is an id of the annotation (Required).
+        value is a unique identifier of annotation in your project (Optional).
+        title is a display name of value (Optional).
+        color is hex color code like #ffffff (Optional).
+        attributes is a list of attribute (Optional).
         """
         endpoint = "annotations/" + annotation_id
         payload = {}
@@ -1450,15 +1654,13 @@ class Client:
         return self.api.put_request(endpoint, payload=payload)
 
     def update_classification_annotation(
-        self,
-        annotation_id: str,
-        attributes: list
+        self, annotation_id: str, attributes: list
     ) -> str:
         """
         Update a classification annotation.
 
-        annotation_id is an id of the annotation. (Required)
-        attributes is a list of attribute. (Required)
+        annotation_id is an id of the annotation (Required).
+        attributes is a list of attribute (Required).
         """
         endpoint = "annotations/classification/" + annotation_id
         payload = {"attributes": attributes}
@@ -1484,7 +1686,7 @@ class Client:
         """
         Find a project by slug.
 
-        slug is slug of your project. (Required)
+        slug is slug of your project (Required).
         """
         projects = self.get_projects(slug=slug)
         if not projects:
@@ -1499,15 +1701,17 @@ class Client:
     ) -> list:
         """
         Returns a list of projects.
-        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
 
-        slug is slug of your project. (Optional)
-        offset is the starting position number to fetch. (Optional)
-        limit is the max number to fetch. (Optional)
+        slug is slug of your project (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
         """
         if limit > 1000:
             raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422)
+                "Limit must be less than or equal to 1000.", 422
+            )
         endpoint = "projects"
         params = {}
         if slug:
@@ -1529,14 +1733,16 @@ class Client:
                 "88e74507-07b5-4607-a130-cb6316ca872c", "image-bbox-slug",
                 "fe2c24a4-8270-46eb-9c78-bb7281c8bdgs", "image-video-slug"
               }
-        Returns up to 1000 at a time, to get more, set offset as the starting position to fetch.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
 
-        offset is the starting position number to fetch. (Optional)
-        limit is the max number to fetch. (Optional)
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
         """
         if limit > 1000:
             raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422)
+                "Limit must be less than or equal to 1000.", 422
+            )
         endpoint = "projects/map/id-slug"
         params = {}
         if offset:
@@ -1558,13 +1764,19 @@ class Client:
         """
         Create a project.
 
-        type can be 'image_bbox', 'image_polygon', 'image_keypoint', 'image_line', 'image_segmentation', 'image_classification', 'image_all', 'multi_image_bbox', 'multi_image_polygon', 'multi_image_keypoint', 'multi_image_line', 'multi_image_segmentation', 'video_bbox', 'video_single_classification'. (Required)
-        name is name of your project. (Required)
-        slug is slug of your project. (Required)
-        is_pixel is whether to annotate image with pixel level. (Optional)
-        job_size is the number of tasks the annotator gets at one time. (Optional)
-        workflow is the type of annotation wokflow. workflow can be 'two_step' or 'three_step' (Optional)
-        external_workflow is the type of external annotation wokflow. external_workflow can be 'two_step' or 'three_step' (Optional)
+        type can be 'image_bbox', 'image_polygon', 'image_keypoint', 'image_line',
+        'image_segmentation', 'image_classification', 'image_all', 'multi_image_bbox',
+        'multi_image_polygon', 'multi_image_keypoint', 'multi_image_line',
+        'multi_image_segmentation', 'video_bbox',
+        'video_single_classification' (Required).
+        name is name of your project (Required).
+        slug is slug of your project (Required).
+        is_pixel is whether to annotate image with pixel level (Optional).
+        job_size is the number of tasks the annotator gets at one time (Optional).
+        workflow is the type of annotation workflow. workflow can be 'two_step' or
+        'three_step' (Optional).
+        external_workflow is the type of external annotation workflow. external_workflow
+        can be 'two_step' or 'three_step' (Optional).
         """
         endpoint = "projects"
         payload = {
@@ -1592,12 +1804,14 @@ class Client:
         """
         Update a project.
 
-        project_id is an id of the project. (Required)
-        name is name of your project. (Optional)
-        slug is slug of your project. (Optional)
-        job_size is the number of tasks the annotator gets at one time. (Optional)
-        workflow is the type of annotation wokflow. workflow can be 'two_step' or 'three_step' (Optional)
-        external_workflow is the type of external annotation wokflow. external_workflow can be 'two_step' or 'three_step' (Optional)
+        project_id is an id of the project (Required).
+        name is name of your project (Optional).
+        slug is slug of your project (Optional).
+        job_size is the number of tasks the annotator gets at one time (Optional).
+        workflow is the type of annotation workflow. workflow can be 'two_step' or
+        'three_step' (Optional).
+        external_workflow is the type of external annotation workflow. external_workflow
+        can be 'two_step' or 'three_step' (Optional).
         """
         endpoint = "projects/" + project_id
         payload = {}
