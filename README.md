@@ -220,6 +220,7 @@ Example of a single image task object
                 200,  # bottom-right x
                 200   # bottom-right y
             ],
+            "rotation": 0,
             "title": "Cat",
             "type": "bbox",
             "value": "cat"
