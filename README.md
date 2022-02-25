@@ -162,35 +162,7 @@ while True:
 
 > Please wait a second before sending another requests!
 
-#### Update Tasks
-
-Update a signle task.
-
-```python
-task_id = client.update_image_task(
-    task_id="YOUR_TASK_ID",
-    status="approved",
-    assignee="USER_SLUG",
-    tags=["tag1", "tag2"],
-    annotations=[
-        {
-            "type": "bbox",
-            "value": "cat"
-            "attributes": [
-                { "key": "kind", "value": "Scottish field" }
-            ],
-            "points": [
-                100,  # top-left x
-                100,  # top-left y
-                200,  # bottom-right x
-                200   # bottom-right y
-            ]
-        }
-    ],
-)
-```
-
-#### Response
+##### Response
 
 Example of a single image task object
 
@@ -300,6 +272,34 @@ Example when the project type is Image - Pose Estimation
 }
 ```
 
+#### Update Tasks
+
+Update a signle task.
+
+```python
+task_id = client.update_image_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"],
+    annotations=[
+        {
+            "type": "bbox",
+            "value": "cat"
+            "attributes": [
+                { "key": "kind", "value": "Scottish field" }
+            ],
+            "points": [
+                100,  # top-left x
+                100,  # top-left y
+                200,  # bottom-right x
+                200   # bottom-right y
+            ]
+        }
+    ],
+)
+```
+
 
 ### Image Classification
 
@@ -344,26 +344,7 @@ Get tasks. (Up to 1000 tasks)
 tasks = client.get_image_classification_tasks(project="YOUR_PROJECT_SLUG")
 ```
 
-#### Update Tasks
-
-Update a signle task.
-
-```python
-task_id = client.update_image_classification_task(
-    task_id="YOUR_TASK_ID",
-    status="approved",
-    assignee="USER_SLUG",
-    tags=["tag1", "tag2"]
-    attributes=[
-        {
-            "key": "attribute-key",
-            "value": "attribute-value"
-        }
-    ],
-)
-```
-
-#### Response
+##### Response
 
 Example of a single image classification task object
 
@@ -392,6 +373,25 @@ Example of a single image classification task object
     "createdAt": "2021-02-22T11:25:27.158Z",
     "updatedAt": "2021-02-22T11:25:27.158Z"
 }
+```
+
+#### Update Tasks
+
+Update a signle task.
+
+```python
+task_id = client.update_image_classification_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"]
+    attributes=[
+        {
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ],
+)
 ```
 
 ### Multi Image
@@ -460,7 +460,7 @@ Get tasks.
 tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
 ```
 
-#### Response
+##### Response
 
 Example of a single task object
 
@@ -592,7 +592,7 @@ Get tasks. (Up to 10 tasks)
 tasks = client.get_video_tasks(project="YOUR_PROJECT_SLUG")
 ```
 
-#### Response
+##### Response
 
 Example of a single image classification task object
 
@@ -701,7 +701,7 @@ tasks = client.get_video_classification_tasks(project="YOUR_PROJECT_SLUG")
 
 #### Update Tasks
 
-Update a signle task.
+Update a single task.
 
 ```python
 task_id = client.update_video_classification_task(
@@ -751,7 +751,7 @@ id_name_map = client.get_task_id_name_map(project="YOUR_PROJECT_SLUG")
 
 ## Annotation
 
-### Create Annotaion
+### Create Annotation
 
 Create a new annotation.
 
@@ -825,7 +825,7 @@ Get annotations. (Up to 1000 annotations)
 annotations = client.get_annotations(project="YOUR_PROJECT_SLUG")
 ```
 
-### Response
+#### Response
 
 Example of an annotation object
 
@@ -999,7 +999,7 @@ Get projects. (Up to 1000 projects)
 projects = client.get_projects()
 ```
 
-### Response
+#### Response
 
 Example of a project object
 
