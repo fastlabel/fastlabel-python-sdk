@@ -894,7 +894,7 @@ Get annotations. (Up to 1000 annotations)
 annotations = client.get_annotations(project="YOUR_PROJECT_SLUG")
 ```
 
-#### Response
+### Response
 
 Example of an annotation object
 
@@ -1068,7 +1068,7 @@ Get projects. (Up to 1000 projects)
 projects = client.get_projects()
 ```
 
-#### Response
+### Response
 
 Example of a project object
 
