@@ -1834,6 +1834,14 @@ class Client:
         endpoint = "projects/" + project_id
         self.api.delete_request(endpoint)
 
+    def copy_project(self, project_id: str) -> None:
+        """
+        Copy a project.
+        """
+        payload = {id: project_id}
+        endpoint = "projects/copy"
+        self.api.post_request(endpoint, payload=payload)
+
     @staticmethod
     def __fill_assign_users(payload: dict, **kwargs):
         if "assignee" in kwargs:
