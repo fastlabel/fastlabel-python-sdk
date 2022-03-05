@@ -470,9 +470,10 @@ task_id = client.update_multi_image_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     assignee="USER_SLUG",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
     annotations=[
         {
+            "type": "bbox",
             "value": "cat",
             "content": "cat1.jpg",
             "attributes": [
@@ -625,8 +626,9 @@ task_id = client.update_video_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     assignee="USER_SLUG",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
     annotations=[{
+        "type": "bbox",
         "value": "bird",
         "points": {
             "1": { 
