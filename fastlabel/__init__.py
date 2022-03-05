@@ -1838,9 +1838,9 @@ class Client:
         """
         Copy a project.
         """
-        payload = {id: project_id}
+        payload = {"id": project_id}
         endpoint = "projects/copy"
-        self.api.post_request(endpoint, payload=payload)
+        return self.api.post_request(endpoint, payload=payload)
 
     @staticmethod
     def __fill_assign_users(payload: dict, **kwargs):
