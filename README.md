@@ -891,11 +891,9 @@ Example of a single vide task object
         {
             "attributes": [],
             "color": "#b36d18",
-            "points": {
-                "start": 0,
-                "end": 10,
-                "text": "0123456789"
-            },
+            "text": "0123456789",
+            "start": 0,
+            "end": 10,
             "title": "Cat",
             "type": "ner",
             "value": "cat"
