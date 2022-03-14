@@ -413,7 +413,7 @@ class Client:
             raise FastLabelInvalidException(
                 "Limit must be less than or equal to 10.", 422
             )
-        endpoint = "tasks/video"
+        endpoint = "tasks/text"
         params = {"project": project}
         if status:
             params["status"] = status
