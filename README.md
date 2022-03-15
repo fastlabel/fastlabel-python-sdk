@@ -845,11 +845,9 @@ task_id = client.create_text_task(
     annotations=[{
         "type": "ner",
         "value": "person",
-        "points": {
-            "start": 0,
-            "end": 10,
-            "text": "1234567890"
-        }
+        "start": 0,
+        "end": 10,
+        "text": "1234567890"
     }]
 )
 ```
@@ -892,11 +890,9 @@ task_id = client.update_text_task(
     annotations=[{
         "type": "bbox",
         "value": "bird",
-        "points": {
-            "start": 0,
-            "end": 10,
-            "text": "0123456789"
-        }
+        "start": 0,
+        "end": 10,
+        "text": "0123456789"
     }]
 )
 ```
@@ -1030,7 +1026,8 @@ task_id = client.create_audio_task(
     annotations=[{
         "type": "segmentation",
         "value": "person",
-        "points": [100, 200]
+        "start": 100,
+        "end": 200
     }]
 )
 ```
@@ -1073,7 +1070,8 @@ task_id = client.update_audio_task(
     annotations=[{
         "type": "segmentation",
         "value": "bird",
-        "points": [100, 200]
+        "start": 100,
+        "end": 200
     }]
 )
 ```
@@ -1098,10 +1096,11 @@ Example of a single audio task object
         {
             "attributes": [],
             "color": "#b36d18",
-            "points": [100, 200],
-            "title": "Cat",
+            "start": 100,
+            "end": 200,
+            "title": "Bird",
             "type": "segmentation",
-            "value": "cat"
+            "value": "bird"
         }
     ],
     "createdAt": "2021-02-22T11:25:27.158Z",
