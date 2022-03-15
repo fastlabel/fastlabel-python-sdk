@@ -340,6 +340,12 @@ Find a single task.
 task = client.find_image_classification_task(task_id="YOUR_TASK_ID")
 ```
 
+Find a single task by name.
+
+```python
+tasks = client.find_image_classification_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
 #### Get Tasks
 
 Get tasks. (Up to 1000 tasks)
@@ -455,6 +461,12 @@ Find a single task.
 
 ```python
 task = client.find_multi_image_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_multi_image_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
 ```
 
 #### Get Tasks
@@ -613,6 +625,12 @@ Find a single task.
 task = client.find_video_task(task_id="YOUR_TASK_ID")
 ```
 
+Find a single task by name.
+
+```python
+tasks = client.find_video_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
 #### Get Tasks
 
 Get tasks. (Up to 10 tasks)
@@ -766,6 +784,12 @@ Find a single task.
 task = client.find_video_classification_task(task_id="YOUR_TASK_ID")
 ```
 
+Find a single task by name.
+
+```python
+tasks = client.find_video_classification_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
 #### Get Tasks
 
 Get tasks. (Up to 1000 tasks)
@@ -839,6 +863,12 @@ Find a single task.
 
 ```python
 task = client.find_text_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_text_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
 ```
 
 #### Get Tasks
@@ -939,6 +969,12 @@ Find a single task.
 task = client.find_text_classification_task(task_id="YOUR_TASK_ID")
 ```
 
+Find a single task by name.
+
+```python
+tasks = client.find_text_classification_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
 #### Get Tasks
 
 Get tasks. (Up to 1000 tasks)
@@ -1008,6 +1044,12 @@ Find a single task.
 
 ```python
 task = client.find_video_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_video_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
 ```
 
 #### Get Tasks
@@ -1100,6 +1142,12 @@ Find a single task.
 
 ```python
 task = client.find_audio_classification_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_audio_classification_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
 ```
 
 #### Get Tasks
