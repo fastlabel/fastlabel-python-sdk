@@ -1105,6 +1105,14 @@ Delete a project.
 client.delete_project(project_id="YOUR_PROJECT_ID")
 ```
 
+### Copy Project
+
+Copy a project.
+
+```python
+project_id = client.copy_project(project_id="YOUR_PROJECT_ID")
+```
+
 ## Converter
 
 ### COCO
