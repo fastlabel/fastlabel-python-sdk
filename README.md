@@ -1166,7 +1166,7 @@ task_id = client.update_audio_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     assignee="USER_SLUG",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
     attributes=[
         {
             "key": "attribute-key",
