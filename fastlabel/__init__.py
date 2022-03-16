@@ -115,6 +115,22 @@ class Client:
             return None
         return tasks[0]
 
+    def find_video_classification_task_by_name(
+        self, project: str, task_name: str
+    ) -> dict:
+        """
+        Find a single video classification task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_video_classification_tasks(
+            project=project, task_name=task_name
+        )
+        if not tasks:
+            return None
+        return tasks[0]
+
     def find_text_task(self, task_id: str) -> dict:
         """
         Find a single text task.
@@ -141,6 +157,20 @@ class Client:
             return None
         return tasks[0]
 
+    def find_text_classification_task_by_name(
+        self, project: str, task_name: str
+    ) -> dict:
+        """
+        Find a single text classification task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_text_classification_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
     def find_audio_task(self, task_id: str) -> dict:
         """
         Find a single audio task.
@@ -152,7 +182,7 @@ class Client:
         """
         Find a single audio classification task.
         """
-        endpoint = "tasks/video/classification/" + task_id
+        endpoint = "tasks/audio/classification/" + task_id
         return self.api.get_request(endpoint)
 
     def find_audio_task_by_name(self, project: str, task_name: str) -> dict:
@@ -163,6 +193,22 @@ class Client:
         task_name is a task name (Required).
         """
         tasks = self.get_audio_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
+    def find_audio_classification_task_by_name(
+        self, project: str, task_name: str
+    ) -> dict:
+        """
+        Find a single audio classification task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_audio_classification_tasks(
+            project=project, task_name=task_name
+        )
         if not tasks:
             return None
         return tasks[0]
@@ -918,7 +964,7 @@ class Client:
         if not utils.is_text_supported_ext(file_path):
             raise FastLabelInvalidException("Supported extensions are txt.", 422)
         if not utils.is_text_supported_size(file_path):
-            raise FastLabelInvalidException("Supported video size is under 2 MB.", 422)
+            raise FastLabelInvalidException("Supported text size is under 2 MB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -971,7 +1017,7 @@ class Client:
         if not utils.is_text_supported_ext(file_path):
             raise FastLabelInvalidException("Supported extensions are txt.", 422)
         if not utils.is_text_supported_size(file_path):
-            raise FastLabelInvalidException("Supported video size is under 2 MB.", 422)
+            raise FastLabelInvalidException("Supported text size is under 2 MB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -1025,7 +1071,7 @@ class Client:
             )
         if not utils.is_audio_supported_size(file_path):
             raise FastLabelInvalidException(
-                "Supported video size is under 120 MB.", 422
+                "Supported audio size is under 120 MB.", 422
             )
 
         file = utils.base64_encode(file_path)
