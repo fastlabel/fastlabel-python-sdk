@@ -364,7 +364,7 @@ task_id = client.update_image_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     assignee="USER_SLUG",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
     attributes=[
         {
             "key": "attribute-key",
@@ -807,7 +807,7 @@ task_id = client.update_video_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     assignee="USER_SLUG",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
     attributes=[
         {
             "key": "attribute-key",
@@ -828,7 +828,7 @@ Supported following project types:
 Create a new task.
 
 ```python
-task_id = client.create_video_task(
+task_id = client.create_text_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.txt",
     file_path="./sample.txt"
@@ -899,7 +899,7 @@ task_id = client.update_text_task(
 
 #### Response
 
-Example of a single vide task object
+Example of a single text task object
 
 ```python
 {
@@ -988,7 +988,7 @@ task_id = client.update_text_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     assignee="USER_SLUG",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
     attributes=[
         {
             "key": "attribute-key",
@@ -1026,8 +1026,8 @@ task_id = client.create_audio_task(
     annotations=[{
         "type": "segmentation",
         "value": "person",
-        "start": 100,
-        "end": 200
+        "start": 0.4,
+        "end": 0.5
     }]
 )
 ```
@@ -1040,13 +1040,13 @@ task_id = client.create_audio_task(
 Find a single task.
 
 ```python
-task = client.find_video_task(task_id="YOUR_TASK_ID")
+task = client.find_audio_task(task_id="YOUR_TASK_ID")
 ```
 
 Find a single task by name.
 
 ```python
-tasks = client.find_video_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+tasks = client.find_audio_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
 ```
 
 #### Get Tasks
@@ -1070,8 +1070,8 @@ task_id = client.update_audio_task(
     annotations=[{
         "type": "segmentation",
         "value": "bird",
-        "start": 100,
-        "end": 200
+        "start": 0.4,
+        "end": 0.5
     }]
 )
 ```
@@ -1096,8 +1096,8 @@ Example of a single audio task object
         {
             "attributes": [],
             "color": "#b36d18",
-            "start": 100,
-            "end": 200,
+            "start": 0.4,
+            "end": 0.5,
             "title": "Bird",
             "type": "segmentation",
             "value": "bird"
