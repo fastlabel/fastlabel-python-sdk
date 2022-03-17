@@ -438,7 +438,7 @@ class Client:
         tags: list = [],
         task_name: str = None,
         offset: int = None,
-        limit: int = 10,
+        limit: int = 100,
     ) -> list:
         """
         Returns a list of text tasks.
@@ -455,9 +455,9 @@ class Client:
         offset is the starting position number to fetch (Optional).
         limit is the max number to fetch (Optional).
         """
-        if limit > 10:
+        if limit > 1000:
             raise FastLabelInvalidException(
-                "Limit must be less than or equal to 10.", 422
+                "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tasks/text"
         params = {"project": project}
@@ -523,7 +523,7 @@ class Client:
         tags: list = [],
         task_name: str = None,
         offset: int = None,
-        limit: int = 10,
+        limit: int = 100,
     ) -> list:
         """
         Returns a list of audio tasks.
@@ -540,9 +540,9 @@ class Client:
         offset is the starting position number to fetch (Optional).
         limit is the max number to fetch (Optional).
         """
-        if limit > 10:
+        if limit > 1000:
             raise FastLabelInvalidException(
-                "Limit must be less than or equal to 10.", 422
+                "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tasks/audio"
         params = {"project": project}
