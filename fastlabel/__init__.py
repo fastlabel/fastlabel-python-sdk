@@ -115,6 +115,104 @@ class Client:
             return None
         return tasks[0]
 
+    def find_video_classification_task_by_name(
+        self, project: str, task_name: str
+    ) -> dict:
+        """
+        Find a single video classification task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_video_classification_tasks(
+            project=project, task_name=task_name
+        )
+        if not tasks:
+            return None
+        return tasks[0]
+
+    def find_text_task(self, task_id: str) -> dict:
+        """
+        Find a single text task.
+        """
+        endpoint = "tasks/text/" + task_id
+        return self.api.get_request(endpoint)
+
+    def find_text_classification_task(self, task_id: str) -> dict:
+        """
+        Find a single text classification task.
+        """
+        endpoint = "tasks/text/classification/" + task_id
+        return self.api.get_request(endpoint)
+
+    def find_text_task_by_name(self, project: str, task_name: str) -> dict:
+        """
+        Find a single text task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_text_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
+    def find_text_classification_task_by_name(
+        self, project: str, task_name: str
+    ) -> dict:
+        """
+        Find a single text classification task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_text_classification_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
+    def find_audio_task(self, task_id: str) -> dict:
+        """
+        Find a single audio task.
+        """
+        endpoint = "tasks/audio/" + task_id
+        return self.api.get_request(endpoint)
+
+    def find_audio_classification_task(self, task_id: str) -> dict:
+        """
+        Find a single audio classification task.
+        """
+        endpoint = "tasks/audio/classification/" + task_id
+        return self.api.get_request(endpoint)
+
+    def find_audio_task_by_name(self, project: str, task_name: str) -> dict:
+        """
+        Find a single audio task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_audio_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
+    def find_audio_classification_task_by_name(
+        self, project: str, task_name: str
+    ) -> dict:
+        """
+        Find a single audio classification task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_audio_classification_tasks(
+            project=project, task_name=task_name
+        )
+        if not tasks:
+            return None
+        return tasks[0]
+
     # Task Get
 
     def get_image_tasks(
@@ -317,6 +415,176 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/video/classification"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def get_text_tasks(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of text tasks.
+        Returns up to 10 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        task_name is a task name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "tasks/text"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def get_text_classification_tasks(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of text classification tasks.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        tags is a list of tag (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        endpoint = "tasks/text/classification"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def get_audio_tasks(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of audio tasks.
+        Returns up to 10 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        task_name is a task name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "tasks/audio"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def get_audio_classification_tasks(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of audio classification tasks.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        tags is a list of tag (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        endpoint = "tasks/audio/classification"
         params = {"project": project}
         if status:
             params["status"] = status
@@ -662,6 +930,222 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def create_text_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        external_status: str = None,
+        annotations: list = [],
+        tags: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Create a single text task.
+
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        file_path is a path to data. Supported extensions are txt (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        annotations is a list of annotation to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/text"
+        if not utils.is_text_supported_ext(file_path):
+            raise FastLabelInvalidException("Supported extensions are txt.", 422)
+        if not utils.is_text_supported_size(file_path):
+            raise FastLabelInvalidException("Supported text size is under 2 MB.", 422)
+
+        file = utils.base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if annotations:
+            for annotation in annotations:
+                annotation["content"] = name
+            payload["annotations"] = annotations
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
+    def create_text_classification_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        external_status: str = None,
+        attributes: list = [],
+        tags: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Create a single text classification task.
+
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        file_path is a path to data. Supported extensions are mp4 (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/text/classification"
+        if not utils.is_text_supported_ext(file_path):
+            raise FastLabelInvalidException("Supported extensions are txt.", 422)
+        if not utils.is_text_supported_size(file_path):
+            raise FastLabelInvalidException("Supported text size is under 2 MB.", 422)
+
+        file = utils.base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if attributes:
+            payload["attributes"] = attributes
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
+    def create_audio_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        external_status: str = None,
+        annotations: list = [],
+        tags: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Create a single audio task.
+
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        file_path is a path to data. Supported extensions are mp4 (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        annotations is a list of annotation to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/audio"
+        if not utils.is_audio_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are mp3, wav and w4a.", 422
+            )
+        if not utils.is_audio_supported_size(file_path):
+            raise FastLabelInvalidException(
+                "Supported audio size is under 120 MB.", 422
+            )
+
+        file = utils.base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if annotations:
+            for annotation in annotations:
+                annotation["content"] = name
+            payload["annotations"] = annotations
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
+    def create_audio_classification_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        external_status: str = None,
+        attributes: list = [],
+        tags: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Create a single audio classification task.
+
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        file_path is a path to data. Supported extensions are mp4 (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/audio/classification"
+        if not utils.is_audio_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are mp3, wav and w4a.", 422
+            )
+        if not utils.is_audio_supported_size(file_path):
+            raise FastLabelInvalidException(
+                "Supported audio size is under 120 MB.", 422
+            )
+
+        file = utils.base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if attributes:
+            payload["attributes"] = attributes
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
     # Task Update
 
     def update_task(
@@ -898,6 +1382,174 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/video/classification/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if attributes:
+            payload["attributes"] = attributes
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_text_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        annotations: List[dict] = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single text task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag to be set (Optional).
+        annotations is a list of annotation to be set (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/text/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            for annotation in annotations:
+                annotation["content"] = ""
+            payload["annotations"] = annotations
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_text_classification_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        attributes: list = [],
+        tags: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single text classification task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/text/classification/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if attributes:
+            payload["attributes"] = attributes
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_audio_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        annotations: List[dict] = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single audio task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag to be set (Optional).
+        annotations is a list of annotation to be set (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/audio/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            for annotation in annotations:
+                annotation["content"] = ""
+            payload["annotations"] = annotations
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_audio_classification_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        attributes: list = [],
+        tags: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single audio classification task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/audio/classification/" + task_id
         payload = {}
         if status:
             payload["status"] = status
