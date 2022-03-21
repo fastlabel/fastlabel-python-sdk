@@ -4,50 +4,66 @@ _Creating and deploying a new package version is easy_
 
 ## Prerequisites
 
-1. Ensure you're on the latest master
+1. Ensure you have a PyPI account created and are added as a Collaborator
 
-2. Ensure you have a PyPI account created and are added as a Collaborator
+2. Store PyPI API Token to GitHub Secrets  
+    If you have already registered GitHub Secret `PYPI_API_TOKEN`, skip this step.
 
-## Deployment Steps:
+    1. Get PyPI API Token  
+        1. Go to [PyPI Account Settings Page](https://pypi.org/manage/account/)
+        2. Click `Add API Token` button in API Token section
+        3. Enter the following
+            - Token name: `GitHub Actions Token`
+            - Scope: `Project: fastlabel`
+        4. Click `Add Token` button and get API Token
 
-**Step 0: Critical - Bump Project Version**
+    2. Store Token to GitHub Secrets
+        1. Go to GitHub `fastlabel-python-sdk` repository
+        2. Go to Settings > Secrets > Actions
+        3. Click `New repository secret` and enter the following
+            - Name: `PYPI_API_TOKEN`
+            - Value: PyPI API Token
 
-In `setup.py`, you need to specify a new project version.
+## Deployment Steps
 
-We use [semantic versioning](https://packaging.python.org/guides/distributing-packages-using-setuptools/#semantic-versioning-preferred). If you are adding a meaningful feature, bump the minor version. If you are fixing a bug, bump the incremental version.
+**Step 1: Create a new release**
 
-**Step 1: Remove Previous Versions**
+1. Click `Releases` label in `Code` tab and go to Releases page
 
-Clear out any previously packaged files in the `dist` folder
+2. Click `Draft a new release` button
 
-**Step 2: Create a Source Distribution**
+3. Enter the following
+    - Tag
+        - Click `Choose a tag` select box
+        - input [version](#version) (ex: 1.12.0) *
+        - Click `Create new tag: x.x.x`
 
-```
-python3 setup.py sdist
-```
+    - Target: main
 
-**Step 3: Create `wheel`**
+    - Release title: `Release x.x.x` (ex: `Release 1.12.0`)
 
-You should also create a wheel for your project. A wheel is a built package that can be installed without needing to go through the “build” process. Installing wheels is substantially faster for the end user than installing from a source distribution
+    - (Optional) fill in the description
 
-```
-python3 setup.py bdist_wheel
-```
+4. Click `Publish release` button
 
-**Step 4: Install Twine**
+**Step 2: (Automatically) Execute GitHub Actions Workflow**
 
-Twine is what is used to manage PyPI pacakges
+After creating a release, GitHub Actions Workflow will be triggered automatically.  
+This workflow builds the SDK distribution and uploads it to PyPI.
 
-```
-pip install twine
-```
+If the workflow fails, follow these steps:
+1. Fix the cause of the error
+2. Remove release created in Step 1
+3. Remove tag created in Step 1
+4. Repeat from Step 1
 
-**Step 5: Upload distribution to PyPI**
-
-```
-python3 -m twine upload dist/*
-```
-
-**Step 6: Check out the PyPI page to ensure all looks good**
+**Step 3: Check out the PyPI page to ensure all looks good**
 
 [https://pypi.org/project/fastlabel/](https://pypi.org/project/fastlabel/)
+
+
+---
+### Version
+We use [semantic versioning](https://packaging.python.org/guides/distributing-packages-using-setuptools/#semantic-versioning-preferred).  
+If you are adding a meaningful feature, bump the minor version.  
+If you are fixing a bug, bump the incremental version.
