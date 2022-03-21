@@ -7,7 +7,7 @@ _Creating and deploying a new package version is easy_
 1. Ensure you have a PyPI account created and are added as a Collaborator
 
 2. Store PyPI API Token to GitHub Secrets  
-    If you have already registered GitHub Secret `PYPI_API_TOKEN`, skip this step.
+    If you have already created GitHub Secret `PYPI_API_TOKEN`, skip this step.
 
     1. Get PyPI API Token  
         1. Go to [PyPI Account Settings Page](https://pypi.org/manage/account/)
