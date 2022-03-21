@@ -35,7 +35,7 @@ _Creating and deploying a new package version is easy_
 3. Enter the following
     - Tag
         - Click `Choose a tag` select box
-        - input [version](#version) (ex: 1.12.0)
+        - input [version](#version) (ex: `1.12.0`)
         - Click `Create new tag: x.x.x`
 
     - Target: main
