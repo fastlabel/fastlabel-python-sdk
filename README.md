@@ -13,6 +13,10 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [Multi Image](#multi-image)
   - [Video](#video)
   - [Video Classification](#video-classification)
+  - [Text](#text)
+  - [Text Classification](#text-classification)
+  - [Audio](#audio)
+  - [Audio Classification](#audio-classification)
   - [Common](#common)
 - [Annotation](#annotation)
 - [Project](#project)
@@ -336,6 +340,12 @@ Find a single task.
 task = client.find_image_classification_task(task_id="YOUR_TASK_ID")
 ```
 
+Find a single task by name.
+
+```python
+tasks = client.find_image_classification_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
 #### Get Tasks
 
 Get tasks. (Up to 1000 tasks)
@@ -354,7 +364,7 @@ task_id = client.update_image_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     assignee="USER_SLUG",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
     attributes=[
         {
             "key": "attribute-key",
@@ -451,6 +461,12 @@ Find a single task.
 
 ```python
 task = client.find_multi_image_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_multi_image_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
 ```
 
 #### Get Tasks
@@ -609,6 +625,12 @@ Find a single task.
 task = client.find_video_task(task_id="YOUR_TASK_ID")
 ```
 
+Find a single task by name.
+
+```python
+tasks = client.find_video_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
 #### Get Tasks
 
 Get tasks. (Up to 10 tasks)
@@ -762,6 +784,12 @@ Find a single task.
 task = client.find_video_classification_task(task_id="YOUR_TASK_ID")
 ```
 
+Find a single task by name.
+
+```python
+tasks = client.find_video_classification_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
 #### Get Tasks
 
 Get tasks. (Up to 1000 tasks)
@@ -779,7 +807,366 @@ task_id = client.update_video_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     assignee="USER_SLUG",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
+    attributes=[
+        {
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ],
+)
+```
+
+### Text
+
+Supported following project types:
+
+- Text - NER
+
+#### Create Task
+
+Create a new task.
+
+```python
+task_id = client.create_text_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.txt",
+    file_path="./sample.txt"
+)
+```
+
+Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
+
+```python
+task_id = client.create_text_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.txt",
+    file_path="./sample.txt",
+    annotations=[{
+        "type": "ner",
+        "value": "person",
+        "start": 0,
+        "end": 10,
+        "text": "1234567890"
+    }]
+)
+```
+
+##### Limitation
+* You can upload up to a size of 2 MB.
+
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_text_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_text_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
+#### Get Tasks
+
+Get tasks. (Up to 10 tasks)
+
+```python
+tasks = client.get_text_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Update Task
+
+Update a single task.
+
+```python
+task_id = client.update_text_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"],
+    annotations=[{
+        "type": "bbox",
+        "value": "bird",
+        "start": 0,
+        "end": 10,
+        "text": "0123456789"
+    }]
+)
+```
+
+#### Response
+
+Example of a single text task object
+
+```python
+{
+    "id": "YOUR_TASK_ID",
+    "name": "cat.txt",
+    "url": "YOUR_TASK_URL",
+    "status": "registered",
+    "externalStatus": "registered",
+    "tags": [],
+    "assignee": "ASSIGNEE_NAME",
+    "reviewer": "REVIEWER_NAME",
+    "externalAssignee": "EXTERNAL_ASSIGNEE_NAME",
+    "externalReviewer": "EXTERNAL_REVIEWER_NAME",
+    "annotations": [
+        {
+            "attributes": [],
+            "color": "#b36d18",
+            "text": "0123456789",
+            "start": 0,
+            "end": 10,
+            "title": "Cat",
+            "type": "ner",
+            "value": "cat"
+        }
+    ],
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
+```
+
+### Text Classification
+
+Supported following project types:
+
+- Text - Classification (Single)
+
+#### Create Task
+
+Create a new task.
+
+```python
+task_id = client.create_text_classification_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.txt",
+    file_path="./sample.txt",
+    attributes=[
+        {
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ],
+)
+```
+
+##### Limitation
+* You can upload up to a size of 2 MB.
+
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_text_classification_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_text_classification_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
+#### Get Tasks
+
+Get tasks. (Up to 1000 tasks)
+
+```python
+tasks = client.get_text_classification_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Update Tasks
+
+Update a single task.
+
+```python
+task_id = client.update_text_classification_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"],
+    attributes=[
+        {
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ],
+)
+```
+
+### Audio
+
+Supported following project types:
+
+- Audio - Segmentation
+
+#### Create Task
+
+Create a new task.
+
+```python
+task_id = client.create_audio_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.mp3",
+    file_path="./sample.mp3"
+)
+```
+
+Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
+
+```python
+task_id = client.create_audio_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.mp3",
+    file_path="./sample.mp3",
+    annotations=[{
+        "type": "segmentation",
+        "value": "person",
+        "start": 0.4,
+        "end": 0.5
+    }]
+)
+```
+
+##### Limitation
+* You can upload up to a size of 120 MB.
+
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_audio_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_audio_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
+#### Get Tasks
+
+Get tasks. (Up to 10 tasks)
+
+```python
+tasks = client.get_audio_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Update Task
+
+Update a single task.
+
+```python
+task_id = client.update_audio_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"],
+    annotations=[{
+        "type": "segmentation",
+        "value": "bird",
+        "start": 0.4,
+        "end": 0.5
+    }]
+)
+```
+
+#### Response
+
+Example of a single audio task object
+
+```python
+{
+    "id": "YOUR_TASK_ID",
+    "name": "cat.mp3",
+    "url": "YOUR_TASK_URL",
+    "status": "registered",
+    "externalStatus": "registered",
+    "tags": [],
+    "assignee": "ASSIGNEE_NAME",
+    "reviewer": "REVIEWER_NAME",
+    "externalAssignee": "EXTERNAL_ASSIGNEE_NAME",
+    "externalReviewer": "EXTERNAL_REVIEWER_NAME",
+    "annotations": [
+        {
+            "attributes": [],
+            "color": "#b36d18",
+            "start": 0.4,
+            "end": 0.5,
+            "title": "Bird",
+            "type": "segmentation",
+            "value": "bird"
+        }
+    ],
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
+```
+
+### Audio Classification
+
+Supported following project types:
+
+- Audio - Classification (Single)
+
+#### Create Task
+
+Create a new task.
+
+```python
+task_id = client.create_audio_classification_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.mp3",
+    file_path="./sample.mp3",
+    attributes=[
+        {
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ],
+)
+```
+
+##### Limitation
+* You can upload up to a size of 120 MB.
+
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_audio_classification_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_audio_classification_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
+#### Get Tasks
+
+Get tasks. (Up to 1000 tasks)
+
+```python
+tasks = client.get_audio_classification_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Update Tasks
+
+Update a single task.
+
+```python
+task_id = client.update_audio_classification_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"],
     attributes=[
         {
             "key": "attribute-key",
