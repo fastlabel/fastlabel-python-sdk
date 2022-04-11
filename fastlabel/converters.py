@@ -373,7 +373,7 @@ def __get_yolo_annotation(data: dict) -> dict:
     dw = 1. / task["width"]
     dh = 1. / task["height"]
 
-    bbox = __to_bbox(points)
+    bbox = __to_bbox(annotation_type, points)
     xmin = bbox[0]
     ymin = bbox[1]
     xmax = bbox[0] + bbox[2]
@@ -443,7 +443,7 @@ def __get_pascalvoc_obj(data: dict) -> dict:
         return None
     if annotation_type == AnnotationType.bbox.value and (int(points[0]) == int(points[2]) or int(points[1]) == int(points[3])):
         return None
-    bbox = __to_bbox(points)
+    bbox = __to_bbox(annotation_type, points)
     x = bbox[0]
     y = bbox[1]
     w = bbox[2]
