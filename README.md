@@ -1294,12 +1294,15 @@ Example of an annotation object
     "value": "cat",
     "title": "Cat",
     "color": "#FF0000",
+    "order": 1,
+    "vertex": 0,
     "attributes": [
         {
             "id": "YOUR_ATTRIBUTE_ID",
             "key": "kind",
             "name": "Kind",
             "options": [],
+            "order": 1,
             "type": "text",
             "value": ""
         },
@@ -1311,6 +1314,7 @@ Example of an annotation object
                 {"title": "Large", "value": "large"},
                 {"title": "Small", "value": "small"}
             ],
+            "order": 2,
             "type": "select",
             "value": ""
         }
