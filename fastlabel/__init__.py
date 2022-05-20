@@ -1573,6 +1573,39 @@ class Client:
         endpoint = "tasks/" + task_id
         self.api.delete_request(endpoint)
 
+    # Integrate Task
+
+    def integrate_audio_task_by_prefix(
+        self,
+        project: str,
+        prefix: str,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of integrate audio tasks.
+        Returns up to 10 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        project is slug of your project (Required).
+        prefix is a prefix of task name (Required).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "tasks/integrate/audio"
+        params = {"project": project}
+        params["prefix"] = prefix
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+
     # Convert to Fastlabel
 
     def convert_coco_to_fastlabel(self, file_path: str) -> dict:
