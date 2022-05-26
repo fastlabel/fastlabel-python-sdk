@@ -1579,30 +1579,16 @@ class Client:
         self,
         project: str,
         prefix: str,
-        offset: int = None,
-        limit: int = 100,
-    ) -> list:
+    ) -> dict:
         """
-        Returns a list of integrate audio tasks.
-        Returns up to 10 at a time, to get more, set offset as the starting position
-        to fetch.
+        Returns a integrate audio task.
 
         project is slug of your project (Required).
         prefix is a prefix of task name (Required).
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
         """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        endpoint = "tasks/integrate/audio"
-        params = {"project": project}
-        params["prefix"] = prefix
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
+        endpoint = "tasks/integrate/audios"
+        params = {"project": project, "prefix": prefix}
+        
         return self.api.get_request(endpoint, params=params)
 
 
