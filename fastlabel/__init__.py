@@ -1573,6 +1573,25 @@ class Client:
         endpoint = "tasks/" + task_id
         self.api.delete_request(endpoint)
 
+    # Integrate Task
+
+    def find_integrated_audio_task_by_prefix(
+        self,
+        project: str,
+        prefix: str,
+    ) -> dict:
+        """
+        Returns a integrate audio task.
+
+        project is slug of your project (Required).
+        prefix is a prefix of task name (Required).
+        """
+        endpoint = "tasks/integrate/audios"
+        params = {"project": project, "prefix": prefix}
+        
+        return self.api.get_request(endpoint, params=params)
+
+
     # Convert to Fastlabel
 
     def convert_coco_to_fastlabel(self, file_path: str) -> dict:

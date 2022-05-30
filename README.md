@@ -1108,6 +1108,56 @@ Example of a single audio task object
 }
 ```
 
+#### Integrate Task
+
+Integration is possible only when tasks are registered from the objects divided by the dataset.
+
+In the case of a task divided under the following conditions.
+
+dataset slug: audio
+object name: voice.mp3
+split count: 3
+
+Objects are registered in the data set in the following form.
+
+- audio/voice/1.mp3
+- audio/voice/2.mp3
+- audio/voice/3.mp3
+
+Annotations are combined when the end point specified in the annotation is the end time of the task and the start point of the next task is 0 seconds.
+
+In this case, SPLIT_AUDIO_TASK_NAME_PREFIX specifies `audio/voice`.
+
+```python
+task = client.find_integrated_audio_task_by_prefix(
+    project="YOUR_PROJECT_SLUG", 
+    prefix="SPLIT_AUDIO_TASK_NAME_PREFIX",
+)
+```
+
+##### Response
+
+Example of a integrated audio task object
+
+```python
+{
+    'groupId': 'eda3ba5b-082c-4813-ad6c-0479b72a27d5',
+    'name': 'audio/voice.mp3',
+    "annotations": [
+        {
+            "attributes": [],
+            "color": "#b36d18",
+            "start": 0.4,
+            "end": 0.5,
+            "title": "Bird",
+            "type": "segmentation",
+            "value": "bird"
+        }
+    ],
+}
+```
+
+
 ### Audio Classification
 
 Supported following project types:
