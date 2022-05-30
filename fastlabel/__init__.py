@@ -1575,7 +1575,7 @@ class Client:
 
     # Integrate Task
 
-    def find_integrated_audio_task_by_prefix(
+    def integrated_audio_task_by_prefix(
         self,
         project: str,
         prefix: str,

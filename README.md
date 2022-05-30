@@ -1129,7 +1129,7 @@ Annotations are combined when the end point specified in the annotation is the e
 In this case, SPLIT_AUDIO_TASK_NAME_PREFIX specifies `audio/voice`.
 
 ```python
-task = client.find_integrated_audio_task_by_prefix(
+task = client.integrated_audio_task_by_prefix(
     project="YOUR_PROJECT_SLUG", 
     prefix="SPLIT_AUDIO_TASK_NAME_PREFIX",
 )
