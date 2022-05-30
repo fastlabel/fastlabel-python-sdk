@@ -1137,7 +1137,7 @@ task = client.find_integrated_audio_task_by_prefix(
 
 ##### Response
 
-Example of a integrate audio task object
+Example of a integrated audio task object
 
 ```python
 {
