@@ -1575,6 +1575,22 @@ class Client:
 
     # Integrate Task
 
+    def find_integrated_image_task_by_prefix(
+        self,
+        project: str,
+        prefix: str,
+    ) -> dict:
+        """
+        Returns a integrate image task.
+        project is slug of your project (Required).
+        prefix is a prefix of task name (Required).
+        """
+        endpoint = "tasks/integrate/images"
+        params = {"project": project, "prefix": prefix}
+
+        return self.api.get_request(endpoint, params=params)
+
+
     def find_integrated_audio_task_by_prefix(
         self,
         project: str,
