@@ -305,6 +305,61 @@ Example when the project type is Image - Pose Estimation
 }
 ```
 
+#### Integrate Task
+
+Integration is possible only when tasks are registered from the objects divided by the dataset.
+Only bbox and polygon annotation types are supported.
+
+In the case of a task divided under the following conditions.
+
+dataset slug: image
+object name: cat.jpg
+split count: 3×3
+
+Objects are registered in the data set in the following form.
+
+- image/cat/1.jpg
+- image/cat/2.jpg
+- image/cat/3.jpg
+(omit)
+- image/cat/9.jpg
+
+
+The annotations at the edges of the image are combined. However, annotations with a maximum length of 300px may not work.
+
+In this case, SPLIT_IMAGE_TASK_NAME_PREFIX specifies `image/cat`.
+
+```python
+task = client.find_integrated_image_task_by_prefix(
+    project="YOUR_PROJECT_SLUG", 
+    prefix="SPLIT_IMAGE_TASK_NAME_PREFIX",
+)
+```
+
+##### Response
+
+Example of a integrated image task object
+
+```python
+{
+    'groupId': 'eda3ba5b-082c-4813-ad6c-0479b72a27d5',
+    'name': 'image/cat.jpg',
+    "annotations": [
+        {
+            "attributes": [],
+            "color": "#b36d18",
+            "confidenceScore"; -1,
+            "keypoints": [],
+            "points": [200,200,300,400],
+            "rotation": 0,
+            "title": "Bird",
+            "type": "polygon",
+            "value": "bird"
+        }
+    ],
+}
+```
+
 ### Image Classification
 
 Supported following project types:
