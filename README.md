@@ -307,6 +307,8 @@ Example when the project type is Image - Pose Estimation
 
 #### Integrate Task
 
+This function is alpha version.
+
 Integration is possible only when tasks are registered from the objects divided by the dataset.
 Only bbox and polygon annotation types are supported.
 
@@ -1164,6 +1166,8 @@ Example of a single audio task object
 ```
 
 #### Integrate Task
+
+This function is alpha version.
 
 Integration is possible only when tasks are registered from the objects divided by the dataset.
 
