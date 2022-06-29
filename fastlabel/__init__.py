@@ -1612,9 +1612,7 @@ class Client:
             ]
         }
         """
-        with open(file_path, "r") as f:
-            file = f.read()
-            return converters.execute_coco_to_fastlabel(eval(file.replace("false","False").replace("true","True")), annotation_type)
+        return converters.execute_coco_to_fastlabel(json.load(open(file_path)), annotation_type)
 
     def convert_labelme_to_fastlabel(self, folder_path: str) -> dict:
         """
