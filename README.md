@@ -1684,14 +1684,16 @@ dataset
 
 ### COCO
 
-Supported bbox or polygon annotation type.
+Supported bbox , polygon or pose_estimation annotation type.
 
 Convert annotation file of [COCO format](https://cocodataset.org/#format-data) as a Fastlabel format and create task.
 
 file_path: COCO annotation json file path
 
 ```python
-annotations_map = client.convert_coco_to_fastlabel(file_path="./sample.json")
+annotations_map = client.convert_coco_to_fastlabel(file_path="./sample.json", annotation_type="bbox")
+# annotation_type = "bbox", "polygon" or "pose_estimation 
+
 task_id = client.create_image_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.jpg",
