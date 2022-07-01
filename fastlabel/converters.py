@@ -687,7 +687,7 @@ def execute_coco_to_fastlabel(coco: dict ,annotation_type:str) -> dict:
             if not category_name:
                 return
 
-            if annotation_type in [AnnotationType.bbox, AnnotationType.polygon]:
+            if annotation_type in [AnnotationType.bbox.value, AnnotationType.polygon.value]:
                 segmentation = target_coco_annotation["segmentation"][0]
                 annotation_type = ""
                 if len(segmentation) == 4:
@@ -701,7 +701,7 @@ def execute_coco_to_fastlabel(coco: dict ,annotation_type:str) -> dict:
                         "type": annotation_type,
                     }
                 )
-            elif annotation_type == AnnotationType.pose_estimation:
+            elif annotation_type == AnnotationType.pose_estimation.value:
                 keypoints = []
                 target_coco_annotation_keypoints = target_coco_annotation["keypoints"]
                 keypoint_keys = coco_categories_keypoints[target_coco_annotation["category_id"]]
@@ -709,8 +709,10 @@ def execute_coco_to_fastlabel(coco: dict ,annotation_type:str) -> dict:
                 keypoint_values = [target_coco_annotation_keypoints[i:i + 3] for i in range(0, len(target_coco_annotation_keypoints), 3)]
                 for index, keypoint_key in enumerate(keypoint_keys):
                     keypoint_value = keypoint_values[index]
-                    if keypoint_value[2] == 0: 
-                        raise FastLabelInvalidException(f"Keypoint value is [0,0,0]. annotation_id: {target_coco_annotation['id']}", 422)
+                    if keypoint_value[2] == 0:
+                        continue
+                    if not keypoint_value[2] in [1, 2]: 
+                        raise FastLabelInvalidException(f"Visibility flag must be 0 or 1, 2 . annotation_id: {target_coco_annotation['id']}", 422)
                     # fastlabel occulusion is 0 or 1 . coco occulusion is 1 or 2. 
                     keypoint_value[2] = keypoint_value[2] - 1
                     keypoints.append({
