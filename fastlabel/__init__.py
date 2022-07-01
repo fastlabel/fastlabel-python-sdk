@@ -1610,7 +1610,7 @@ class Client:
 
     # Convert to Fastlabel
 
-    def convert_coco_to_fastlabel(self, file_path: str) -> dict:
+    def convert_coco_to_fastlabel(self, file_path: str, annotation_type: str) -> dict:
         """
         Convert COCO format to FastLabel format as annotation file.
 
@@ -1647,9 +1647,7 @@ class Client:
             ]
         }
         """
-        with open(file_path, "r") as f:
-            file = f.read()
-            return converters.execute_coco_to_fastlabel(eval(file))
+        return converters.execute_coco_to_fastlabel(json.load(open(file_path)), annotation_type)
 
     def convert_labelme_to_fastlabel(self, folder_path: str) -> dict:
         """
