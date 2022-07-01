@@ -709,7 +709,7 @@ def execute_coco_to_fastlabel(coco: dict ,annotation_type:str) -> dict:
                 keypoint_values = [target_coco_annotation_keypoints[i:i + 3] for i in range(0, len(target_coco_annotation_keypoints), 3)]
                 for index, keypoint_key in enumerate(keypoint_keys):
                     keypoint_value = keypoint_values[index]
-                    if keypoint_value == [0,0,0]: 
+                    if keypoint_value[2] == 0: 
                         raise FastLabelInvalidException(f"Keypoint value is [0,0,0]. annotation_id: {target_coco_annotation['id']}", 422)
                     # fastlabel occulusion is 0 or 1 . coco occulusion is 1 or 2. 
                     keypoint_value[2] = keypoint_value[2] - 1
