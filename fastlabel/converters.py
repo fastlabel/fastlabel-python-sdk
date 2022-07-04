@@ -1,5 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor
-from curses import keyname
 from datetime import datetime
 from decimal import Decimal
 from typing import List
@@ -667,7 +666,7 @@ def execute_coco_to_fastlabel(coco: dict ,annotation_type:str) -> dict:
     coco_categories = {}
     coco_categories_keypoints={}
     for c in coco["categories"]:
-        coco_categories[c["id"]] = c["name"]
+        coco_categories[c["id"]] = c["supercategory"]
         coco_categories_keypoints[c["id"]] = c["keypoints"]
 
     coco_annotations = coco["annotations"]

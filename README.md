@@ -66,7 +66,7 @@ Supported following project types:
 - Image - Keypoint
 - Image - Line
 - Image - Segmentation
-- Image - Pose Estimation(not support Create Task)
+- Image - Pose Estimation
 - Image - All
 
 #### Create Task
