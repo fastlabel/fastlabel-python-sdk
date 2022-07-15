@@ -344,7 +344,6 @@ Example of a integrated image task object
 
 ```python
 {
-    'groupId': 'eda3ba5b-082c-4813-ad6c-0479b72a27d5',
     'name': 'image/cat.jpg',
     "annotations": [
         {
@@ -1200,7 +1199,6 @@ Example of a integrated audio task object
 
 ```python
 {
-    'groupId': 'eda3ba5b-082c-4813-ad6c-0479b72a27d5',
     'name': 'audio/voice.mp3',
     "annotations": [
         {
