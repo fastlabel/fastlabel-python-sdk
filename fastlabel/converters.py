@@ -54,23 +54,23 @@ def to_coco(tasks: list, annotations: list = []) -> dict:
     }
 
 
-def __get_coco_skelton(keypoints: list) -> list:
-    keypoint_id_skelton_index_map = {}
+def __get_coco_skeleton(keypoints: list) -> list:
+    keypoint_id_skeleton_index_map = {}
     for index, keypoint in enumerate(keypoints, 1):
-        keypoint_id_skelton_index_map[keypoint["id"]] = index
+        keypoint_id_skeleton_index_map[keypoint["id"]] = index
 
-    skelton = []
-    filtered_skelton_indexes = []
+    skeleton = []
+    filtered_skeleton_indexes = []
     for keypoint in keypoints:
         id = keypoint["id"]
-        skelton_index = keypoint_id_skelton_index_map[id]
+        skeleton_index = keypoint_id_skeleton_index_map[id]
         edges = keypoint["edges"]
         for edge in edges:
-            edge_skelton_index = keypoint_id_skelton_index_map[edge]
-            if not edge_skelton_index in filtered_skelton_indexes:
-                skelton.append([skelton_index, edge_skelton_index])
-            filtered_skelton_indexes.append(skelton_index)
-    return skelton
+            edge_skeleton_index = keypoint_id_skeleton_index_map[edge]
+            if not edge_skeleton_index in filtered_skeleton_indexes:
+                skeleton.append([skeleton_index, edge_skeleton_index])
+            filtered_skeleton_indexes.append(skeleton_index)
+    return skeleton
 
 
 def __get_categories(tasks: list, annotations: list) -> list:
@@ -87,7 +87,7 @@ def __get_categories(tasks: list, annotations: list) -> list:
     if not annotations:
         for index, value in enumerate(values, 1):
             category = {
-                "skelton": [],
+                "skeleton": [],
                 "keypoints": [],
                 "keypoint_colors": [],
                 "color": task_annotation["color"],
@@ -103,7 +103,7 @@ def __get_categories(tasks: list, annotations: list) -> list:
     for annotation in annotations:
         if not annotation["value"] in values:
             continue
-        coco_skelton = []
+        coco_skeleton = []
         coco_keypoints = []
         coco_keypoint_colors = []
         if annotation["type"] == AnnotationType.pose_estimation.value:
@@ -111,8 +111,8 @@ def __get_categories(tasks: list, annotations: list) -> list:
             for keypoint in keypoints:
                 coco_keypoints.append(keypoint["key"])
                 coco_keypoint_colors.append(keypoint["color"])
-            coco_skelton = __get_coco_skelton(keypoints)
-        category = {"skelton": coco_skelton,
+            coco_skeleton = __get_coco_skeleton(keypoints)
+        category = {"skeleton": coco_skeleton,
                     "keypoints": coco_keypoints,
                     "keypoint_colors": coco_keypoint_colors,
                     "color": annotation["color"],
