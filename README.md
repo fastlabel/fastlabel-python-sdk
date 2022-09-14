@@ -556,6 +556,8 @@ Example of a single task object
 Supported following project types:
 
 - Video - Bounding Box
+- Video - Keypoint
+- Video - Line
 
 #### Create Task
 
