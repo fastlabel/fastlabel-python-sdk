@@ -1590,6 +1590,21 @@ class Client:
 
         return self.api.get_request(endpoint, params=params)
 
+    def find_integrated_video_task_by_prefix(
+        self,
+        project: str,
+        prefix: str,
+    ) -> dict:
+        """
+        Returns a integrate video task.
+
+        project is slug of your project (Required).
+        prefix is a prefix of task name (Required).
+        """
+        endpoint = "tasks/integrate/videos"
+        params = {"project": project, "prefix": prefix}
+        
+        return self.api.get_request(endpoint, params=params)
 
     def find_integrated_audio_task_by_prefix(
         self,

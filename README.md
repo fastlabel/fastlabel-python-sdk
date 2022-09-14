@@ -740,6 +740,34 @@ task_id = client.update_video_task(
     }]
 )
 ```
+#### Integrate Video
+
+This function is alpha version. It is subject to major changes in the future.
+
+Integration is possible only when tasks are registered from the objects divided by the dataset.
+
+In the case of a task divided under the following conditions.
+
+dataset slug: image
+object name: cat.mp4
+split count: 3
+
+Objects are registered in the data set in the following form.
+
+- video/cat/1.mp4
+- video/cat/2.mp4
+- video/cat/3.mp4
+(omit)
+- video/cat/9.mp4
+
+In this case, SPLIT_VIDEO_TASK_NAME_PREFIX specifies `video/cat`.
+
+```python
+task = client.find_integrated_video_task_by_prefix(
+    project="YOUR_PROJECT_SLUG", 
+    prefix="SPLIT_VIDEO_TASK_NAME_PREFIX",
+)
+```
 
 #### Response
 
