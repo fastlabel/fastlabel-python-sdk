@@ -314,9 +314,9 @@ Only bbox and polygon annotation types are supported.
 
 In the case of a task divided under the following conditions.
 
-dataset slug: image
-object name: cat.jpg
-split count: 3×3
+Dataset slug: image
+Object name: cat.jpg
+Split count: 3×3
 
 Objects are registered in the data set in the following form.
 
@@ -748,17 +748,16 @@ Integration is possible only when tasks are registered from the objects divided 
 
 In the case of a task divided under the following conditions.
 
-dataset slug: image
-object name: cat.mp4
-split count: 3
+Dataset slug: video
+Object name: cat.mp4
+Split count: 3
 
 Objects are registered in the data set in the following form.
 
 - video/cat/1.mp4
 - video/cat/2.mp4
 - video/cat/3.mp4
-(omit)
-- video/cat/9.mp4
+
 
 In this case, SPLIT_VIDEO_TASK_NAME_PREFIX specifies `video/cat`.
 
@@ -1200,9 +1199,9 @@ Integration is possible only when tasks are registered from the objects divided 
 
 In the case of a task divided under the following conditions.
 
-dataset slug: audio
-object name: voice.mp3
-split count: 3
+Dataset slug: audio
+Object name: voice.mp3
+Split count: 3
 
 Objects are registered in the data set in the following form.
 
