@@ -4,14 +4,20 @@ import os
 import re
 from logging import getLogger
 from typing import List
-
+from concurrent.futures import ThreadPoolExecutor
 import cv2
 import numpy as np
 import xmltodict
-from PIL import Image
-
+from PIL import Image, ImageColor, ImageDraw
 from fastlabel import const, converters, utils
-from fastlabel.const import AnnotationType
+from fastlabel.const import (
+    KEYPOINT_MIN_STROKE_WIDTH,
+    OPACITY_DARK,
+    OPACITY_THIN,
+    POSE_ESTIMATION_MIN_STROKE_WIDTH,
+    SEPARATOER,
+    AnnotationType,
+)
 
 from .api import Api
 from .exceptions import FastLabelInvalidException
@@ -2224,6 +2230,278 @@ class Client:
         for i in range(int(len(new_points) / 2)):
             cv_points.append((new_points[i * 2], new_points[i * 2 + 1]))
         return np.array(cv_points)
+
+    def __reverse_points(self, points: list[int]) -> list[int]:
+        """
+        e.g.)
+        [4, 5, 4, 9, 8, 9, 8, 5, 4, 5] => [4, 5, 8, 5, 8, 9, 4, 9, 4, 5]
+        """
+        reversed_points = []
+        for index, _ in enumerate(points):
+            if index % 2 == 0:
+                reversed_points.insert(0, points[index + 1])
+                reversed_points.insert(0, points[index])
+        return reversed_points
+
+    def __create_image_with_annotation(self, img_file_path_task):
+        [img_file_path, task, output_dir] = img_file_path_task
+        img = Image.open(img_file_path).convert("RGB")
+        width, height = img.size
+        if width > height:
+            stroke_width = int(height / 300)
+        else:
+            stroke_width = int(width / 300)
+        stroke_width = stroke_width if stroke_width > 1 else 1
+        draw_img = ImageDraw.Draw(img, "RGBA")
+        # For segmentation task
+        is_seg = False
+        seg_mask_images = []
+        task_annotations = task["annotations"]
+        for task_annotation in task_annotations:
+            # Draw annotations in content
+            rgb = None
+            try:
+                rgb = ImageColor.getcolor(task_annotation["color"], "RGB")
+            except Exception as e:
+                print(e)
+            if not rgb:
+                continue
+            rgba_dark = rgb + (OPACITY_DARK,)
+            rgba_thin = rgb + (OPACITY_THIN,)
+            if AnnotationType(task_annotation["type"]) == AnnotationType.bbox:
+                points = task_annotation["points"]
+                draw_img.rectangle(
+                    points, fill=rgba_thin, outline=rgba_dark, width=stroke_width
+                )
+            elif AnnotationType(task_annotation["type"]) == AnnotationType.circle:
+                x = task_annotation["points"][0]
+                y = task_annotation["points"][1]
+                radius = task_annotation["points"][2]
+                points = [
+                    x - radius,
+                    y - radius,
+                    x + radius,
+                    y + radius,
+                ]
+                draw_img.ellipse(points, fill=rgba_dark, width=radius)
+            elif AnnotationType(task_annotation["type"]) == AnnotationType.polygon:
+                points = task_annotation["points"]
+                # require start point at the end
+                points.append(points[0])
+                points.append(points[1])
+                draw_img.line(points, fill=rgba_dark, width=stroke_width)
+                draw_img.polygon(points, fill=rgba_thin)
+            elif AnnotationType(task_annotation["type"]) == AnnotationType.keypoint:
+                x = task_annotation["points"][0]
+                y = task_annotation["points"][1]
+                if stroke_width < KEYPOINT_MIN_STROKE_WIDTH:
+                    stroke_width = KEYPOINT_MIN_STROKE_WIDTH
+                points = [
+                    x - stroke_width,
+                    y - stroke_width,
+                    x + stroke_width,
+                    y + stroke_width,
+                ]
+                draw_img.ellipse(points, fill=rgba_dark, width=stroke_width)
+            elif AnnotationType(task_annotation["type"]) == AnnotationType.line:
+                points = task_annotation["points"]
+                draw_img.line(points, fill=rgba_dark, width=stroke_width)
+            elif AnnotationType(task_annotation["type"]) == AnnotationType.segmentation:
+                is_seg = True
+                rgba_seg = rgb + (OPACITY_THIN * 2,)
+                seg_mask_ground = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+                seg_mask_im = np.array(seg_mask_ground)
+                for region in task_annotation["points"]:
+                    count = 0
+                    for points in region:
+                        if count == 0:
+                            cv_draw_points = self.__get_cv_draw_points(points)
+                            # For diagonal segmentation points, fillPoly cannot rendering cv_drawpoints, so convert
+                            # shape. When multiimage project can use only pixcel mode, remove it
+                            converted_points = (
+                                np.array(cv_draw_points)
+                                .reshape((-1, 1, 2))
+                                .astype(np.int32)
+                            )
+                            cv2.fillPoly(
+                                seg_mask_im,
+                                [converted_points],
+                                rgba_seg,
+                                lineType=cv2.LINE_8,
+                                shift=0,
+                            )
+                        else:
+                            # Reverse hollow points for opencv because this points are counter clockwise
+                            cv_draw_points = self.__get_cv_draw_points(
+                                self.__reverse_points(points)
+                            )
+                            converted_points = (
+                                np.array(cv_draw_points)
+                                .reshape((-1, 1, 2))
+                                .astype(np.int32)
+                            )
+                            cv2.fillPoly(
+                                seg_mask_im,
+                                [converted_points],
+                                (0, 0, 0, 0),
+                                lineType=cv2.LINE_8,
+                                shift=0,
+                            )
+                        count += 1
+                seg_mask_images.append(seg_mask_im)
+            elif (
+                AnnotationType(task_annotation["type"])
+                == AnnotationType.pose_estimation
+            ):
+                """
+                {
+                    keypoint_id: {
+                        point: [x, y],
+                        keypoint_rgb: keypoint.color
+                    }
+                }
+                """
+                if stroke_width < POSE_ESTIMATION_MIN_STROKE_WIDTH:
+                    stroke_width = POSE_ESTIMATION_MIN_STROKE_WIDTH
+                linked_points_and_color_to_key_map = {}
+                relations = []
+                for task_annotation_keypoint in task_annotation["keypoints"]:
+                    try:
+                        task_annotation_keypoint_keypoint_color = task_annotation[
+                            "color"
+                        ]
+                        task_annotation_keypoint_name = task_annotation_keypoint["name"]
+                        task_annotation_keypoint_value = task_annotation_keypoint[
+                            "value"
+                        ]
+                        task_annotation_keypoint_key = task_annotation_keypoint["key"]
+                        keypoint_rgb = ImageColor.getcolor(
+                            task_annotation_keypoint_keypoint_color, "RGB"
+                        )
+                    except Exception as e:
+                        print(
+                            f"Invalid color: {task_annotation_keypoint_keypoint_color}, "
+                            f"content_name: {task_annotation_keypoint_name}, {e}"
+                        )
+                    if not keypoint_rgb:
+                        continue
+                    if not task_annotation_keypoint_value:
+                        continue
+
+                    x = task_annotation_keypoint_value[0]
+                    y = task_annotation_keypoint_value[1]
+                    linked_points_and_color_to_key_map[task_annotation_keypoint_key] = {
+                        "point": [x, y],
+                        "keypoint_rgb": keypoint_rgb,
+                    }
+                    for edge in task_annotation_keypoint["edges"]:
+                        relations.append(
+                            SEPARATOER.join(
+                                sorted([task_annotation_keypoint_key, edge])
+                            )
+                        )
+
+                for relation in set(relations):
+                    first_key, second_key = relation.split(SEPARATOER)
+                    if (
+                        linked_points_and_color_to_key_map.get(first_key) is None
+                        or linked_points_and_color_to_key_map.get(second_key) is None
+                    ):
+                        continue
+                    line_start_point = linked_points_and_color_to_key_map.get(
+                        first_key
+                    )["point"]
+                    line_end_point = linked_points_and_color_to_key_map.get(second_key)[
+                        "point"
+                    ]
+                    relation_line_points = line_start_point + line_end_point
+
+                    draw_img.line(
+                        relation_line_points, fill=rgba_dark, width=stroke_width
+                    )
+
+                for key in linked_points_and_color_to_key_map:
+                    x, y = linked_points_and_color_to_key_map[key]["point"]
+                    points = [
+                        x - stroke_width,
+                        y - stroke_width,
+                        x + stroke_width,
+                        y + stroke_width,
+                    ]
+                    draw_img.ellipse(
+                        points,
+                        fill=linked_points_and_color_to_key_map[key]["keypoint_rgb"],
+                        width=stroke_width,
+                    )
+
+        if is_seg:
+            # For segmentation, merge each mask images with logical adding
+            mask_seg_ground = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+            mask_seg = np.array(mask_seg_ground)
+            for seg_mask_image in seg_mask_images:
+                mask_seg = mask_seg | seg_mask_image
+
+            # Alpha brend original image and segmentation mask
+            np_img = np.array(img.convert("RGBA"))
+            merged_seg = np_img * 0.5 + mask_seg * 0.5
+            # Composite all. 'merged_seg' will be used rendering annotation area,
+            # other area will calcurate from 'mask_seg' and rendered by original image
+            img = Image.composite(
+                Image.fromarray(merged_seg.astype(np.uint8)),
+                Image.fromarray(np_img.astype(np.uint8)),
+                Image.fromarray(mask_seg.astype(np.uint8)),
+            )
+
+            # For export with original ext, if original image is not png foamat, convert RGB
+            if os.path.splitext(img_file_path)[1].lower() != ".png":
+                img = img.convert("RGB")
+        # Save annotated content
+        output_file_path = os.path.join(output_dir, task["name"])
+        os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+        img.save(output_file_path, quality=95)
+
+    def export_image_with_annotations(
+        self,
+        tasks: list,
+        image_dir: str,
+        output_dir: str = os.path.join("output", "images_with_annotations"),
+    ) -> None:
+        """
+        Export image with annotations
+        """
+        target_file_candidate_paths = glob.glob(
+            os.path.join(image_dir, "**"), recursive=True
+        )
+        img_file_paths = []
+        for target_file_candidate_path in target_file_candidate_paths:
+            if not os.path.isfile(target_file_candidate_path):
+                continue
+            if not target_file_candidate_path.endswith(
+                (".jpeg", ".jpg", ".png", ".JPEG", ".JPG", ".PNG", ".tif", ".TIF")
+            ):
+                continue
+            img_file_paths.append(target_file_candidate_path)
+        img_file_paths.sort()
+
+        img_file_path_task_list = []
+        for img_file_path in img_file_paths:
+            slashed_img_file_path = img_file_path.replace(os.path.sep, "/")
+            task_name = (
+                slashed_img_file_path.replace(image_dir + "/", "")
+                if not image_dir.endswith("/")
+                else slashed_img_file_path.replace(image_dir, "")
+            )
+            task = next(
+                filter(lambda x: x["name"] == task_name, tasks),
+                None,
+            )
+            if not task:
+                print(f"not find task. filepath: {task_name}")
+                continue
+            img_file_path_task_list.append([img_file_path, task, output_dir])
+
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            executor.map(self.__create_image_with_annotation, img_file_path_task_list)
 
     # Annotation
 
