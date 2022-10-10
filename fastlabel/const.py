@@ -185,6 +185,15 @@ KEYPOINT_MIN_STROKE_WIDTH = 2
 POSE_ESTIMATION_MIN_STROKE_WIDTH = 7
 SEPARATOER = "@@@@@"
 
+EXPORT_IMAGE_WITH_ANNOTATIONS_SUPPORTED_IMAGE_TYPES = (
+    ".jpeg",
+    ".jpg",
+    ".png",
+    ".tif",
+    ".tiff",
+    ".bmp",
+)
+
 # under 512 MB. Actual size is 536870888 bytes, but to consider other attributes,
 # minus 888 bytes.
 # Because of V8's limitation, API only can accept the JSON string that length is

@@ -2,7 +2,7 @@ import glob
 import json
 import os
 import re
-from logging import getLogger
+import logging
 from typing import List
 from concurrent.futures import ThreadPoolExecutor
 import cv2
@@ -11,6 +11,7 @@ import xmltodict
 from PIL import Image, ImageColor, ImageDraw
 from fastlabel import const, converters, utils
 from fastlabel.const import (
+    EXPORT_IMAGE_WITH_ANNOTATIONS_SUPPORTED_IMAGE_TYPES,
     KEYPOINT_MIN_STROKE_WIDTH,
     OPACITY_DARK,
     OPACITY_THIN,
@@ -22,7 +23,11 @@ from fastlabel.const import (
 from .api import Api
 from .exceptions import FastLabelInvalidException
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s: %(message)s",
+)
 
 
 class Client:
@@ -2263,7 +2268,7 @@ class Client:
             try:
                 rgb = ImageColor.getcolor(task_annotation["color"], "RGB")
             except Exception as e:
-                print(e)
+                logger.info(e)
             if not rgb:
                 continue
             rgba_dark = rgb + (OPACITY_DARK,)
@@ -2379,7 +2384,7 @@ class Client:
                             task_annotation_keypoint_keypoint_color, "RGB"
                         )
                     except Exception as e:
-                        print(
+                        logger.info(
                             f"Invalid color: {task_annotation_keypoint_keypoint_color}, "
                             f"content_name: {task_annotation_keypoint_name}, {e}"
                         )
@@ -2476,8 +2481,8 @@ class Client:
         for target_file_candidate_path in target_file_candidate_paths:
             if not os.path.isfile(target_file_candidate_path):
                 continue
-            if not target_file_candidate_path.endswith(
-                (".jpeg", ".jpg", ".png", ".JPEG", ".JPG", ".PNG", ".tif", ".TIF")
+            if not target_file_candidate_path.lower().endswith(
+                EXPORT_IMAGE_WITH_ANNOTATIONS_SUPPORTED_IMAGE_TYPES
             ):
                 continue
             img_file_paths.append(target_file_candidate_path)
@@ -2496,7 +2501,7 @@ class Client:
                 None,
             )
             if not task:
-                print(f"not find task. filepath: {task_name}")
+                logger.info(f"Not find task. filepath: {task_name}")
                 continue
             img_file_path_task_list.append([img_file_path, task, output_dir])
 
