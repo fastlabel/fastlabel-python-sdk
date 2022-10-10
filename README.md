@@ -305,6 +305,26 @@ Example when the project type is Image - Pose Estimation
 }
 ```
 
+#### Export Image With Annotations 
+
+Get tasks and export images with annotations.
+Only support the following image extension.
+
+- jpeg
+- jpg
+- png
+- tif
+- tiff
+- bmp
+
+
+```python
+tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
+client.export_image_with_annotations(
+    tasks=tasks, image_dir="IMAGE_DIR", output_dir="OUTPUT_DIR"
+)
+```
+
 #### Integrate Task
 
 This function is alpha version. It is subject to major changes in the future.
