@@ -2825,6 +2825,80 @@ class Client:
         endpoint = "projects/copy"
         return self.api.post_request(endpoint, payload=payload)
 
+    def update_s3_storage(
+        self, 
+        project: str,
+        bucket_name: str,
+        bucket_region: str,
+        prefix: str = None
+    ) -> str:
+        """
+        Insert or update S3 storage settings.
+        
+        project is a slug of the project (Required).
+        bucket_name is a bucket name of the s3 (Required).
+        bucket_region is a bucket region of the s3 (Required).
+        prefix is a folder name in the s3 bucket. (Optional).
+        If sample_dir is specified as a prefix in the case of a hierarchical structure like the bucket below,
+        only the data under the sample_dir directory will be linked.
+        If not specified, everything under the bucket will be linked.
+        
+        [tree structure]
+        fastlabel
+        ├── sample1.jpg
+        └── sample_dir
+            └── sample2.jpg
+
+        """
+        endpoint = "storage/s3/" + project
+        payload = {
+            "bucketName": bucket_name,
+            "bucketRegion": bucket_region,
+        }
+        if prefix:
+            payload["prefix"] = prefix
+        return self.api.put_request(endpoint, payload=payload)
+    
+    def create_task_from_s3(
+        self, 
+        project: str,
+        status: str = "registered",
+        tags: list[str] = [],
+        priority: int = 0,
+    ) -> dict:
+        """
+        Insert or update S3 storage settings.
+        
+        project is a slug of the project (Required).
+        status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined' (default: registered) (Optional).
+        tags is a list of tag (default: []) (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
+        """
+        endpoint = "tasks/s3"
+        payload = {
+            "project": project,
+            "status": status,
+            "tags": tags,
+            "priority": priority,
+        }
+        return self.api.post_request(endpoint, payload=payload)
+    
+    def get_s3_import_status_by_project(
+        self, 
+        project: str,
+    ) -> dict:
+        """
+        Returns a import status of create task from s3.
+        """
+        endpoint = "tasks/import/status/s3/" + project
+        return self.api.get_request(endpoint)
+
     @staticmethod
     def __fill_assign_users(payload: dict, **kwargs):
         if "assignee" in kwargs:

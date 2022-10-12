@@ -1363,6 +1363,43 @@ client.delete_task(task_id="YOUR_TASK_ID")
 id_name_map = client.get_task_id_name_map(project="YOUR_PROJECT_SLUG")
 ```
 
+#### Create Task from S3
+
+Task creation from S3.
+
+- Support project
+    - Image
+    - Video
+    - Audio
+    - Text
+
+
+- To use it, you need to set the contents of the following link.
+https://docs.fastlabel.ai/docs/integrations-aws-s3
+
+- Setup s3 properties
+```python
+status = client.update_s3_storage(
+    project="YOUR_PROJECT_SLUG",
+    bucket_name="S3_BUCKET_NAME",
+    bucket_region="S3_REGIONS",
+)
+```
+
+- Run create task from S3
+```python
+history = client.create_task_from_s3(
+    project="YOUR_PROJECT_SLUG",
+)
+```
+
+- Get s3 import status
+```python
+history = client.get_s3_import_status_by_project(
+    project="YOUR_PROJECT_SLUG",
+)
+```
+
 ## Annotation
 
 ### Create Annotation
