@@ -2850,7 +2850,7 @@ class Client:
             └── sample2.jpg
 
         """
-        endpoint = "storage/s3/" + project
+        endpoint = "storages/s3/" + project
         payload = {
             "bucketName": bucket_name,
             "bucketRegion": bucket_region,
