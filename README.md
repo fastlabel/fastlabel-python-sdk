@@ -1377,25 +1377,25 @@ Task creation from S3.
 - To use it, you need to set the contents of the following link.
 https://docs.fastlabel.ai/docs/integrations-aws-s3
 
-- Setup s3 properties
+- Setup AWS S3 properties
 ```python
-status = client.update_s3_storage(
+status = client.update_aws_s3_storage(
     project="YOUR_PROJECT_SLUG",
     bucket_name="S3_BUCKET_NAME",
     bucket_region="S3_REGIONS",
 )
 ```
 
-- Run create task from S3
+- Run create task from AWS S3
 ```python
-history = client.create_task_from_s3(
+history = client.create_task_from_aws_s3(
     project="YOUR_PROJECT_SLUG",
 )
 ```
 
-- Get s3 import status
+- Get AWS S3 import status
 ```python
-history = client.get_s3_import_status_by_project(
+history = client.get_aws_s3_import_status_by_project(
     project="YOUR_PROJECT_SLUG",
 )
 ```

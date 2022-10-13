@@ -2825,7 +2825,7 @@ class Client:
         endpoint = "projects/copy"
         return self.api.post_request(endpoint, payload=payload)
 
-    def update_s3_storage(
+    def update_aws_s3_storage(
         self, 
         project: str,
         bucket_name: str,
@@ -2833,12 +2833,12 @@ class Client:
         prefix: str = None
     ) -> str:
         """
-        Insert or update S3 storage settings.
+        Insert or update AWS S3 storage settings.
         
         project is a slug of the project (Required).
-        bucket_name is a bucket name of the s3 (Required).
-        bucket_region is a bucket region of the s3 (Required).
-        prefix is a folder name in the s3 bucket. (Optional).
+        bucket_name is a bucket name of the aws s3 (Required).
+        bucket_region is a bucket region of the aws s3 (Required).
+        prefix is a folder name in the aws s3 bucket. (Optional).
         If sample_dir is specified as a prefix in the case of a hierarchical structure like the bucket below,
         only the data under the sample_dir directory will be linked.
         If not specified, everything under the bucket will be linked.
@@ -2850,7 +2850,7 @@ class Client:
             └── sample2.jpg
 
         """
-        endpoint = "storages/s3/" + project
+        endpoint = "storages/aws-s3/" + project
         payload = {
             "bucketName": bucket_name,
             "bucketRegion": bucket_region,
@@ -2859,7 +2859,7 @@ class Client:
             payload["prefix"] = prefix
         return self.api.put_request(endpoint, payload=payload)
     
-    def create_task_from_s3(
+    def create_task_from_aws_s3(
         self, 
         project: str,
         status: str = "registered",
@@ -2867,7 +2867,7 @@ class Client:
         priority: int = 0,
     ) -> dict:
         """
-        Insert or update S3 storage settings.
+        Insert or update AWS S3 storage settings.
         
         project is a slug of the project (Required).
         status can be 'registered', 'completed', 'skipped',
@@ -2880,7 +2880,7 @@ class Client:
             medium = 20,
             high = 30,
         """
-        endpoint = "tasks/s3"
+        endpoint = "tasks/aws-s3"
         payload = {
             "project": project,
             "status": status,
@@ -2889,14 +2889,14 @@ class Client:
         }
         return self.api.post_request(endpoint, payload=payload)
     
-    def get_s3_import_status_by_project(
+    def get_aws_s3_import_status_by_project(
         self, 
         project: str,
     ) -> dict:
         """
-        Returns a import status of create task from s3.
+        Returns a import status of create task from AWS S3.
         """
-        endpoint = "tasks/import/status/s3/" + project
+        endpoint = "tasks/import/status/aws-s3/" + project
         return self.api.get_request(endpoint)
 
     @staticmethod
