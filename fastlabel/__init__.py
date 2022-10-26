@@ -2236,7 +2236,7 @@ class Client:
             cv_points.append((new_points[i * 2], new_points[i * 2 + 1]))
         return np.array(cv_points)
 
-    def __reverse_points(self, points: list[int]) -> list[int]:
+    def __reverse_points(self, points: List[int]) -> List[int]:
         """
         e.g.)
         [4, 5, 4, 9, 8, 9, 8, 5, 4, 5] => [4, 5, 8, 5, 8, 9, 4, 9, 4, 5]
@@ -2863,7 +2863,7 @@ class Client:
         self, 
         project: str,
         status: str = "registered",
-        tags: list[str] = [],
+        tags: List[str] = [],
         priority: int = 0,
     ) -> dict:
         """
