@@ -1,14 +1,16 @@
 import glob
 import json
+import logging
 import os
 import re
-import logging
-from typing import List
 from concurrent.futures import ThreadPoolExecutor
+from typing import List
+
 import cv2
 import numpy as np
 import xmltodict
 from PIL import Image, ImageColor, ImageDraw
+
 from fastlabel import const, converters, utils
 from fastlabel.const import (
     EXPORT_IMAGE_WITH_ANNOTATIONS_SUPPORTED_IMAGE_TYPES,
@@ -1614,7 +1616,7 @@ class Client:
         """
         endpoint = "tasks/integrate/videos"
         params = {"project": project, "prefix": prefix}
-        
+
         return self.api.get_request(endpoint, params=params)
 
     def find_integrated_audio_task_by_prefix(
@@ -1630,9 +1632,8 @@ class Client:
         """
         endpoint = "tasks/integrate/audios"
         params = {"project": project, "prefix": prefix}
-        
-        return self.api.get_request(endpoint, params=params)
 
+        return self.api.get_request(endpoint, params=params)
 
     # Convert to Fastlabel
 
@@ -1673,7 +1674,9 @@ class Client:
             ]
         }
         """
-        return converters.execute_coco_to_fastlabel(json.load(open(file_path)), annotation_type)
+        return converters.execute_coco_to_fastlabel(
+            json.load(open(file_path)), annotation_type
+        )
 
     def convert_labelme_to_fastlabel(self, folder_path: str) -> dict:
         """
@@ -2826,15 +2829,11 @@ class Client:
         return self.api.post_request(endpoint, payload=payload)
 
     def update_aws_s3_storage(
-        self, 
-        project: str,
-        bucket_name: str,
-        bucket_region: str,
-        prefix: str = None
+        self, project: str, bucket_name: str, bucket_region: str, prefix: str = None
     ) -> str:
         """
         Insert or update AWS S3 storage settings.
-        
+
         project is a slug of the project (Required).
         bucket_name is a bucket name of the aws s3 (Required).
         bucket_region is a bucket region of the aws s3 (Required).
@@ -2842,7 +2841,7 @@ class Client:
         If sample_dir is specified as a prefix in the case of a hierarchical structure like the bucket below,
         only the data under the sample_dir directory will be linked.
         If not specified, everything under the bucket will be linked.
-        
+
         [tree structure]
         fastlabel
         ├── sample1.jpg
@@ -2858,9 +2857,9 @@ class Client:
         if prefix:
             payload["prefix"] = prefix
         return self.api.put_request(endpoint, payload=payload)
-    
+
     def create_task_from_aws_s3(
-        self, 
+        self,
         project: str,
         status: str = "registered",
         tags: List[str] = [],
@@ -2868,7 +2867,7 @@ class Client:
     ) -> dict:
         """
         Insert or update AWS S3 storage settings.
-        
+
         project is a slug of the project (Required).
         status can be 'registered', 'completed', 'skipped',
         'reviewed', 'sent_back', 'approved', 'declined' (default: registered) (Optional).
@@ -2888,9 +2887,9 @@ class Client:
             "priority": priority,
         }
         return self.api.post_request(endpoint, payload=payload)
-    
+
     def get_aws_s3_import_status_by_project(
-        self, 
+        self,
         project: str,
     ) -> dict:
         """
