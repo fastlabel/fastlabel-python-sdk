@@ -3077,7 +3077,7 @@ class Client:
             raise FastLabelInvalidException(
                 "Limit must be less than or equal to 1000.", 422
             )
-        endpoint = "dataset-objects"
+        endpoint = "dataset-objects/imports/histories"
         params = {"datasetId": dataset_id}
         if offset:
             params["offset"] = offset
