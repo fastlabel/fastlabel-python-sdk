@@ -1,4 +1,5 @@
 import os
+
 import requests
 
 from .exceptions import FastLabelException, FastLabelInvalidException
@@ -13,8 +14,7 @@ class Api:
     def __init__(self):
         if not os.environ.get("FASTLABEL_ACCESS_TOKEN"):
             raise ValueError("FASTLABEL_ACCESS_TOKEN is not configured.")
-        self.access_token = "Bearer " + \
-            os.environ.get("FASTLABEL_ACCESS_TOKEN")
+        self.access_token = "Bearer " + os.environ.get("FASTLABEL_ACCESS_TOKEN")
 
     def get_request(self, endpoint: str, params=None) -> dict:
         """Makes a get request to an endpoint.
@@ -27,8 +27,7 @@ class Api:
             "Content-Type": "application/json",
             "Authorization": self.access_token,
         }
-        r = requests.get(FASTLABEL_ENDPOINT + endpoint,
-                         headers=headers, params=params)
+        r = requests.get(FASTLABEL_ENDPOINT + endpoint, headers=headers, params=params)
 
         if r.status_code == 200:
             return r.json()
@@ -78,8 +77,7 @@ class Api:
             "Content-Type": "application/json",
             "Authorization": self.access_token,
         }
-        r = requests.post(FASTLABEL_ENDPOINT + endpoint,
-                          json=payload, headers=headers)
+        r = requests.post(FASTLABEL_ENDPOINT + endpoint, json=payload, headers=headers)
 
         if r.status_code == 200:
             return r.json()
@@ -104,8 +102,7 @@ class Api:
             "Content-Type": "application/json",
             "Authorization": self.access_token,
         }
-        r = requests.put(FASTLABEL_ENDPOINT + endpoint,
-                         json=payload, headers=headers)
+        r = requests.put(FASTLABEL_ENDPOINT + endpoint, json=payload, headers=headers)
 
         if r.status_code == 200:
             return r.json()
