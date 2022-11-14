@@ -27,6 +27,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [labelme](#labelme)
   - [Segmentation](#segmentation)
 - [Converter to FastLabel format](#converter-to-fastlabel-format)
+- [Dataset](#dataset)
 
 ## Installation
 
@@ -2104,6 +2105,198 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
 ```
 
 > Please check const.COLOR_PALLETE for index colors.
+
+## Dataset
+
+### Create Dataset
+
+Create a new dataset.
+
+```python
+dataset = client.create_dataset(
+    name="Japanese Dogs",
+    slug="japanese_dogs",
+    type="image"
+)
+```
+
+#### Response Dataset
+
+See API docs for details.
+
+```python
+{
+    'id': 'YOUR_DATASET_ID',
+    'name': 'Japanese Dogs',
+    'slug': 'japanese_dogs',
+    'type': 'image',
+    'createdAt': '2022-10-31T02:20:00.248Z',
+    'updatedAt': '2022-10-31T02:20:00.248Z'
+}
+```
+
+### Find Dataset
+
+Find a single dataset.
+
+```python
+dataset = client.find_dataset(dataset_id="YOUR_DATASET_ID")
+```
+
+Success response is the same as when created.
+
+### Get Dataset
+
+Get all datasets in the workspace. (Up to 1000 tasks)
+
+```python
+datasets = client.get_datasets()
+```
+
+The success response is the same as when created, but it is an array.
+
+You can filter by type and keywords.
+
+```python
+datasets = client.get_datasets(
+    type="image", # 'image', 'video', 'audio'
+    keyword="dog"
+)
+```
+
+If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get%20tasks).
+
+### Update Dataset
+
+Update a single dataset.
+
+```python
+dataset = client.update_dataset(
+    dataset_id="YOUR_DATASET_ID", name="World dogs"
+)
+```
+
+Success response is the same as when created.
+
+### Delete Dataset
+
+Delete a single dataset.
+
+**⚠️ The dataset object and its associated tasks that dataset has will also be deleted, so check carefully before executing.**
+
+```python
+client.delete_dataset(dataset_id="YOUR_DATASET_ID")
+```
+
+### Create Dataset Object
+
+Create object in the dataset.
+
+The types of objects that can be created are "image", "video", and "audio".
+There are type-specific methods. but they can be used in the same way.
+
+```python
+dataset_object = client.create_image_dataset_object(
+    dataset_id="YOUR_DATASET_ID",
+    name="brushwood_dog.jpg",
+    file_path="./brushwood_dog.jpg",
+)
+```
+
+#### Response Dataset Object
+
+See API docs for details.
+
+```python
+{
+    'id': 'YOUR_DATASET_OBJECT_ID',
+    'name': 'brushwood_dog.jpg',
+    'size': 6717,
+    'height': 225,
+    'width': 225,
+    'groupId': None,
+    'createdAt': '2022-10-30T08:32:20.748Z',
+    'updatedAt': '2022-10-30T08:32:20.748Z'
+}
+```
+
+### Find Dataset Object
+
+Find a single dataset object.
+
+```python
+dataset_object = client.find_dataset_object(
+    dataset_object_id="YOUR_DATASET_OBJECT_ID"
+)
+```
+
+Success response is the same as when created.
+
+### Get Dataset Object
+
+Get all dataset object in the dataset. (Up to 1000 tasks)
+
+```python
+dataset_objects = client.get_dataset_objects(dataset_id="YOUR_DATASET_ID")
+```
+
+The success response is the same as when created, but it is an array.
+
+You can filter by keywords.
+
+```python
+dataset_objects = client.get_dataset_objects(
+    dataset_id="YOUR_DATASET_ID", keyword="dog"
+)
+```
+
+If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get%20tasks).
+
+### Delete Dataset Object
+
+Delete a multi dataset objects.
+
+**⚠️ Related tasks will also be deleted, so please check them carefully before execution.**
+
+```python
+client.delete_dataset_objects(
+    dataset_id="YOUR_DATASET_ID",
+    dataset_object_ids=[
+        "YOUR_DATASET_OBJECT_ID_1",
+        "YOUR_DATASET_OBJECT_ID_2",
+    ],
+)
+```
+
+### Get Import Histories For Dataset Object
+
+Get all import histories in the dataset. (Up to 1000 tasks)
+
+```python
+datasets = client.get_dataset_object_import_histories(
+    dataset_id="YOUR_DATASET_ID"
+)
+```
+
+#### Response Dataset Object Import Histories
+
+See API docs for details.
+
+```python
+[
+    {
+        'id': 'YOUR_DATASET_OBJECT_IMPORT_HISTORY_ID',
+        'type': 'local',
+        'status': 'completed',
+        'msgCode': 'none',
+        'msgLevel': 'none',
+        'userName': 'admin',
+        'count': 1,
+        'createdAt': '2022-10-30T08:31:31.588Z',
+        'updatedAt': '2022-11-02T07:36:07.636Z'
+  }
+]
+```
 
 ## API Docs
 

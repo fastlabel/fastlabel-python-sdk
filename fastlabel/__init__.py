@@ -2828,6 +2828,263 @@ class Client:
         endpoint = "projects/copy"
         return self.api.post_request(endpoint, payload=payload)
 
+    # Dataset
+
+    def find_dataset(self, dataset_id: str) -> dict:
+        """
+        Find a dataset.
+        """
+        endpoint = "datasets/" + dataset_id
+        return self.api.get_request(endpoint)
+
+    def get_datasets(
+        self,
+        keyword: str = None,
+        type: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of datasets.
+
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        keyword are search terms in the dataset slug (Optional).
+        type is type of your dataset (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "datasets"
+        params = {}
+        if keyword:
+            params["keyword"] = keyword
+        if type:
+            params["type"] = type
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def create_dataset(
+        self,
+        type: str,
+        name: str,
+        slug: str,
+    ) -> str:
+        """
+        Create a dataset.
+
+        type can be 'image', 'video', 'audio' (Required).
+        name is name of your dataset (Required).
+        slug is slug of your dataset (Required).
+        """
+        endpoint = "datasets"
+        payload = {
+            "type": type,
+            "name": name,
+            "slug": slug,
+        }
+        return self.api.post_request(endpoint, payload=payload)
+
+    def update_dataset(
+        self,
+        dataset_id: str,
+        name: str = None,
+    ) -> str:
+        """
+        Update a dataset.
+
+        dataset_id is an id of the dataset (Required).
+        name is name of your dataset (Required).
+        """
+        endpoint = "datasets/" + dataset_id
+        payload = {"name": name}
+        return self.api.put_request(endpoint, payload=payload)
+
+    def delete_dataset(self, dataset_id: str) -> None:
+        """
+        Delete a dataset.
+        """
+        endpoint = "datasets/" + dataset_id
+        self.api.delete_request(endpoint)
+
+    # Dataset Object
+
+    def find_dataset_object(self, dataset_object_id: str) -> dict:
+        """
+        Find a dataset object.
+        """
+        endpoint = "dataset-objects/" + dataset_object_id
+        return self.api.get_request(endpoint)
+
+    def get_dataset_objects(
+        self,
+        dataset_id: str = None,
+        keyword: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of dataset objects.
+
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        dataset_id is dataset object in dataset (Required).
+        keyword are search terms in the dataset object name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "dataset-objects"
+        params = {"datasetId": dataset_id}
+        if keyword:
+            params["keyword"] = keyword
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def create_image_dataset_object(
+        self,
+        dataset_id: str,
+        name: str,
+        file_path: str,
+    ) -> str:
+        """
+        Create a image dataset object.
+
+        dataset_id is dataset object in dataset (Required).
+        name is an unique identifier of dataset object in your dataset (Required).
+        file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
+        """
+        endpoint = "dataset-objects"
+        # TODO: add jfif, pjpeg, pjp?
+        if not utils.is_image_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are png, jpg, jpeg.", 422
+            )
+        if not utils.is_image_supported_size(file_path):
+            raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
+
+        payload = {
+            "datasetId": dataset_id,
+            "name": name,
+            "file": utils.base64_encode(file_path),
+            "type": "image",
+        }
+        return self.api.post_request(endpoint, payload=payload)
+
+    def create_video_dataset_object(
+        self,
+        dataset_id: str,
+        name: str,
+        file_path: str,
+    ) -> str:
+        """
+        Create a video dataset object.
+
+        dataset_id is dataset object in dataset (Required).
+        name is an unique identifier of dataset object in your dataset (Required).
+        file_path is a path to data. Supported extensions are mp4 (Required).
+        """
+        endpoint = "dataset-objects"
+        # TODO: add m4v, mov, avi?
+        if not utils.is_video_supported_ext(file_path):
+            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
+        if not utils.is_video_supported_size(file_path):
+            raise FastLabelInvalidException(
+                "Supported video size is under 250 MB.", 422
+            )
+
+        payload = {
+            "datasetId": dataset_id,
+            "name": name,
+            "file": utils.base64_encode(file_path),
+            "type": "video",
+        }
+        return self.api.post_request(endpoint, payload=payload)
+
+    def create_audio_dataset_object(
+        self,
+        dataset_id: str,
+        name: str,
+        file_path: str,
+    ) -> str:
+        """
+        Create a audio dataset object.
+
+        dataset_id is dataset object in dataset (Required).
+        name is an unique identifier of dataset object in your dataset (Required).
+        file_path is a path to data. Supported extensions are mp3, wav, w4a (Required).
+        """
+        endpoint = "dataset-objects"
+        # TODO: add mp2?
+        if not utils.is_audio_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are mp3, wav and w4a.", 422
+            )
+        if not utils.is_audio_supported_size(file_path):
+            raise FastLabelInvalidException(
+                "Supported audio size is under 120 MB.", 422
+            )
+
+        payload = {
+            "datasetId": dataset_id,
+            "name": name,
+            "file": utils.base64_encode(file_path),
+            "type": "audio",
+        }
+        return self.api.post_request(endpoint, payload=payload)
+
+    def delete_dataset_objects(
+        self, dataset_id: str, dataset_object_ids: List[str]
+    ) -> None:
+        """
+        Delete a dataset objects.
+        """
+        endpoint = "dataset-objects/delete/multi"
+        payload = {"datasetId": dataset_id, "datasetObjectIds": dataset_object_ids}
+        self.api.post_request(endpoint, payload=payload)
+
+    def get_dataset_object_import_histories(
+        self,
+        dataset_id: str = None,
+        offset: int = None,
+        limit: int = 5,
+    ) -> list:
+        """
+        Returns a list of dataset objects.
+
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        dataset_id is import histories in dataset (Required).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "dataset-objects/imports/histories"
+        params = {"datasetId": dataset_id}
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
     def update_aws_s3_storage(
         self, project: str, bucket_name: str, bucket_region: str, prefix: str = None
     ) -> str:
