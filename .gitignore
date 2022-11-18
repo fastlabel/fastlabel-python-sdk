@@ -6,13 +6,13 @@
 dist
 build
 fastlabel.egg-info
-test*.py
 annotation.json
 *.jpg
 *.jpeg
 *.png
 *.mp4
-tests/
 output/
 .eggs/
-venv/
+.venv/
+.env
+!tests/files/*
