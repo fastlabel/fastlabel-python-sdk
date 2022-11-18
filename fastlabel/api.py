@@ -4,14 +4,15 @@ import requests
 
 from .exceptions import FastLabelException, FastLabelInvalidException
 
-FASTLABEL_ENDPOINT = "https://api.fastlabel.ai/v1/"
-
 
 class Api:
 
+    base_url = "https://api.fastlabel.ai/v1/"
     access_token = None
 
     def __init__(self):
+        if os.environ.get("FASTLABEL_API_URL"):
+            self.base_url = os.environ.get("FASTLABEL_API_URL")
         if not os.environ.get("FASTLABEL_ACCESS_TOKEN"):
             raise ValueError("FASTLABEL_ACCESS_TOKEN is not configured.")
         self.access_token = "Bearer " + os.environ.get("FASTLABEL_ACCESS_TOKEN")
@@ -27,7 +28,7 @@ class Api:
             "Content-Type": "application/json",
             "Authorization": self.access_token,
         }
-        r = requests.get(FASTLABEL_ENDPOINT + endpoint, headers=headers, params=params)
+        r = requests.get(self.base_url + endpoint, headers=headers, params=params)
 
         if r.status_code == 200:
             return r.json()
@@ -52,9 +53,7 @@ class Api:
             "Content-Type": "application/json",
             "Authorization": self.access_token,
         }
-        r = requests.delete(
-            FASTLABEL_ENDPOINT + endpoint, headers=headers, params=params
-        )
+        r = requests.delete(self.base_url + endpoint, headers=headers, params=params)
 
         if r.status_code != 204:
             try:
@@ -77,10 +76,12 @@ class Api:
             "Content-Type": "application/json",
             "Authorization": self.access_token,
         }
-        r = requests.post(FASTLABEL_ENDPOINT + endpoint, json=payload, headers=headers)
+        r = requests.post(self.base_url + endpoint, json=payload, headers=headers)
 
         if r.status_code == 200:
             return r.json()
+        elif r.status_code == 204:
+            return
         else:
             try:
                 error = r.json()["message"]
@@ -102,7 +103,7 @@ class Api:
             "Content-Type": "application/json",
             "Authorization": self.access_token,
         }
-        r = requests.put(FASTLABEL_ENDPOINT + endpoint, json=payload, headers=headers)
+        r = requests.put(self.base_url + endpoint, json=payload, headers=headers)
 
         if r.status_code == 200:
             return r.json()

@@ -2115,7 +2115,7 @@ Create a new dataset.
 ```python
 dataset = client.create_dataset(
     name="Japanese Dogs",
-    slug="japanese_dogs",
+    slug="japanese-dogs",
     type="image"
 )
 ```
@@ -2128,7 +2128,7 @@ See API docs for details.
 {
     'id': 'YOUR_DATASET_ID',
     'name': 'Japanese Dogs',
-    'slug': 'japanese_dogs',
+    'slug': 'japanese-dogs',
     'type': 'image',
     'createdAt': '2022-10-31T02:20:00.248Z',
     'updatedAt': '2022-10-31T02:20:00.248Z'
@@ -2164,7 +2164,7 @@ datasets = client.get_datasets(
 )
 ```
 
-If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get%20tasks).
+If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get-tasks).
 
 ### Update Dataset
 
@@ -2250,7 +2250,7 @@ dataset_objects = client.get_dataset_objects(
 )
 ```
 
-If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get%20tasks).
+If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get-tasks).
 
 ### Delete Dataset Object
 
