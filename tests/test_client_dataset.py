@@ -1,3 +1,4 @@
+import re
 import sys
 from pathlib import Path
 from uuid import uuid4
@@ -82,19 +83,23 @@ class TestImageDataset:
         assert dataset_object["width"] == 225
         assert dataset_object["groupId"] is None
 
-    @pytest.mark.xfail(raises=FastLabelInvalidException)
     def test_create_dataset_object_file_type_violation(
         self, client: Client, testing_image_dataset: dict
     ):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_video.mp4"
         # Act
-        client.create_image_dataset_object(
-            dataset_id=testing_image_dataset["id"],
-            name="test_video.mp4",
-            file_path=str(target_file),
-        )
-        pytest.fail("Intended error was not raise")
+        with pytest.raises(
+            expected_exception=FastLabelInvalidException,
+            match=re.escape(
+                "<Response [422]> Supported extensions are png, jpg, jpeg."
+            ),
+        ) as _:
+            client.create_image_dataset_object(
+                dataset_id=testing_image_dataset["id"],
+                name="test_video.mp4",
+                file_path=str(target_file),
+            )
 
     def test_find_dataset_object(self, client: Client, testing_image_dataset: dict):
         # Arrange
@@ -208,19 +213,21 @@ class TestVideoDataset:
         assert dataset_object["width"] == 320
         assert dataset_object["groupId"] is None
 
-    @pytest.mark.xfail(raises=FastLabelInvalidException)
     def test_create_dataset_object_file_type_violation(
         self, client: Client, testing_video_dataset: dict
     ):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_image.jpg"
         # Act
-        client.create_video_dataset_object(
-            dataset_id=testing_video_dataset["id"],
-            name="test_image.jpg",
-            file_path=str(target_file),
-        )
-        pytest.fail("Intended error was not raise")
+        with pytest.raises(
+            expected_exception=FastLabelInvalidException,
+            match=re.escape("<Response [422]> Supported extensions are mp4."),
+        ) as _:
+            client.create_video_dataset_object(
+                dataset_id=testing_video_dataset["id"],
+                name="test_image.jpg",
+                file_path=str(target_file),
+            )
 
     def test_find_dataset_object(self, client: Client, testing_video_dataset: dict):
         # Arrange
@@ -334,19 +341,23 @@ class TestAudioDataset:
         assert dataset_object["width"] == 0
         assert dataset_object["groupId"] is None
 
-    @pytest.mark.xfail(raises=FastLabelInvalidException)
     def test_create_dataset_object_file_type_violation(
         self, client: Client, testing_audio_dataset: dict
     ):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_image.jpg"
         # Act
-        client.create_audio_dataset_object(
-            dataset_id=testing_audio_dataset["id"],
-            name="test_image.jpg",
-            file_path=str(target_file),
-        )
-        pytest.fail("Intended error was not raise")
+        with pytest.raises(
+            expected_exception=FastLabelInvalidException,
+            match=re.escape(
+                "<Response [422]> Supported extensions are mp3, wav and w4a."
+            ),
+        ) as _:
+            client.create_audio_dataset_object(
+                dataset_id=testing_audio_dataset["id"],
+                name="test_image.jpg",
+                file_path=str(target_file),
+            )
 
     def test_find_dataset_object(self, client: Client, testing_audio_dataset: dict):
         # Arrange
