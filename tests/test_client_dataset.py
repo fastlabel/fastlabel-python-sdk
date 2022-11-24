@@ -89,7 +89,7 @@ class TestImageDataset:
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_video.mp4"
         # Act
-        client.create_audio_dataset_object(
+        client.create_image_dataset_object(
             dataset_id=testing_image_dataset["id"],
             name="test_video.mp4",
             file_path=str(target_file),
@@ -215,7 +215,7 @@ class TestVideoDataset:
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_image.jpg"
         # Act
-        client.create_audio_dataset_object(
+        client.create_video_dataset_object(
             dataset_id=testing_video_dataset["id"],
             name="test_image.jpg",
             file_path=str(target_file),
