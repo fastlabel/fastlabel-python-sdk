@@ -2876,7 +2876,7 @@ class Client:
         type: str,
         name: str,
         slug: str,
-    ) -> str:
+    ) -> dict:
         """
         Create a dataset.
 
@@ -2896,7 +2896,7 @@ class Client:
         self,
         dataset_id: str,
         name: str = None,
-    ) -> str:
+    ) -> dict:
         """
         Update a dataset.
 
@@ -2960,7 +2960,7 @@ class Client:
         dataset_id: str,
         name: str,
         file_path: str,
-    ) -> str:
+    ) -> dict:
         """
         Create a image dataset object.
 
@@ -2990,7 +2990,7 @@ class Client:
         dataset_id: str,
         name: str,
         file_path: str,
-    ) -> str:
+    ) -> dict:
         """
         Create a video dataset object.
 
@@ -3020,7 +3020,7 @@ class Client:
         dataset_id: str,
         name: str,
         file_path: str,
-    ) -> str:
+    ) -> dict:
         """
         Create a audio dataset object.
 
