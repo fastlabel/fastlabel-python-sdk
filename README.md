@@ -17,6 +17,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [Text Classification](#text-classification)
   - [Audio](#audio)
   - [Audio Classification](#audio-classification)
+  - [PCD](#pcd)
   - [Common](#common)
 - [Annotation](#annotation)
 - [Project](#project)
@@ -1341,6 +1342,160 @@ task_id = client.update_audio_classification_task(
 )
 ```
 
+### PCD
+
+Supported following project types:
+
+- PCD - Cuboid
+- PCD - Segmentation
+
+#### Create Task
+
+Create a new task.
+
+```python
+task_id = client.create_pcd_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.pcd",
+    file_path="./sample.pcd"
+)
+```
+
+Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
+
+Annotation Type: cuboid
+
+```python
+task_id = client.create_pcd_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.pcd",
+    file_path="./sample.pcd",
+    annotations=[
+        {
+            "type": "cuboid",
+            "value": "car",
+            "points": [ # For cuboid, it is a 9-digit number.
+                1, # Coordinate X
+                2, # Coordinate Y
+                3, # Coordinate Z
+                1, # Rotation x
+                1, # Rotation Y
+                1, # Rotation Z
+                2, # Length X
+                2, # Length Y
+                2  # Length Z
+            ],
+        }
+    ],
+)
+```
+
+Annotation Type: segmentation
+
+```python
+task_id = client.create_pcd_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample.pcd",
+    file_path="./sample.pcd",
+    annotations=[
+        {
+            "type": "segmentation",
+            "value": "car",
+            "points": [1, 2, 3, 4, 5], # For segmentation, it is an arbitrary numeric array.
+        }
+    ],
+)
+```
+
+##### Limitation
+
+- You can upload up to a size of 30 MB.
+
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_pcd_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_pcd_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
+#### Get Tasks
+
+Get tasks. (Up to 1000 tasks)
+
+```python
+tasks = client.get_pcd_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Update Task
+
+Update a single task.
+
+```python
+task_id = client.update_pcd_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"],
+    annotations=[
+        {
+            "type": "cuboid",
+            "value": "car",
+            "points": [ # For cuboid, it is a 9-digit number.
+                1, # Coordinate X
+                2, # Coordinate Y
+                3, # Coordinate Z
+                1, # Rotation x
+                1, # Rotation Y
+                1, # Rotation Z
+                2, # Length X
+                2, # Length Y
+                2  # Length Z
+            ],
+        }
+    ],
+)
+```
+
+#### Response
+
+Example of a single PCD task object
+
+```python
+{
+    "id": "YOUR_TASK_ID",
+    "name": "sample.pcd",
+    "url": "YOUR_TASK_URL",
+    "status": "registered",
+    "externalStatus": "registered",
+    "tags": ["tag1", "tag2"],
+    "assignee": "ASSIGNEE_NAME",
+    "reviewer": "REVIEWER_NAME",
+    "approver": "APPROVER_NAME",
+    "externalAssignee": "EXTERNAL_ASSIGNEE_NAME",
+    "externalReviewer": "EXTERNAL_REVIEWER_NAME",
+    "externalApprover": "EXTERNAL_APPROVER_NAME",
+    "annotations": [
+        {
+            "attributes": [],
+            "color": "#b36d18",
+            "title": "Car",
+            "type": "segmentation",
+            "value": "car",
+            "points": [1, 2, 3, 1, 1, 1, 2, 2, 2],
+        }
+    ],
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
+```
+
 ### Common
 
 APIs for update and delete are same over all tasks.
@@ -1384,7 +1539,7 @@ Task creation from S3.
   - Text
 
 - To use it, you need to set the contents of the following link.
-  https://docs.fastlabel.ai/docs/integrations-aws-s3
+  <https://docs.fastlabel.ai/docs/integrations-aws-s3>
 
 - Setup AWS S3 properties
 

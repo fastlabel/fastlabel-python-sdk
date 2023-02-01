@@ -226,6 +226,25 @@ class Client:
             return None
         return tasks[0]
 
+    def find_pcd_task(self, task_id: str) -> dict:
+        """
+        Find a single PCD task.
+        """
+        endpoint = "tasks/pcd/" + task_id
+        return self.api.get_request(endpoint)
+
+    def find_pcd_task_by_name(self, project: str, task_name: str) -> dict:
+        """
+        Find a single PCD task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_pcd_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
     # Task Get
 
     def get_image_tasks(
@@ -598,6 +617,52 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/audio/classification"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def get_pcd_tasks(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of PCD tasks.
+        Returns up to 1000 at a time, to get more,
+        set offset as the starting position to fetch.
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined',
+        'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        task_name is a task name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "tasks/pcd"
         params = {"project": project}
         if status:
             params["status"] = status
@@ -1159,6 +1224,59 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def create_pcd_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        external_status: str = None,
+        annotations: list = [],
+        tags: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Create a single PCD task.
+
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        file_path is a path to data. Supported extensions are pcd only (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        annotations is a list of annotation to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/pcd"
+        if not utils.is_pcd_supported_ext(file_path):
+            raise FastLabelInvalidException("Supported extensions are pcd only", 422)
+        if not utils.is_pcd_supported_size(file_path):
+            raise FastLabelInvalidException("Supported PCD size is under 30 MB.", 422)
+
+        file = utils.base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if annotations:
+            for annotation in annotations:
+                annotation["content"] = name
+            payload["annotations"] = annotations
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
     # Task Update
 
     def update_task(
@@ -1572,6 +1690,51 @@ class Client:
             payload["attributes"] = attributes
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_pcd_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        annotations: List[dict] = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single pcd task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        tags is a list of tag to be set (Optional).
+        annotations is a list of annotation to be set (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/pcd/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            for annotation in annotations:
+                # Since the content name is not passed in the sdk update api,
+                # the content will be filled on the server side.
+                annotation["content"] = ""
+            payload["annotations"] = annotations
 
         self.__fill_assign_users(payload, **kwargs)
 

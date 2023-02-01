@@ -30,6 +30,12 @@ def is_audio_supported_ext(file_path: str) -> bool:
     return file_path.lower().endswith((".mp3", ".wav", ".m4a"))
 
 
+def is_pcd_supported_ext(file_path: str) -> bool:
+    # .ply is not yet supported. To support it, modification of the API
+    # needs to be considered as well.
+    return file_path.lower().endswith((".pcd"))
+
+
 def is_image_supported_size(file_path: str) -> bool:
     return os.path.getsize(file_path) <= const.SUPPORTED_IMAGE_SIZE
 
@@ -44,6 +50,10 @@ def is_text_supported_size(file_path: str) -> bool:
 
 def is_audio_supported_size(file_path: str) -> bool:
     return os.path.getsize(file_path) <= const.SUPPORTED_AUDIO_SIZE
+
+
+def is_pcd_supported_size(file_path: str) -> bool:
+    return os.path.getsize(file_path) <= const.SUPPORTED_PCD_SIZE
 
 
 def is_json_ext(file_name: str) -> bool:
