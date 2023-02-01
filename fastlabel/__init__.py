@@ -641,7 +641,7 @@ class Client:
         task_name: str = None,
         offset: int = None,
         limit: int = 100,
-    ) -> list[dict]:
+    ) -> list:
         """
         Returns a list of PCD tasks.
         Returns up to 1000 at a time, to get more,
