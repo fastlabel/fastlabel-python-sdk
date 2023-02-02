@@ -85,6 +85,31 @@ def reverse_points(points: List[int]) -> List[int]:
     return reversed_points
 
 
+def sorted_segmentation_points(points: List[int]) -> List[int]:
+    """
+    e.g.)
+    [1, 2, 1, 1, 2, 1, 2, 2, 1, 2] => [1, 1, 2, 1, 2, 2, 1, 2, 1, 1]
+    """
+    points_array = np.array(points).reshape((-1, 2))[1:]
+    base_point_index = 0
+    points_list = points_array.tolist()
+    for index, val in enumerate(points_list):
+        if index == 0:
+            continue
+        if (
+            val[1] <= points_list[base_point_index][1] and val[0] <= points_list[base_point_index][0]
+        ):
+            base_point_index = index
+    new_points_array = np.vstack(
+        [
+            points_array[base_point_index:],
+            points_array[:base_point_index],
+            np.array([points_array[base_point_index]]),
+        ]
+    )
+    return new_points_array.ravel().tolist()
+
+
 def is_clockwise(points: list) -> bool:
     """
     points: [x1, y1, x2, y2, x3, y3, ... xn, yn]

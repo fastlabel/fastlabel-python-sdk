@@ -2308,10 +2308,16 @@ class Client:
                         if count == 0:
                             cv_draw_points = []
                             if utils.is_clockwise(points):
-                                cv_draw_points = self.__get_cv_draw_points(points)
-                            else:
                                 cv_draw_points = self.__get_cv_draw_points(
-                                    utils.reverse_points(points)
+                                    utils.sorted_segmentation_points(points)
+                                )
+                            else:
+                                reverse_points = utils.reverse_points(points)
+                                sorted_points = utils.sorted_segmentation_points(
+                                    reverse_points
+                                )
+                                cv_draw_points = self.__get_cv_draw_points(
+                                    sorted_points
                                 )
                             cv2.fillPoly(
                                 seg_mask_image,
@@ -2323,9 +2329,11 @@ class Client:
                         else:
                             # Reverse hollow points for opencv because these points are
                             # counterclockwise
-                            cv_draw_points = self.__get_cv_draw_points(
-                                utils.reverse_points(points)
+                            reverse_points = utils.reverse_points(points)
+                            sorted_points = utils.sorted_segmentation_points(
+                                reverse_points
                             )
+                            cv_draw_points = self.__get_cv_draw_points(sorted_points)
                             cv2.fillPoly(
                                 seg_mask_image,
                                 [cv_draw_points],
@@ -2362,7 +2370,8 @@ class Client:
 
     def __get_cv_draw_points(self, points: List[int]) -> List[int]:
         """
-        Convert points to pillow draw points. Diagonal points are not supported.
+        Convert points to pillow draw points. Diagonal points are not supported
+        Annotation clockwise draw.
         """
         x_points = []
         x_points.append(points[0])
