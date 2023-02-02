@@ -2309,11 +2309,11 @@ class Client:
                             cv_draw_points = []
                             if utils.is_clockwise(points):
                                 cv_draw_points = self.__get_cv_draw_points(
-                                    utils.sorted_segmentation_points(points)
+                                    utils.sort_segmentation_points(points)
                                 )
                             else:
                                 reverse_points = utils.reverse_points(points)
-                                sorted_points = utils.sorted_segmentation_points(
+                                sorted_points = utils.sort_segmentation_points(
                                     reverse_points
                                 )
                                 cv_draw_points = self.__get_cv_draw_points(
@@ -2330,7 +2330,7 @@ class Client:
                             # Reverse hollow points for opencv because these points are
                             # counterclockwise
                             reverse_points = utils.reverse_points(points)
-                            sorted_points = utils.sorted_segmentation_points(
+                            sorted_points = utils.sort_segmentation_points(
                                 reverse_points
                             )
                             cv_draw_points = self.__get_cv_draw_points(sorted_points)

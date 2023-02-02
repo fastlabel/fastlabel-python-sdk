@@ -85,7 +85,7 @@ def reverse_points(points: List[int]) -> List[int]:
     return reversed_points
 
 
-def sorted_segmentation_points(points: List[int]) -> List[int]:
+def sort_segmentation_points(points: List[int]) -> List[int]:
     """
     e.g.)
     [1, 2, 1, 1, 2, 1, 2, 2, 1, 2] => [1, 1, 2, 1, 2, 2, 1, 2, 1, 1]
