@@ -2521,7 +2521,6 @@ class Client:
         # Supported extensions are png, jpg, jpeg (Required).
         # """
         endpoint = "model-endpoints/infer"
-        # TODO: add jfif, pjpeg, pjp?
         if not utils.is_image_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are png, jpg, jpeg.", 422
