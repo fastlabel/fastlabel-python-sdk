@@ -2508,3 +2508,29 @@ class Client:
             payload["externalReviewer"] = kwargs.get("external_reviewer")
         if "external_approver" in kwargs:
             payload["externalApprover"] = kwargs.get("external_approver")
+
+    def inference_with_endpoint(
+        self,
+        endpoint_name: str,
+        file_path: str,
+    ) -> dict:
+        # """
+        # Inference with existing endpoint.
+        # endpoint_name is name of target endpoint (Required).
+        # file_path is a path to data.
+        # Supported extensions are png, jpg, jpeg (Required).
+        # """
+        endpoint = "model-endpoints/infer"
+        # TODO: add jfif, pjpeg, pjp?
+        if not utils.is_image_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are png, jpg, jpeg.", 422
+            )
+        if not utils.is_image_supported_size_for_inference(file_path):
+            raise FastLabelInvalidException("Supported image size is under 6 MB.", 422)
+
+        payload = {
+            "modelEndpointName": endpoint_name,
+            "file": utils.base64_encode(file_path),
+        }
+        return self.api.post_request(endpoint, payload=payload)
