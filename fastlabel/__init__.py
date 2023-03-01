@@ -2509,18 +2509,18 @@ class Client:
         if "external_approver" in kwargs:
             payload["externalApprover"] = kwargs.get("external_approver")
 
-    def inference_with_endpoint(
+    def execute_endpoint(
         self,
         endpoint_name: str,
         file_path: str,
     ) -> dict:
         # """
-        # Inference with existing endpoint.
+        # Execute existing endpoint.
         # endpoint_name is name of target endpoint (Required).
         # file_path is a path to data.
         # Supported extensions are png, jpg, jpeg (Required).
         # """
-        endpoint = "model-endpoints/infer"
+        endpoint = "model-endpoints/execute"
         if not utils.is_image_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are png, jpg, jpeg.", 422

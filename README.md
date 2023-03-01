@@ -1907,13 +1907,11 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
 > Please check const.COLOR_PALLETE for index colors.
 
 
-## Inference
+## Execute endpoint
 
-### Inference with existing endpoint
+Create the endpoint from the screen at first.
 
-First create the endpoint from the screen.
-
-Currently, the ability to create endpoints is in alpha and is not available to users.
+Currently, the feature to create endpoints is in alpha and is not available to users.
 If you would like to try it out, please contact a FastLabel representative.
 
 ```python
@@ -1935,14 +1933,14 @@ def base64_to_cv(img_str):
   return img
 
 if __name__ == '__main__':
-  # Execute inference
-  response = client.inference_with_endpoint(
+  # Execute endpoint
+  response = client.execute_endpoint(
       endpoint_name=ENDPOINT_NAME, file_path=IMAGE_PATH)
 
-  # Show inference result
+  # Show  result
   print(response["json"])
 
-  # Save inference result image
+  # Save result
   img = base64_to_cv(response["file"])
   cv2.imwrite(RESULT_IMAGE_FILE_PATH, img)
 ```
