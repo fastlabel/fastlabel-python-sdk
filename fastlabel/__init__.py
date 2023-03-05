@@ -2190,13 +2190,16 @@ class Client:
         tasks is a list of tasks (Required).
         output_dir is output directory(default: output/pascalvoc) (Optional).
         """
-        pascalvoc = converters.to_pascalvoc(tasks)
+        os.makedirs(output_dir, exist_ok=True)
+        pascalvoc = converters.to_pascalvoc(tasks=tasks, output_dir=output_dir)
         for voc in pascalvoc:
             file_name = voc["annotation"]["filename"]
             basename = utils.get_basename(file_name)
-            file_path = os.path.join(output_dir, basename + ".xml")
+            file_path = os.path.join(output_dir, "annotations", basename + ".xml")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            xml = xmltodict.unparse(voc, pretty=True, full_document=False)
+            xml = xmltodict.unparse(
+                voc, pretty=True, indent="    ", full_document=False
+            )
             with open(file_path, "w", encoding="utf8") as f:
                 f.write(xml)
 
