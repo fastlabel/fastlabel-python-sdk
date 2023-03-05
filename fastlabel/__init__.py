@@ -2162,7 +2162,10 @@ class Client:
         classes is a list of annotation values.  e.g. ['dog','bird'] (Optional).
         output_dir is output directory(default: output/yolo) (Optional).
         """
-        annos, categories = converters.to_yolo(tasks, classes)
+        os.makedirs(output_dir, exist_ok=True)
+        annos, categories = converters.to_yolo(
+            tasks=tasks, classes=classes, output_dir=output_dir
+        )
         for anno in annos:
             file_name = anno["filename"]
             basename = utils.get_basename(file_name)
@@ -2173,7 +2176,6 @@ class Client:
                     f.write(obj)
                     f.write("\n")
         classes_file_path = os.path.join(output_dir, "classes.txt")
-        os.makedirs(os.path.dirname(classes_file_path), exist_ok=True)
         with open(classes_file_path, "w", encoding="utf8") as f:
             for category in categories:
                 f.write(category["name"])

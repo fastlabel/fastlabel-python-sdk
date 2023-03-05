@@ -357,12 +357,12 @@ def __serialize(value: any) -> any:
 # YOLO
 
 
-def to_yolo(tasks: list, classes: list) -> tuple:
+def to_yolo(tasks: list, classes: list, output_dir: str) -> tuple:
     if len(classes) == 0:
-        coco = to_coco(tasks)
+        coco = to_coco(tasks=tasks, output_dir=output_dir)
         return __coco2yolo(coco)
     else:
-        return __to_yolo(tasks, classes)
+        return __to_yolo(tasks=tasks, classes=classes, output_dir=output_dir)
 
 
 def __coco2yolo(coco: dict) -> tuple:
@@ -410,37 +410,59 @@ def __coco2yolo(coco: dict) -> tuple:
     return annos, categories
 
 
-def __to_yolo(tasks: list, classes: list) -> tuple:
+def __to_yolo(tasks: list, classes: list, output_dir: str) -> tuple:
     annos = []
     for task in tasks:
         if task["height"] == 0 or task["width"] == 0:
             continue
-        objs = []
-        data = [
-            {"annotation": annotation, "task": task, "classes": classes}
-            for annotation in task["annotations"]
-        ]
-        with ThreadPoolExecutor(max_workers=8) as executor:
-            results = executor.map(__get_yolo_annotation, data)
-            for result in results:
-                if not result:
-                    continue
-                objs.append(" ".join(result))
-            anno = {"filename": task["name"], "object": objs}
+
+        if is_video_supported_ext(task["name"]):
+            image_file_names = _export_image_files_for_video_task(
+                task, str((Path(output_dir) / "images").resolve())
+            )
+
+            def get_annotation_points(anno, index):
+                return _get_annotation_points_for_video_annotation(anno, index)
+
+        else:
+            image_file_names = [task["name"]]
+
+            def get_annotation_points(anno, _):
+                return _get_annotation_points_for_image_annotation(anno)
+
+        for index, image_file_name in enumerate(image_file_names, 1):
+            param = [
+                {
+                    "annotation_value": annotation["value"],
+                    "annotation_type": annotation["type"],
+                    "annotation_points": get_annotation_points(annotation, index),
+                    "width": task["width"],
+                    "height": task["height"],
+                    "classes": classes,
+                }
+                for annotation in task["annotations"]
+            ]
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                image_anno_dicts = executor.map(__get_yolo_annotation, param)
+
+            image_anno_rows = [
+                " ".join(anno)
+                for anno in sorted(image_anno_dicts, key=itemgetter(0))
+                if anno
+            ]
+            anno = {"filename": image_file_name, "object": image_anno_rows}
             annos.append(anno)
 
-    categories = map(lambda val: {"name": val}, classes)
+    categories = map(lambda val: {"name": val}, sorted(classes))
 
     return annos, categories
 
 
 def __get_yolo_annotation(data: dict) -> dict:
-    annotation = data["annotation"]
-    points = annotation["points"]
-    annotation_type = annotation["type"]
-    value = annotation["value"]
+    points = data["annotation_points"]
+    annotation_type = data["annotation_type"]
+    value = data["annotation_value"]
     classes = list(data["classes"])
-    task = data["task"]
     if (
         annotation_type != AnnotationType.bbox.value
         and annotation_type != AnnotationType.polygon.value
@@ -452,11 +474,11 @@ def __get_yolo_annotation(data: dict) -> dict:
         int(points[0]) == int(points[2]) or int(points[1]) == int(points[3])
     ):
         return None
-    if not annotation["value"] in classes:
+    if value not in classes:
         return None
 
-    dw = 1.0 / task["width"]
-    dh = 1.0 / task["height"]
+    dw = 1.0 / data["width"]
+    dh = 1.0 / data["height"]
 
     bbox = __to_bbox(annotation_type, points)
     xmin = bbox[0]
