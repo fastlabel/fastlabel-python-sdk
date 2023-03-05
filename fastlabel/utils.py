@@ -40,6 +40,10 @@ def is_image_supported_size(file_path: str) -> bool:
     return os.path.getsize(file_path) <= const.SUPPORTED_IMAGE_SIZE
 
 
+def is_image_supported_size_for_inference(file_path: str) -> bool:
+    return os.path.getsize(file_path) <= const.SUPPORTED_INFERENCE_IMAGE_SIZE
+
+
 def is_video_supported_size(file_path: str) -> bool:
     return os.path.getsize(file_path) <= const.SUPPORTED_VIDEO_SIZE
 

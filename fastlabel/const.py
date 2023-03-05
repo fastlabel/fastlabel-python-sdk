@@ -216,6 +216,9 @@ SUPPORTED_AUDIO_SIZE = 120 * math.pow(1024, 2)
 SUPPORTED_PCD_SIZE = 30 * math.pow(1024, 2)
 
 
+SUPPORTED_INFERENCE_IMAGE_SIZE = 6 * math.pow(1024, 2)
+
+
 class AnnotationType(Enum):
     bbox = "bbox"
     polygon = "polygon"

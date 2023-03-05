@@ -2388,6 +2388,45 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
 
 > Please check const.COLOR_PALLETE for index colors.
 
+
+## Execute endpoint
+
+Create the endpoint from the screen at first.
+
+Currently, the feature to create endpoints is in alpha and is not available to users.
+If you would like to try it out, please contact a FastLabel representative.
+
+```python
+import fastlabel
+import numpy as np
+import cv2
+import base64
+client = fastlabel.Client()
+
+ENDPOINT_NAME = "YOUR ENDPOINT NAME"
+IMAGE_FILE_PATH = "YOUR IMAGE FILE PATH"
+RESULT_IMAGE_FILE_PATH = "YOUR RESULT IMAGE FILE PATH"
+
+def base64_to_cv(img_str):
+  if "base64," in img_str:
+      img_str = img_str.split(",")[1]
+  img_raw = np.frombuffer(base64.b64decode(img_str), np.uint8)
+  img = cv2.imdecode(img_raw, cv2.IMREAD_UNCHANGED)
+  return img
+
+if __name__ == '__main__':
+  # Execute endpoint
+  response = client.execute_endpoint(
+      endpoint_name=ENDPOINT_NAME, file_path=IMAGE_PATH)
+
+  # Show  result
+  print(response["json"])
+
+  # Save result
+  img = base64_to_cv(response["file"])
+  cv2.imwrite(RESULT_IMAGE_FILE_PATH, img)
+```
+
 ## API Docs
 
 Check [this](https://api.fastlabel.ai/docs/) for further information.
