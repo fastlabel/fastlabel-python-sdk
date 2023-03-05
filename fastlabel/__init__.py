@@ -2138,8 +2138,10 @@ class Client:
             raise FastLabelInvalidException(
                 "Output file name must have a json extension", 422
             )
-        coco = converters.to_coco(tasks, annotations)
         os.makedirs(output_dir, exist_ok=True)
+        coco = converters.to_coco(
+            tasks=tasks, annotations=annotations, output_dir=output_dir
+        )
         file_path = os.path.join(output_dir, output_file_name)
         with open(file_path, "w") as f:
             json.dump(coco, f, indent=4, ensure_ascii=False)
