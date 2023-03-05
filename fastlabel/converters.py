@@ -19,69 +19,6 @@ from fastlabel.const import AnnotationType
 from fastlabel.exceptions import FastLabelInvalidException
 from fastlabel.utils import is_video_supported_ext
 
-
-@contextmanager
-def VideoCapture(*args, **kwds):
-    videoCapture = cv2.VideoCapture(*args, **kwds)
-    try:
-        yield videoCapture
-    finally:
-        videoCapture.release()
-
-
-def _download_file(url: str, output_file_path: str, chunk_size: int = 8192) -> str:
-    with requests.get(url, stream=True) as stream:
-        stream.raise_for_status()
-        with open(file=output_file_path, mode="wb") as file:
-            for chunk in stream.iter_content(chunk_size=chunk_size):
-                if chunk:
-                    file.write(chunk)
-            return file.name
-
-
-def _export_image_files_for_video_file(
-    file_path: str,
-    output_dir_path: str,
-    basename: str,
-):
-    image_file_names = []
-    with VideoCapture(file_path) as cap:
-        if not cap.isOpened():
-            raise FastLabelInvalidException(
-                (
-                    "Video to image conversion failed. Video could not be opened.",
-                    " Download may have failed or there is a problem with the video.",
-                ),
-                422,
-            )
-        digit = len(str(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))))
-        frame_num = 0
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-
-            image_file_name = f"{basename}_{str(frame_num).zfill(digit)}.jpg"
-            image_file_path = os.path.join(output_dir_path, image_file_name)
-            os.makedirs(output_dir_path, exist_ok=True)
-            cv2.imwrite(image_file_path, frame)
-            frame_num += 1
-            image_file_names.append(image_file_name)
-    return image_file_names
-
-
-def _export_image_files_for_video_task(video_task: dict, output_dir_path: str):
-    with NamedTemporaryFile(prefix="fastlabel-sdk-") as video_file:
-        video_file_path = _download_file(
-            url=video_task["url"], output_file_path=video_file.name
-        )
-        return _export_image_files_for_video_file(
-            file_path=video_file_path,
-            output_dir_path=output_dir_path,
-            basename=Path(video_task["name"]).stem,
-        )
-
-
 # COCO
 
 
@@ -110,14 +47,8 @@ def to_coco(tasks: list, output_dir: str, annotations: list = []) -> dict:
             )
             image_index = len(task_images) + image_index
 
-            def get_annotation_points(annotation: dict, index: int):
-                points = annotation.get("points")
-                if not points:
-                    return None
-                video_point_datum = points.get(str(index))
-                if not video_point_datum:
-                    return None
-                return video_point_datum["value"]
+            def get_annotation_points(anno, index):
+                return _get_annotation_points_for_video_annotation(anno, index)
 
         else:
             image_index += 1
@@ -130,8 +61,8 @@ def to_coco(tasks: list, output_dir: str, annotations: list = []) -> dict:
                 }
             ]
 
-            def get_annotation_points(annotation: dict, index: int):
-                return annotation.get("points")
+            def get_annotation_points(anno, _):
+                return _get_annotation_points_for_image_annotation(anno)
 
         for index, task_image in enumerate(task_images, 1):
             param = [
@@ -222,7 +153,7 @@ def __get_coco_categories(tasks: list, annotations: list) -> list:
                 "skeleton": [],
                 "keypoints": [],
                 "keypoint_colors": [],
-                # BUG: アノテーションごとのcolorを設定しなければならない
+                # BUG: All are set to the same color.
                 "color": task_annotation["color"],
                 "supercategory": value,
                 "id": index,
@@ -1035,3 +966,79 @@ def __get_annotation_type_by_labelme(shape_type: str) -> str:
     if shape_type == "line":
         return "line"
     return None
+
+
+@contextmanager
+def VideoCapture(*args, **kwds):
+    videoCapture = cv2.VideoCapture(*args, **kwds)
+    try:
+        yield videoCapture
+    finally:
+        videoCapture.release()
+
+
+def _download_file(url: str, output_file_path: str, chunk_size: int = 8192) -> str:
+    with requests.get(url, stream=True) as stream:
+        stream.raise_for_status()
+        with open(file=output_file_path, mode="wb") as file:
+            for chunk in stream.iter_content(chunk_size=chunk_size):
+                if chunk:
+                    file.write(chunk)
+            return file.name
+
+
+def _export_image_files_for_video_file(
+    file_path: str,
+    output_dir_path: str,
+    basename: str,
+):
+    image_file_names = []
+    with VideoCapture(file_path) as cap:
+        if not cap.isOpened():
+            raise FastLabelInvalidException(
+                (
+                    "Video to image conversion failed. Video could not be opened.",
+                    " Download may have failed or there is a problem with the video.",
+                ),
+                422,
+            )
+        digit = len(str(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))))
+        frame_num = 0
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            image_file_name = f"{basename}_{str(frame_num).zfill(digit)}.jpg"
+            image_file_path = os.path.join(output_dir_path, image_file_name)
+            os.makedirs(output_dir_path, exist_ok=True)
+            cv2.imwrite(image_file_path, frame)
+            frame_num += 1
+            image_file_names.append(image_file_name)
+    return image_file_names
+
+
+def _export_image_files_for_video_task(video_task: dict, output_dir_path: str):
+    with NamedTemporaryFile(prefix="fastlabel-sdk-") as video_file:
+        video_file_path = _download_file(
+            url=video_task["url"], output_file_path=video_file.name
+        )
+        return _export_image_files_for_video_file(
+            file_path=video_file_path,
+            output_dir_path=output_dir_path,
+            basename=Path(video_task["name"]).stem,
+        )
+
+
+def _get_annotation_points_for_video_annotation(annotation: dict, index: int):
+    points = annotation.get("points")
+    if not points:
+        return None
+    video_point_datum = points.get(str(index))
+    if not video_point_datum:
+        return None
+    return video_point_datum["value"]
+
+
+def _get_annotation_points_for_image_annotation(annotation: dict):
+    return annotation.get("points")
