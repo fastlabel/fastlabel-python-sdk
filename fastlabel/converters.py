@@ -8,7 +8,7 @@ from decimal import Decimal
 from operator import itemgetter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List
+from typing import List, Optional
 
 import cv2
 import geojson
@@ -80,8 +80,12 @@ def to_coco(tasks: list, output_dir: str, annotations: list = []) -> dict:
             with ThreadPoolExecutor(max_workers=8) as executor:
                 image_annotations = executor.map(__to_coco_annotation, params)
 
+            filtered_image_annotations = list(filter(None, image_annotations))
+            if len(filtered_image_annotations) <= 0:
+                continue
+
             for image_annotation in sorted(
-                image_annotations, key=itemgetter("image_id", "category_id")
+                filtered_image_annotations, key=itemgetter("image_id", "category_id")
             ):
                 annotation_id += 1
                 if not image_annotation:
@@ -217,15 +221,21 @@ def __to_coco_annotation(data: dict) -> dict:
         return None
 
     category = __get_coco_category_by_name(categories, annotation_value)
+    if category is None:
+        return None
 
     return __get_coco_annotation(
         annotation_id, points, keypoints, category["id"], image_id, annotation_type
     )
 
 
-def __get_coco_category_by_name(categories: list, name: str) -> str:
-    category = [category for category in categories if category["name"] == name][0]
-    return category
+def __get_coco_category_by_name(categories: list, name: str) -> Optional[dict]:
+    matched_categories = [
+        category for category in categories if category["name"] == name
+    ]
+    if len(matched_categories) >= 1:
+        return matched_categories[0]
+    return None
 
 
 def __get_coco_annotation_keypoints(keypoints: list) -> list:
@@ -445,9 +455,13 @@ def __to_yolo(tasks: list, classes: list, output_dir: str) -> tuple:
             with ThreadPoolExecutor(max_workers=8) as executor:
                 image_anno_dicts = executor.map(__get_yolo_annotation, params)
 
+            filtered_image_anno_dicts = list(filter(None, image_anno_dicts))
+            if len(filtered_image_anno_dicts) <= 0:
+                continue
+
             image_anno_rows = [
                 " ".join(anno)
-                for anno in sorted(image_anno_dicts, key=itemgetter(0))
+                for anno in sorted(filtered_image_anno_dicts, key=itemgetter(0))
                 if anno
             ]
             anno = {"filename": image_file_name, "object": image_anno_rows}
@@ -541,6 +555,10 @@ def to_pascalvoc(tasks: list, output_dir: str) -> list:
             with ThreadPoolExecutor(max_workers=8) as executor:
                 pascalvoc_objs = executor.map(__get_pascalvoc_obj, params)
 
+            filtered_pascalvoc_objs = list(filter(None, pascalvoc_objs))
+            if len(filtered_pascalvoc_objs) <= 0:
+                continue
+
             voc = {
                 "annotation": {
                     "filename": image_file_name,
@@ -551,7 +569,7 @@ def to_pascalvoc(tasks: list, output_dir: str) -> list:
                     },
                     "segmented": 0,
                     "object": list(
-                        sorted(filter(None, pascalvoc_objs), key=itemgetter("name"))
+                        sorted(filtered_pascalvoc_objs, key=itemgetter("name"))
                     ),
                 }
             }
