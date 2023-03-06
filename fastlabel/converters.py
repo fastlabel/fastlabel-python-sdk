@@ -85,7 +85,8 @@ def to_coco(tasks: list, output_dir: str, annotations: list = []) -> dict:
                 continue
 
             for image_annotation in sorted(
-                filtered_image_annotations, key=itemgetter("image_id", "category_id")
+                filtered_image_annotations,
+                key=itemgetter("image_id", "category_id", "area"),
             ):
                 annotation_id += 1
                 if not image_annotation:
