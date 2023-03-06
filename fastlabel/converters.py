@@ -17,12 +17,14 @@ import requests
 
 from fastlabel.const import AnnotationType
 from fastlabel.exceptions import FastLabelInvalidException
-from fastlabel.utils import is_video_supported_ext
+from fastlabel.utils import is_video_project_type
 
 # COCO
 
 
-def to_coco(tasks: list, output_dir: str, annotations: list = []) -> dict:
+def to_coco(
+    project_type: str, tasks: list, output_dir: str, annotations: list = []
+) -> dict:
     # Get categories
     categories = __get_coco_categories(tasks, annotations)
 
@@ -35,7 +37,7 @@ def to_coco(tasks: list, output_dir: str, annotations: list = []) -> dict:
         if task["height"] == 0 or task["width"] == 0:
             continue
 
-        if is_video_supported_ext(task["name"]):
+        if is_video_project_type(project_type):
             image_file_names = _export_image_files_for_video_task(
                 task, str((Path(output_dir) / "images").resolve())
             )
@@ -367,12 +369,17 @@ def __serialize(value: any) -> any:
 # YOLO
 
 
-def to_yolo(tasks: list, classes: list, output_dir: str) -> tuple:
+def to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) -> tuple:
     if len(classes) == 0:
-        coco = to_coco(tasks=tasks, output_dir=output_dir)
+        coco = to_coco(project_type=project_type, tasks=tasks, output_dir=output_dir)
         return __coco2yolo(coco)
     else:
-        return __to_yolo(tasks=tasks, classes=classes, output_dir=output_dir)
+        return __to_yolo(
+            project_type=project_type,
+            tasks=tasks,
+            classes=classes,
+            output_dir=output_dir,
+        )
 
 
 def __coco2yolo(coco: dict) -> tuple:
@@ -420,13 +427,13 @@ def __coco2yolo(coco: dict) -> tuple:
     return annos, categories
 
 
-def __to_yolo(tasks: list, classes: list, output_dir: str) -> tuple:
+def __to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) -> tuple:
     annos = []
     for task in tasks:
         if task["height"] == 0 or task["width"] == 0:
             continue
 
-        if is_video_supported_ext(task["name"]):
+        if is_video_project_type(project_type):
             image_file_names = _export_image_files_for_video_task(
                 task, str((Path(output_dir) / "images").resolve())
             )
@@ -521,13 +528,13 @@ def _truncate(n, decimals=0) -> float:
 # Pascal VOC
 
 
-def to_pascalvoc(tasks: list, output_dir: str) -> list:
+def to_pascalvoc(project_type: str, tasks: list, output_dir: str) -> list:
     pascalvoc = []
     for task in tasks:
         if task["height"] == 0 or task["width"] == 0:
             continue
 
-        if is_video_supported_ext(task["name"]):
+        if is_video_project_type(project_type):
             image_file_names = _export_image_files_for_video_task(
                 task, str((Path(output_dir) / "images").resolve())
             )
