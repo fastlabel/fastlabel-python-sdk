@@ -210,9 +210,8 @@ def __to_coco_annotation(data: dict) -> dict:
         AnnotationType.pose_estimation.value,
     ]:
         return None
-    if (
-        annotation_type != AnnotationType.pose_estimation.value
-        and (not points or len(points)) == 0
+    if annotation_type != AnnotationType.pose_estimation.value and (
+        not points or (len(points) == 0)
     ):
         return None
     if annotation_type == AnnotationType.bbox.value and (
