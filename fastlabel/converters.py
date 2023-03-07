@@ -67,6 +67,7 @@ def to_coco(
                 return _get_annotation_points_for_image_annotation(anno)
 
         for index, task_image in enumerate(task_images, 1):
+            images.append(task_image)
             params = [
                 {
                     "annotation_value": annotation["value"],
@@ -95,8 +96,6 @@ def to_coco(
                     continue
                 image_annotation["id"] = annotation_id
                 annotations.append(image_annotation)
-
-            images.append(task_image)
 
     return {
         "images": images,
@@ -463,15 +462,16 @@ def __to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) ->
                 image_anno_dicts = executor.map(__get_yolo_annotation, params)
 
             filtered_image_anno_dicts = list(filter(None, image_anno_dicts))
-            if len(filtered_image_anno_dicts) <= 0:
-                continue
 
-            image_anno_rows = [
-                " ".join(anno)
-                for anno in sorted(filtered_image_anno_dicts, key=itemgetter(0))
-                if anno
-            ]
-            anno = {"filename": image_file_name, "object": image_anno_rows}
+            anno = {"filename": image_file_name}
+
+            if len(filtered_image_anno_dicts) > 0:
+                anno["object"] = [
+                    " ".join(anno)
+                    for anno in sorted(filtered_image_anno_dicts, key=itemgetter(0))
+                    if anno
+                ]
+
             annos.append(anno)
 
     categories = map(lambda val: {"name": val}, sorted(classes))
@@ -563,8 +563,6 @@ def to_pascalvoc(project_type: str, tasks: list, output_dir: str) -> list:
                 pascalvoc_objs = executor.map(__get_pascalvoc_obj, params)
 
             filtered_pascalvoc_objs = list(filter(None, pascalvoc_objs))
-            if len(filtered_pascalvoc_objs) <= 0:
-                continue
 
             voc = {
                 "annotation": {
@@ -575,11 +573,14 @@ def to_pascalvoc(project_type: str, tasks: list, output_dir: str) -> list:
                         "depth": 3,
                     },
                     "segmented": 0,
-                    "object": list(
-                        sorted(filtered_pascalvoc_objs, key=itemgetter("name"))
-                    ),
                 }
             }
+
+            if len(filtered_pascalvoc_objs) > 0:
+                voc["annotation"]["object"] = list(
+                    sorted(filtered_pascalvoc_objs, key=itemgetter("name"))
+                )
+
             pascalvoc.append(voc)
     return pascalvoc
 

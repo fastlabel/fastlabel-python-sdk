@@ -2196,7 +2196,10 @@ class Client:
             file_path = os.path.join(output_dir, "annotations", basename + ".txt")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             with open(file_path, "w", encoding="utf8") as f:
-                for obj in anno["object"]:
+                objects = anno.get("object")
+                if objects is None:
+                    continue
+                for obj in objects:
                     f.write(obj)
                     f.write("\n")
         classes_file_path = os.path.join(output_dir, "classes.txt")
