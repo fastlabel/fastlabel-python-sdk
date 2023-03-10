@@ -18,6 +18,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [Audio](#audio)
   - [Audio Classification](#audio-classification)
   - [PCD](#pcd)
+  - [Sequential PCD](#sequential-pcd)
   - [Common](#common)
 - [Annotation](#annotation)
 - [Project](#project)
@@ -1494,6 +1495,20 @@ Example of a single PCD task object
     "createdAt": "2021-02-22T11:25:27.158Z",
     "updatedAt": "2021-02-22T11:25:27.158Z"
 }
+```
+
+### Sequential PCD
+
+Supported following project types:
+
+- Sequential PCD - Cuboid
+
+#### Get Tasks
+
+Get tasks. (Up to 1000 tasks)
+
+```python
+tasks = client.get_sequential_pcd_tasks(project="YOUR_PROJECT_SLUG")
 ```
 
 ### Common
