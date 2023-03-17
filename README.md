@@ -2069,14 +2069,15 @@ Support the following annotation types.
 Get tasks and export as a [COCO format](https://cocodataset.org/#format-data) file.
 
 ```python
-tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
-client.export_coco(tasks)
+project_slug = "YOUR_PROJECT_SLUG"
+tasks = client.get_image_tasks(project=project_slug)
+client.export_coco(project=project_slug, tasks=tasks)
 ```
 
 Export with specifying output directory and file name.
 
 ```python
-client.export_coco(tasks=tasks, output_dir="YOUR_DIRECTROY", output_file_name="YOUR_FILE_NAME")
+client.export_coco(project="YOUR_PROJECT_SLUG", tasks=tasks, output_dir="YOUR_DIRECTROY", output_file_name="YOUR_FILE_NAME")
 ```
 
 If you would like to export pose estimation type annotations, please pass annotations.
@@ -2085,7 +2086,7 @@ If you would like to export pose estimation type annotations, please pass annota
 project_slug = "YOUR_PROJECT_SLUG"
 tasks = client.get_image_tasks(project=project_slug)
 annotations = client.get_annotations(project=project_slug)
-client.export_coco(tasks=tasks, annotations=annotations, output_dir="YOUR_DIRECTROY", output_file_name="YOUR_FILE_NAME")
+client.export_coco(project=project_slug, tasks=tasks, annotations=annotations, output_dir="YOUR_DIRECTROY", output_file_name="YOUR_FILE_NAME")
 ```
 
 ### FastLabel To YOLO
@@ -2098,8 +2099,9 @@ Support the following annotation types.
 Get tasks and export as YOLO format files.
 
 ```python
-tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
-client.export_yolo(tasks, output_dir="YOUR_DIRECTROY")
+project_slug = "YOUR_PROJECT_SLUG"
+tasks = client.get_image_tasks(project=project_slug)
+client.export_yolo(project=project_slug, tasks=tasks, output_dir="YOUR_DIRECTROY")
 ```
 
 Get tasks and export as YOLO format files with classes.txt
@@ -2110,7 +2112,7 @@ project_slug = "YOUR_PROJECT_SLUG"
 tasks = client.get_image_tasks(project=project_slug)
 annotations = client.get_annotations(project=project_slug)
 classes = list(map(lambda annotation: annotation["value"], annotations))
-client.export_yolo(tasks=tasks, classes=classes, output_dir="YOUR_DIRECTROY")
+client.export_yolo(project=project_slug, tasks=tasks, classes=classes, output_dir="YOUR_DIRECTROY")
 ```
 
 ### FastLabel To Pascal VOC
@@ -2123,8 +2125,9 @@ Support the following annotation types.
 Get tasks and export as Pascal VOC format files.
 
 ```python
-tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
-client.export_pascalvoc(tasks)
+project_slug = "YOUR_PROJECT_SLUG"
+tasks = client.get_image_tasks(project=project_slug)
+client.export_pascalvoc(project=project_slug, tasks=tasks)
 ```
 
 ### FastLabel To labelme
@@ -2387,7 +2390,6 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
 ```
 
 > Please check const.COLOR_PALLETE for index colors.
-
 
 ## Execute endpoint
 
