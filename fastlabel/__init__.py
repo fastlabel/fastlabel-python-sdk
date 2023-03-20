@@ -2167,6 +2167,7 @@ class Client:
 
     def export_coco(
         self,
+        project: str,
         tasks: list,
         annotations: list = [],
         output_dir: str = os.path.join("output", "coco"),
@@ -2176,6 +2177,7 @@ class Client:
         Convert tasks to COCO format and export as a file.
         If you pass annotations, you can export Pose Estimation type annotations.
 
+        project is slug of your project (Required).
         tasks is a list of tasks (Required).
         annotations is a list of annotations (Optional).
         output_dir is output directory(default: output/coco) (Optional).
@@ -2185,14 +2187,27 @@ class Client:
             raise FastLabelInvalidException(
                 "Output file name must have a json extension", 422
             )
-        coco = converters.to_coco(tasks, annotations)
+
+        project = self.find_project_by_slug(project)
+        if project is None:
+            raise FastLabelInvalidException(
+                "Project not found. Check the project slag.", 422
+            )
+
         os.makedirs(output_dir, exist_ok=True)
+        coco = converters.to_coco(
+            project_type=project["type"],
+            tasks=tasks,
+            annotations=annotations,
+            output_dir=output_dir,
+        )
         file_path = os.path.join(output_dir, output_file_name)
         with open(file_path, "w") as f:
             json.dump(coco, f, indent=4, ensure_ascii=False)
 
     def export_yolo(
         self,
+        project: str,
         tasks: list,
         classes: list = [],
         output_dir: str = os.path.join("output", "yolo"),
@@ -2203,43 +2218,75 @@ class Client:
         If not , classes.txt will be generated based on passed tasks .
         (Annotations never used in your project will not be exported.)
 
+        project is slug of your project (Required).
         tasks is a list of tasks (Required).
         classes is a list of annotation values.  e.g. ['dog','bird'] (Optional).
         output_dir is output directory(default: output/yolo) (Optional).
         """
-        annos, categories = converters.to_yolo(tasks, classes)
+
+        project = self.find_project_by_slug(project)
+        if project is None:
+            raise FastLabelInvalidException(
+                "Project not found. Check the project slag.", 422
+            )
+
+        os.makedirs(output_dir, exist_ok=True)
+        annos, categories = converters.to_yolo(
+            project_type=project["type"],
+            tasks=tasks,
+            classes=classes,
+            output_dir=output_dir,
+        )
         for anno in annos:
             file_name = anno["filename"]
             basename = utils.get_basename(file_name)
             file_path = os.path.join(output_dir, "annotations", basename + ".txt")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             with open(file_path, "w", encoding="utf8") as f:
-                for obj in anno["object"]:
+                objects = anno.get("object")
+                if objects is None:
+                    continue
+                for obj in objects:
                     f.write(obj)
                     f.write("\n")
         classes_file_path = os.path.join(output_dir, "classes.txt")
-        os.makedirs(os.path.dirname(classes_file_path), exist_ok=True)
         with open(classes_file_path, "w", encoding="utf8") as f:
             for category in categories:
                 f.write(category["name"])
                 f.write("\n")
 
     def export_pascalvoc(
-        self, tasks: list, output_dir: str = os.path.join("output", "pascalvoc")
+        self,
+        project: str,
+        tasks: list,
+        output_dir: str = os.path.join("output", "pascalvoc"),
     ) -> None:
         """
         Convert tasks to Pascal VOC format as files.
 
+        project is slug of your project (Required).
         tasks is a list of tasks (Required).
         output_dir is output directory(default: output/pascalvoc) (Optional).
         """
-        pascalvoc = converters.to_pascalvoc(tasks)
+
+        project = self.find_project_by_slug(project)
+        if project is None:
+            raise FastLabelInvalidException(
+                "Project not found. Check the project slag.", 422
+            )
+
+        os.makedirs(output_dir, exist_ok=True)
+        pascalvoc = converters.to_pascalvoc(
+            project_type=project["type"], tasks=tasks, output_dir=output_dir
+        )
         for voc in pascalvoc:
             file_name = voc["annotation"]["filename"]
             basename = utils.get_basename(file_name)
-            file_path = os.path.join(output_dir, basename + ".xml")
+            file_path = os.path.join(output_dir, "annotations", basename + ".xml")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            xml = xmltodict.unparse(voc, pretty=True, full_document=False)
+            xml = xmltodict.unparse(
+                voc, pretty=True, indent="    ", full_document=False
+            )
             with open(file_path, "w", encoding="utf8") as f:
                 f.write(xml)
 

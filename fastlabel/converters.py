@@ -2,60 +2,120 @@ import copy
 import math
 import os
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from datetime import datetime
 from decimal import Decimal
-from typing import List
+from operator import itemgetter
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+from typing import List, Optional
 
+import cv2
 import geojson
 import numpy as np
+import requests
 
 from fastlabel.const import AnnotationType
 from fastlabel.exceptions import FastLabelInvalidException
+from fastlabel.utils import is_video_project_type
 
 # COCO
 
 
-def to_coco(tasks: list, annotations: list = []) -> dict:
+def to_coco(
+    project_type: str, tasks: list, output_dir: str, annotations: list = []
+) -> dict:
     # Get categories
-    categories = __get_categories(tasks, annotations)
+    categories = __get_coco_categories(tasks, annotations)
 
     # Get images and annotations
     images = []
     annotations = []
     annotation_id = 0
-    image_id = 0
+    image_index = 0
     for task in tasks:
         if task["height"] == 0 or task["width"] == 0:
             continue
 
-        image_id += 1
-        image = {
-            "file_name": task["name"],
-            "height": task["height"],
-            "width": task["width"],
-            "id": image_id,
-        }
-        images.append(image)
+        if is_video_project_type(project_type):
+            image_file_names = _export_image_files_for_video_task(
+                task, str((Path(output_dir) / "images").resolve())
+            )
+            task_images = _generate_coco_images(
+                image_file_names=image_file_names,
+                height=task["height"],
+                width=task["width"],
+                offset=image_index,
+            )
+            image_index = len(task_images) + image_index
 
-        data = [
-            {"annotation": annotation, "categories": categories, "image": image}
-            for annotation in task["annotations"]
-        ]
-        with ThreadPoolExecutor(max_workers=8) as executor:
-            results = executor.map(__to_annotation, data)
+            def get_annotation_points(anno, index):
+                return _get_annotation_points_for_video_annotation(anno, index)
 
-        for result in results:
-            annotation_id += 1
-            if not result:
+        else:
+            image_index += 1
+            task_images = [
+                {
+                    "file_name": task["name"],
+                    "height": task["height"],
+                    "width": task["width"],
+                    "id": image_index,
+                }
+            ]
+
+            def get_annotation_points(anno, _):
+                return _get_annotation_points_for_image_annotation(anno)
+
+        for index, task_image in enumerate(task_images, 1):
+            images.append(task_image)
+            params = [
+                {
+                    "annotation_value": annotation["value"],
+                    "annotation_type": annotation["type"],
+                    "annotation_points": get_annotation_points(annotation, index),
+                    "annotation_keypoints": annotation.get("keypoints"),
+                    "categories": categories,
+                    "image_id": task_image["id"],
+                }
+                for annotation in task["annotations"]
+            ]
+
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                image_annotations = executor.map(__to_coco_annotation, params)
+
+            filtered_image_annotations = list(filter(None, image_annotations))
+            if len(filtered_image_annotations) <= 0:
                 continue
-            result["id"] = annotation_id
-            annotations.append(result)
+
+            for image_annotation in sorted(
+                filtered_image_annotations,
+                key=itemgetter("image_id", "category_id", "area"),
+            ):
+                annotation_id += 1
+                if not image_annotation:
+                    continue
+                image_annotation["id"] = annotation_id
+                annotations.append(image_annotation)
 
     return {
         "images": images,
         "categories": categories,
         "annotations": annotations,
     }
+
+
+def _generate_coco_images(
+    image_file_names: str, height: int, width: int, offset: int = 0
+):
+    return [
+        {
+            "file_name": file_name,
+            "height": height,
+            "width": width,
+            "id": (index + 1) + offset,
+        }
+        for index, file_name in enumerate(image_file_names)
+    ]
 
 
 def __get_coco_skeleton(keypoints: list) -> list:
@@ -77,7 +137,7 @@ def __get_coco_skeleton(keypoints: list) -> list:
     return skeleton
 
 
-def __get_categories(tasks: list, annotations: list) -> list:
+def __get_coco_categories(tasks: list, annotations: list) -> list:
     categories = []
     values = []
     for task in tasks:
@@ -90,7 +150,7 @@ def __get_categories(tasks: list, annotations: list) -> list:
             ]:
                 continue
             values.append(task_annotation["value"])
-    values = list(set(values))
+    values = sorted(list(set(values)))
 
     # Create categories from task annotations (not support pose esitimation)
     if not annotations:
@@ -99,6 +159,7 @@ def __get_categories(tasks: list, annotations: list) -> list:
                 "skeleton": [],
                 "keypoints": [],
                 "keypoint_colors": [],
+                # BUG: All are set to the same color.
                 "color": task_annotation["color"],
                 "supercategory": value,
                 "id": index,
@@ -135,13 +196,13 @@ def __get_categories(tasks: list, annotations: list) -> list:
     return categories
 
 
-def __to_annotation(data: dict) -> dict:
-    annotation = data["annotation"]
+def __to_coco_annotation(data: dict) -> dict:
     categories = data["categories"]
-    image = data["image"]
-    points = annotation.get("points")
-    keypoints = annotation.get("keypoints")
-    annotation_type = annotation["type"]
+    image_id = data["image_id"]
+    points = data["annotation_points"]
+    keypoints = data["annotation_keypoints"]
+    annotation_type = data["annotation_type"]
+    annotation_value = data["annotation_value"]
     annotation_id = 0
 
     if annotation_type not in [
@@ -151,9 +212,8 @@ def __to_annotation(data: dict) -> dict:
         AnnotationType.pose_estimation.value,
     ]:
         return None
-    if (
-        annotation_type != AnnotationType.pose_estimation.value
-        and (not points or len(points)) == 0
+    if annotation_type != AnnotationType.pose_estimation.value and (
+        not points or (len(points) == 0)
     ):
         return None
     if annotation_type == AnnotationType.bbox.value and (
@@ -161,16 +221,22 @@ def __to_annotation(data: dict) -> dict:
     ):
         return None
 
-    category = __get_category_by_name(categories, annotation["value"])
+    category = __get_coco_category_by_name(categories, annotation_value)
+    if category is None:
+        return None
 
-    return __get_annotation(
-        annotation_id, points, keypoints, category["id"], image, annotation_type
+    return __get_coco_annotation(
+        annotation_id, points, keypoints, category["id"], image_id, annotation_type
     )
 
 
-def __get_category_by_name(categories: list, name: str) -> str:
-    category = [category for category in categories if category["name"] == name][0]
-    return category
+def __get_coco_category_by_name(categories: list, name: str) -> Optional[dict]:
+    matched_categories = [
+        category for category in categories if category["name"] == name
+    ]
+    if len(matched_categories) >= 1:
+        return matched_categories[0]
+    return None
 
 
 def __get_coco_annotation_keypoints(keypoints: list) -> list:
@@ -186,12 +252,12 @@ def __get_coco_annotation_keypoints(keypoints: list) -> list:
     return coco_annotation_keypoints
 
 
-def __get_annotation(
+def __get_coco_annotation(
     id_: int,
     points: list,
     keypoints: list,
     category_id: int,
-    image: dict,
+    image_id: str,
     annotation_type: str,
 ) -> dict:
     annotation = {}
@@ -202,7 +268,7 @@ def __get_annotation(
     annotation["segmentation"] = __to_coco_segmentation(annotation_type, points)
     annotation["iscrowd"] = 0
     annotation["area"] = __to_area(annotation_type, points)
-    annotation["image_id"] = image["id"]
+    annotation["image_id"] = image_id
     annotation["bbox"] = __to_bbox(annotation_type, points)
     annotation["category_id"] = category_id
     annotation["id"] = id_
@@ -302,12 +368,17 @@ def __serialize(value: any) -> any:
 # YOLO
 
 
-def to_yolo(tasks: list, classes: list) -> tuple:
+def to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) -> tuple:
     if len(classes) == 0:
-        coco = to_coco(tasks)
+        coco = to_coco(project_type=project_type, tasks=tasks, output_dir=output_dir)
         return __coco2yolo(coco)
     else:
-        return __to_yolo(tasks, classes)
+        return __to_yolo(
+            project_type=project_type,
+            tasks=tasks,
+            classes=classes,
+            output_dir=output_dir,
+        )
 
 
 def __coco2yolo(coco: dict) -> tuple:
@@ -355,37 +426,64 @@ def __coco2yolo(coco: dict) -> tuple:
     return annos, categories
 
 
-def __to_yolo(tasks: list, classes: list) -> tuple:
+def __to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) -> tuple:
     annos = []
     for task in tasks:
         if task["height"] == 0 or task["width"] == 0:
             continue
-        objs = []
-        data = [
-            {"annotation": annotation, "task": task, "classes": classes}
-            for annotation in task["annotations"]
-        ]
-        with ThreadPoolExecutor(max_workers=8) as executor:
-            results = executor.map(__get_yolo_annotation, data)
-            for result in results:
-                if not result:
-                    continue
-                objs.append(" ".join(result))
-            anno = {"filename": task["name"], "object": objs}
+
+        if is_video_project_type(project_type):
+            image_file_names = _export_image_files_for_video_task(
+                task, str((Path(output_dir) / "images").resolve())
+            )
+
+            def get_annotation_points(anno, index):
+                return _get_annotation_points_for_video_annotation(anno, index)
+
+        else:
+            image_file_names = [task["name"]]
+
+            def get_annotation_points(anno, _):
+                return _get_annotation_points_for_image_annotation(anno)
+
+        for index, image_file_name in enumerate(image_file_names, 1):
+            params = [
+                {
+                    "annotation_value": annotation["value"],
+                    "annotation_type": annotation["type"],
+                    "annotation_points": get_annotation_points(annotation, index),
+                    "width": task["width"],
+                    "height": task["height"],
+                    "classes": classes,
+                }
+                for annotation in task["annotations"]
+            ]
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                image_anno_dicts = executor.map(__get_yolo_annotation, params)
+
+            filtered_image_anno_dicts = list(filter(None, image_anno_dicts))
+
+            anno = {"filename": image_file_name}
+
+            if len(filtered_image_anno_dicts) > 0:
+                anno["object"] = [
+                    " ".join(anno)
+                    for anno in sorted(filtered_image_anno_dicts, key=itemgetter(0))
+                    if anno
+                ]
+
             annos.append(anno)
 
-    categories = map(lambda val: {"name": val}, classes)
+    categories = map(lambda val: {"name": val}, sorted(classes))
 
     return annos, categories
 
 
 def __get_yolo_annotation(data: dict) -> dict:
-    annotation = data["annotation"]
-    points = annotation["points"]
-    annotation_type = annotation["type"]
-    value = annotation["value"]
+    points = data["annotation_points"]
+    annotation_type = data["annotation_type"]
+    value = data["annotation_value"]
     classes = list(data["classes"])
-    task = data["task"]
     if (
         annotation_type != AnnotationType.bbox.value
         and annotation_type != AnnotationType.polygon.value
@@ -397,11 +495,11 @@ def __get_yolo_annotation(data: dict) -> dict:
         int(points[0]) == int(points[2]) or int(points[1]) == int(points[3])
     ):
         return None
-    if not annotation["value"] in classes:
+    if value not in classes:
         return None
 
-    dw = 1.0 / task["width"]
-    dh = 1.0 / task["height"]
+    dw = 1.0 / data["width"]
+    dh = 1.0 / data["height"]
 
     bbox = __to_bbox(annotation_type, points)
     xmin = bbox[0]
@@ -430,65 +528,88 @@ def _truncate(n, decimals=0) -> float:
 # Pascal VOC
 
 
-def to_pascalvoc(tasks: list) -> list:
+def to_pascalvoc(project_type: str, tasks: list, output_dir: str) -> list:
     pascalvoc = []
     for task in tasks:
         if task["height"] == 0 or task["width"] == 0:
             continue
 
-        pascal_objs = []
-        data = [{"annotation": annotation} for annotation in task["annotations"]]
-        with ThreadPoolExecutor(max_workers=8) as executor:
-            results = executor.map(__get_pascalvoc_obj, data)
+        if is_video_project_type(project_type):
+            image_file_names = _export_image_files_for_video_task(
+                task, str((Path(output_dir) / "images").resolve())
+            )
 
-        for result in results:
-            if not result:
-                continue
-            pascal_objs.append(result)
+            def get_annotation_points(anno, index):
+                return _get_annotation_points_for_video_annotation(anno, index)
 
-        voc = {
-            "annotation": {
-                "filename": task["name"],
-                "size": {
-                    "width": task["width"],
-                    "height": task["height"],
-                    "depth": 3,
-                },
-                "segmented": 0,
-                "object": pascal_objs,
+        else:
+            image_file_names = [task["name"]]
+
+            def get_annotation_points(anno, _):
+                return _get_annotation_points_for_image_annotation(anno)
+
+        for index, image_file_name in enumerate(image_file_names, 1):
+            params = [
+                {
+                    "annotation_type": annotation["type"],
+                    "annotation_value": annotation["value"],
+                    "annotation_points": get_annotation_points(annotation, index),
+                    "annotation_attributes": annotation["attributes"],
+                }
+                for annotation in task["annotations"]
+            ]
+
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                pascalvoc_objs = executor.map(__get_pascalvoc_obj, params)
+
+            filtered_pascalvoc_objs = list(filter(None, pascalvoc_objs))
+
+            voc = {
+                "annotation": {
+                    "filename": image_file_name,
+                    "size": {
+                        "width": task["width"],
+                        "height": task["height"],
+                        "depth": 3,
+                    },
+                    "segmented": 0,
+                }
             }
-        }
-        pascalvoc.append(voc)
+
+            if len(filtered_pascalvoc_objs) > 0:
+                voc["annotation"]["object"] = list(
+                    sorted(filtered_pascalvoc_objs, key=itemgetter("name"))
+                )
+
+            pascalvoc.append(voc)
     return pascalvoc
 
 
 def __get_pascalvoc_obj(data: dict) -> dict:
-    annotation = data["annotation"]
-    points = annotation["points"]
-    annotation_type = annotation["type"]
-    if (
-        annotation_type != AnnotationType.bbox.value
-        and annotation_type != AnnotationType.polygon.value
-    ):
+    points = data["annotation_points"]
+    type = data["annotation_type"]
+    value = data["annotation_value"]
+    attributes = data["annotation_attributes"]
+    if type != AnnotationType.bbox.value and type != AnnotationType.polygon.value:
         return None
     if not points or len(points) == 0:
         return None
-    if annotation_type == AnnotationType.bbox.value and (
+    if type == AnnotationType.bbox.value and (
         int(points[0]) == int(points[2]) or int(points[1]) == int(points[3])
     ):
         return None
-    bbox = __to_bbox(annotation_type, points)
+    bbox = __to_bbox(type, points)
     x = bbox[0]
     y = bbox[1]
     w = bbox[2]
     h = bbox[3]
 
     return {
-        "name": annotation["value"],
+        "name": value,
         "pose": "Unspecified",
-        "truncated": __get_pascalvoc_tag_value(annotation, "truncated"),
-        "occluded": __get_pascalvoc_tag_value(annotation, "occluded"),
-        "difficult": __get_pascalvoc_tag_value(annotation, "difficult"),
+        "truncated": __get_pascalvoc_tag_value(attributes, "truncated"),
+        "occluded": __get_pascalvoc_tag_value(attributes, "occluded"),
+        "difficult": __get_pascalvoc_tag_value(attributes, "difficult"),
         "bndbox": {
             "xmin": math.floor(x),
             "ymin": math.floor(y),
@@ -498,8 +619,7 @@ def __get_pascalvoc_obj(data: dict) -> dict:
     }
 
 
-def __get_pascalvoc_tag_value(annotation: dict, target_tag_name: str) -> int:
-    attributes = annotation["attributes"]
+def __get_pascalvoc_tag_value(attributes: list, target_tag_name: str) -> int:
     if not attributes:
         return 0
     related_attr = next(
@@ -911,3 +1031,79 @@ def __get_annotation_type_by_labelme(shape_type: str) -> str:
     if shape_type == "line":
         return "line"
     return None
+
+
+@contextmanager
+def VideoCapture(*args, **kwds):
+    videoCapture = cv2.VideoCapture(*args, **kwds)
+    try:
+        yield videoCapture
+    finally:
+        videoCapture.release()
+
+
+def _download_file(url: str, output_file_path: str, chunk_size: int = 8192) -> str:
+    with requests.get(url, stream=True) as stream:
+        stream.raise_for_status()
+        with open(file=output_file_path, mode="wb") as file:
+            for chunk in stream.iter_content(chunk_size=chunk_size):
+                if chunk:
+                    file.write(chunk)
+            return file.name
+
+
+def _export_image_files_for_video_file(
+    file_path: str,
+    output_dir_path: str,
+    basename: str,
+):
+    image_file_names = []
+    with VideoCapture(file_path) as cap:
+        if not cap.isOpened():
+            raise FastLabelInvalidException(
+                (
+                    "Video to image conversion failed. Video could not be opened.",
+                    " Download may have failed or there is a problem with the video.",
+                ),
+                422,
+            )
+        digit = len(str(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))))
+        frame_num = 0
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            image_file_name = f"{basename}_{str(frame_num).zfill(digit)}.jpg"
+            image_file_path = os.path.join(output_dir_path, image_file_name)
+            os.makedirs(output_dir_path, exist_ok=True)
+            cv2.imwrite(image_file_path, frame)
+            frame_num += 1
+            image_file_names.append(image_file_name)
+    return image_file_names
+
+
+def _export_image_files_for_video_task(video_task: dict, output_dir_path: str):
+    with NamedTemporaryFile(prefix="fastlabel-sdk-") as video_file:
+        video_file_path = _download_file(
+            url=video_task["url"], output_file_path=video_file.name
+        )
+        return _export_image_files_for_video_file(
+            file_path=video_file_path,
+            output_dir_path=output_dir_path,
+            basename=Path(video_task["name"]).stem,
+        )
+
+
+def _get_annotation_points_for_video_annotation(annotation: dict, index: int):
+    points = annotation.get("points")
+    if not points:
+        return None
+    video_point_datum = points.get(str(index))
+    if not video_point_datum:
+        return None
+    return video_point_datum["value"]
+
+
+def _get_annotation_points_for_image_annotation(annotation: dict):
+    return annotation.get("points")

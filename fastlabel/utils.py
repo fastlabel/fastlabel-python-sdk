@@ -60,6 +60,10 @@ def is_pcd_supported_size(file_path: str) -> bool:
     return os.path.getsize(file_path) <= const.SUPPORTED_PCD_SIZE
 
 
+def is_video_project_type(project_type: str):
+    return type(project_type) is str and project_type.startswith("video_")
+
+
 def is_json_ext(file_name: str) -> bool:
     return file_name.lower().endswith(".json")
 
@@ -101,7 +105,8 @@ def sort_segmentation_points(points: List[int]) -> List[int]:
         if index == 0:
             continue
         if (
-            val[1] <= points_list[base_point_index][1] and val[0] <= points_list[base_point_index][0]
+            val[1] <= points_list[base_point_index][1]
+            and val[0] <= points_list[base_point_index][0]
         ):
             base_point_index = index
     new_points_array = np.vstack(
