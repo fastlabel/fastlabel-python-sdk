@@ -245,6 +245,25 @@ class Client:
             return None
         return tasks[0]
 
+    def find_sequential_pcd_task(self, task_id: str) -> dict:
+        """
+        Find a single Sequential PCD task.
+        """
+        endpoint = "tasks/sequential-pcd/" + task_id
+        return self.api.get_request(endpoint)
+
+    def find_sequential_pcd_task_by_name(self, project: str, task_name: str) -> dict:
+        """
+        Find a single Sequential PCD task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_sequential_pcd_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
     # Task Get
 
     def get_image_tasks(
@@ -723,7 +742,6 @@ class Client:
         if limit:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
-
 
     def get_task_id_name_map(
         self,
@@ -1324,6 +1342,87 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def create_sequential_pcd_task(
+        self,
+        project: str,
+        name: str,
+        folder_path: str,
+        status: str = None,
+        external_status: str = None,
+        annotations: list = [],
+        tags: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Create a single sequential PCD task.
+
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        folder_path is a path to data folder. Files should be under the folder.
+        Nested folder structure is not supported. Supported extensions are
+        pcd only (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        annotations is a list of annotation to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        if not os.path.isdir(folder_path):
+            raise FastLabelInvalidException("Folder does not exist.", 422)
+
+        endpoint = "tasks/sequential-pcd"
+        file_paths = glob.glob(os.path.join(folder_path, "*"))
+        if not file_paths:
+            raise FastLabelInvalidException("Folder does not have any file.", 422)
+        contents = []
+        contents_size = 0
+        for file_path in file_paths:
+            if not utils.is_pcd_supported_ext(file_path):
+                raise FastLabelInvalidException(
+                    "Supported extensions are pcd only", 422
+                )
+
+            if not utils.is_pcd_supported_size(file_path):
+                raise FastLabelInvalidException(
+                    "Supported PCD size is under 30 MB.", 422
+                )
+
+            if len(contents) == 250:
+                raise FastLabelInvalidException(
+                    "The count of files should be under 250", 422
+                )
+
+            file = utils.base64_encode(file_path)
+            contents.append({"name": os.path.basename(file_path), "file": file})
+            contents_size += utils.get_json_length(contents[-1])
+            if contents_size > const.SUPPORTED_CONTENTS_SIZE:
+                raise FastLabelInvalidException(
+                    "Supported contents size is under"
+                    f" {const.SUPPORTED_CONTENTS_SIZE}.",
+                    422,
+                )
+
+        payload = {"project": project, "name": name, "contents": contents}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if annotations:
+            payload["annotations"] = annotations
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
     # Task Update
 
     def update_task(
@@ -1769,6 +1868,51 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/pcd/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            for annotation in annotations:
+                # Since the content name is not passed in the sdk update api,
+                # the content will be filled on the server side.
+                annotation["content"] = ""
+            payload["annotations"] = annotations
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_sequential_pcd_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        annotations: List[dict] = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single sequential PCD task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        tags is a list of tag to be set (Optional).
+        annotations is a list of annotation to be set (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/sequential-pcd/" + task_id
         payload = {}
         if status:
             payload["status"] = status
