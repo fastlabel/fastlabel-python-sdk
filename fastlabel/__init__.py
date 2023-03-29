@@ -705,11 +705,11 @@ class Client:
         tags: list = None,
         task_name: str = None,
         offset: int = None,
-        limit: int = 100,
+        limit: int = 10,
     ) -> list:
         """
         Returns a list of Sequential PCD tasks.
-        Returns up to 1000 at a time, to get more,
+        Returns up to 10 at a time, to get more,
         set offset as the starting position to fetch.
 
         project is slug of your project (Required).
@@ -723,9 +723,9 @@ class Client:
         offset is the starting position number to fetch (Optional).
         limit is the max number to fetch (Optional).
         """
-        if limit > 1000:
+        if limit > 10:
             raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
+                "Limit must be less than or equal to 10.", 422
             )
         endpoint = "tasks/sequential-pcd"
         params = {"project": project}
