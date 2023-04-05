@@ -1608,7 +1608,7 @@ task = client.find_sequential_pcd_task(project="YOUR_PROJECT_SLUG", task_name="Y
 
 #### Get Tasks
 
-Get tasks. (Up to 1000 tasks)
+Get tasks. (Up to 10 tasks)
 
 ```python
 tasks = client.get_sequential_pcd_tasks(project="YOUR_PROJECT_SLUG")
