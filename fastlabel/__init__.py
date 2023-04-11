@@ -4,10 +4,11 @@ import logging
 import os
 import re
 from concurrent.futures import ThreadPoolExecutor
-from typing import List
+from typing import List, Dict
 
 import cv2
 import numpy as np
+import open3d
 import xmltodict
 from PIL import Image, ImageColor, ImageDraw
 
@@ -97,7 +98,8 @@ class Client:
         project is slug of your project (Required).
         task_name is a task name (Required).
         """
-        tasks = self.get_multi_image_tasks(project=project, task_name=task_name)
+        tasks = self.get_multi_image_tasks(
+            project=project, task_name=task_name)
         if not tasks:
             return None
         return tasks[0]
@@ -179,7 +181,8 @@ class Client:
         project is slug of your project (Required).
         task_name is a task name (Required).
         """
-        tasks = self.get_text_classification_tasks(project=project, task_name=task_name)
+        tasks = self.get_text_classification_tasks(
+            project=project, task_name=task_name)
         if not tasks:
             return None
         return tasks[0]
@@ -259,7 +262,8 @@ class Client:
         project is slug of your project (Required).
         task_name is a task name (Required).
         """
-        tasks = self.get_sequential_pcd_tasks(project=project, task_name=task_name)
+        tasks = self.get_sequential_pcd_tasks(
+            project=project, task_name=task_name)
         if not tasks:
             return None
         return tasks[0]
@@ -812,7 +816,8 @@ class Client:
                 "Supported extensions are png, jpg, jpeg.", 422
             )
         if not utils.is_image_supported_size(file_path):
-            raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
+            raise FastLabelInvalidException(
+                "Supported image size is under 20 MB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -867,7 +872,8 @@ class Client:
                 "Supported extensions are png, jpg, jpeg.", 422
             )
         if not utils.is_image_supported_size(file_path):
-            raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
+            raise FastLabelInvalidException(
+                "Supported image size is under 20 MB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -922,7 +928,8 @@ class Client:
         endpoint = "tasks/multi-image"
         file_paths = glob.glob(os.path.join(folder_path, "*"))
         if not file_paths:
-            raise FastLabelInvalidException("Folder does not have any file.", 422)
+            raise FastLabelInvalidException(
+                "Folder does not have any file.", 422)
         contents = []
         contents_size = 0
         for file_path in file_paths:
@@ -942,7 +949,8 @@ class Client:
                 )
 
             file = utils.base64_encode(file_path)
-            contents.append({"name": os.path.basename(file_path), "file": file})
+            contents.append(
+                {"name": os.path.basename(file_path), "file": file})
             contents_size += utils.get_json_length(contents[-1])
             if contents_size > const.SUPPORTED_CONTENTS_SIZE:
                 raise FastLabelInvalidException(
@@ -997,7 +1005,8 @@ class Client:
         """
         endpoint = "tasks/video"
         if not utils.is_video_supported_ext(file_path):
-            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
+            raise FastLabelInvalidException(
+                "Supported extensions are mp4.", 422)
         if not utils.is_video_supported_size(file_path):
             raise FastLabelInvalidException(
                 "Supported video size is under 250 MB.", 422
@@ -1052,7 +1061,8 @@ class Client:
         """
         endpoint = "tasks/video/classification"
         if not utils.is_video_supported_ext(file_path):
-            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
+            raise FastLabelInvalidException(
+                "Supported extensions are mp4.", 422)
         if not utils.is_video_supported_size(file_path):
             raise FastLabelInvalidException(
                 "Supported video size is under 250 MB.", 422
@@ -1105,9 +1115,11 @@ class Client:
         """
         endpoint = "tasks/text"
         if not utils.is_text_supported_ext(file_path):
-            raise FastLabelInvalidException("Supported extensions are txt.", 422)
+            raise FastLabelInvalidException(
+                "Supported extensions are txt.", 422)
         if not utils.is_text_supported_size(file_path):
-            raise FastLabelInvalidException("Supported text size is under 2 MB.", 422)
+            raise FastLabelInvalidException(
+                "Supported text size is under 2 MB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -1158,9 +1170,11 @@ class Client:
         """
         endpoint = "tasks/text/classification"
         if not utils.is_text_supported_ext(file_path):
-            raise FastLabelInvalidException("Supported extensions are txt.", 422)
+            raise FastLabelInvalidException(
+                "Supported extensions are txt.", 422)
         if not utils.is_text_supported_size(file_path):
-            raise FastLabelInvalidException("Supported text size is under 2 MB.", 422)
+            raise FastLabelInvalidException(
+                "Supported text size is under 2 MB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -1321,9 +1335,11 @@ class Client:
         """
         endpoint = "tasks/pcd"
         if not utils.is_pcd_supported_ext(file_path):
-            raise FastLabelInvalidException("Supported extensions are pcd only", 422)
+            raise FastLabelInvalidException(
+                "Supported extensions are pcd only", 422)
         if not utils.is_pcd_supported_size(file_path):
-            raise FastLabelInvalidException("Supported PCD size is under 30 MB.", 422)
+            raise FastLabelInvalidException(
+                "Supported PCD size is under 30 MB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -1380,7 +1396,8 @@ class Client:
         endpoint = "tasks/sequential-pcd"
         file_paths = glob.glob(os.path.join(folder_path, "*"))
         if not file_paths:
-            raise FastLabelInvalidException("Folder does not have any file.", 422)
+            raise FastLabelInvalidException(
+                "Folder does not have any file.", 422)
         contents = []
         contents_size = 0
         for file_path in file_paths:
@@ -1400,7 +1417,8 @@ class Client:
                 )
 
             file = utils.base64_encode(file_path)
-            contents.append({"name": os.path.basename(file_path), "file": file})
+            contents.append(
+                {"name": os.path.basename(file_path), "file": file})
             contents_size += utils.get_json_length(contents[-1])
             if contents_size > const.SUPPORTED_CONTENTS_SIZE:
                 raise FastLabelInvalidException(
@@ -2218,7 +2236,8 @@ class Client:
         """
         classes = self.__get_yolo_format_classes(classes_file_path)
         image_sizes = self.__get_yolo_image_sizes(dataset_folder_path)
-        yolo_annotations = self.__get_yolo_format_annotations(dataset_folder_path)
+        yolo_annotations = self.__get_yolo_format_annotations(
+            dataset_folder_path)
 
         return converters.execute_yolo_to_fastlabel(
             classes,
@@ -2384,7 +2403,8 @@ class Client:
         for anno in annos:
             file_name = anno["filename"]
             basename = utils.get_basename(file_name)
-            file_path = os.path.join(output_dir, "annotations", basename + ".txt")
+            file_path = os.path.join(
+                output_dir, "annotations", basename + ".txt")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             with open(file_path, "w", encoding="utf8") as f:
                 objects = anno.get("object")
@@ -2426,7 +2446,8 @@ class Client:
         for voc in pascalvoc:
             file_name = voc["annotation"]["filename"]
             basename = utils.get_basename(file_name)
-            file_path = os.path.join(output_dir, "annotations", basename + ".xml")
+            file_path = os.path.join(
+                output_dir, "annotations", basename + ".xml")
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             xml = xmltodict.unparse(
                 voc, pretty=True, indent="    ", full_document=False
@@ -2536,9 +2557,11 @@ class Client:
             )
             if annotation["type"] == AnnotationType.segmentation.value:
                 # Create each annotation's masks and merge them finally
-                seg_mask_ground = Image.new("RGB", (task["width"], task["height"]), 0)
+                seg_mask_ground = Image.new(
+                    "RGB", (task["width"], task["height"]), 0)
                 seg_mask_image = np.array(seg_mask_ground)
-                seg_mask_image = cv2.cvtColor(seg_mask_image, cv2.COLOR_BGR2GRAY)
+                seg_mask_image = cv2.cvtColor(
+                    seg_mask_image, cv2.COLOR_BGR2GRAY)
 
                 for region in annotation["points"]:
                     count = 0
@@ -2571,7 +2594,8 @@ class Client:
                             sorted_points = utils.sort_segmentation_points(
                                 reverse_points
                             )
-                            cv_draw_points = self.__get_cv_draw_points(sorted_points)
+                            cv_draw_points = self.__get_cv_draw_points(
+                                sorted_points)
                             cv2.fillPoly(
                                 seg_mask_image,
                                 [cv_draw_points],
@@ -2582,12 +2606,14 @@ class Client:
                         count += 1
                 seg_mask_images.append(seg_mask_image)
             elif annotation["type"] == AnnotationType.polygon.value:
-                cv_draw_points = self.__get_cv_draw_points(annotation["points"])
+                cv_draw_points = self.__get_cv_draw_points(
+                    annotation["points"])
                 cv2.fillPoly(
                     image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0
                 )
             elif annotation["type"] == AnnotationType.bbox.value:
-                cv_draw_points = self.__get_cv_draw_points(annotation["points"])
+                cv_draw_points = self.__get_cv_draw_points(
+                    annotation["points"])
                 cv2.fillPoly(
                     image, [cv_draw_points], color, lineType=cv2.LINE_8, shift=0
                 )
@@ -2599,7 +2625,8 @@ class Client:
         for seg_mask_image in seg_mask_images:
             image = image | seg_mask_image
 
-        image_path = os.path.join(output_dir, utils.get_basename(task["name"]) + ".png")
+        image_path = os.path.join(
+            output_dir, utils.get_basename(task["name"]) + ".png")
         os.makedirs(os.path.dirname(image_path), exist_ok=True)
         image = Image.fromarray(image)
         image = image.convert("P")
@@ -2727,7 +2754,8 @@ class Client:
             elif AnnotationType(task_annotation["type"]) == AnnotationType.segmentation:
                 is_seg = True
                 rgba_seg = rgb + (OPACITY_THIN * 2,)
-                seg_mask_ground = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+                seg_mask_ground = Image.new(
+                    "RGBA", (width, height), (0, 0, 0, 0))
                 seg_mask_im = np.array(seg_mask_ground)
                 for region in task_annotation["points"]:
                     count = 0
@@ -2822,7 +2850,8 @@ class Client:
                 for relation in set(relations):
                     first_key, second_key = relation.split(SEPARATOER)
                     if (
-                        linked_points_and_color_to_key_map.get(first_key) is None
+                        linked_points_and_color_to_key_map.get(
+                            first_key) is None
                         or linked_points_and_color_to_key_map.get(second_key) is None
                     ):
                         continue
@@ -2919,7 +2948,8 @@ class Client:
             img_file_path_task_list.append([img_file_path, task, output_dir])
 
         with ThreadPoolExecutor(max_workers=4) as executor:
-            executor.map(self.__create_image_with_annotation, img_file_path_task_list)
+            executor.map(self.__create_image_with_annotation,
+                         img_file_path_task_list)
 
     # Annotation
 
@@ -3385,7 +3415,8 @@ class Client:
                 "Supported extensions are png, jpg, jpeg.", 422
             )
         if not utils.is_image_supported_size(file_path):
-            raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
+            raise FastLabelInvalidException(
+                "Supported image size is under 20 MB.", 422)
 
         payload = {
             "datasetId": dataset_id,
@@ -3411,7 +3442,8 @@ class Client:
         endpoint = "dataset-objects"
         # TODO: add m4v, mov, avi?
         if not utils.is_video_supported_ext(file_path):
-            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
+            raise FastLabelInvalidException(
+                "Supported extensions are mp4.", 422)
         if not utils.is_video_supported_size(file_path):
             raise FastLabelInvalidException(
                 "Supported video size is under 250 MB.", 422
@@ -3464,7 +3496,8 @@ class Client:
         Delete a dataset objects.
         """
         endpoint = "dataset-objects/delete/multi"
-        payload = {"datasetId": dataset_id, "datasetObjectIds": dataset_object_ids}
+        payload = {"datasetId": dataset_id,
+                   "datasetObjectIds": dataset_object_ids}
         self.api.post_request(endpoint, payload=payload)
 
     def get_dataset_object_import_histories(
@@ -3597,10 +3630,62 @@ class Client:
                 "Supported extensions are png, jpg, jpeg.", 422
             )
         if not utils.is_image_supported_size_for_inference(file_path):
-            raise FastLabelInvalidException("Supported image size is under 6 MB.", 422)
+            raise FastLabelInvalidException(
+                "Supported image size is under 6 MB.", 422)
 
         payload = {
             "modelEndpointName": endpoint_name,
             "file": utils.base64_encode(file_path),
         }
         return self.api.post_request(endpoint, payload=payload)
+
+    def check_unpainted_3d_segmentation(
+        self,
+        file_path: str,
+        tasks: List,
+    ) -> List[Dict]:
+        """
+        3d segmentation unpainted checker.
+
+        file_path is a path to data.
+        Supported extensions are pcd only.(Required)
+        tasks is task data list.(Required)
+        """
+        result = {
+            "error": None,
+            "file_path": file_path,
+            "target_task_name": None,
+            "pcd_points_count": 0,
+            "annotation_count": 0,
+        }
+
+        support_extension = [".pcd"]
+        extension = os.path.splitext(file_path)[1]
+        if extension not in support_extension:
+            result["error"] = "Supported extensions are pcd only."
+            return result
+
+        pcd = open3d.io.read_point_cloud(file_path)
+        pcd_points_count = len(np.asarray(pcd.points))
+        result["pcd_points_count"] = pcd_points_count
+
+        target_task = next(
+            filter(
+                lambda x: x["name"] == os.path.basename(file_path), tasks
+            ), None
+        )
+        if not target_task:
+            result["error"] = "Not found task."
+            return result
+
+        result["target_task_name"] = target_task["name"]
+
+        anno_points_count = 0
+        for annotation in target_task["annotations"]:
+            anno_points_count += len(annotation["points"])
+        result["annotation_count"] = anno_points_count
+
+        if pcd_points_count != anno_points_count:
+            result["error"] = "There is an unpainted area."
+
+        return result
