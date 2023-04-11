@@ -4,7 +4,7 @@ import logging
 import os
 import re
 from concurrent.futures import ThreadPoolExecutor
-from typing import List, Dict
+from typing import List
 
 import cv2
 import numpy as np
@@ -3643,17 +3643,22 @@ class Client:
         self,
         file_path: str,
         tasks: List,
-    ) -> List[Dict]:
+    ) -> dict:
         """
         3d segmentation unpainted checker.
 
         file_path is a path to data.
         Supported extensions are pcd only.(Required)
         tasks is task data list.(Required)
+
+        return dict
+            error: check error string. complete is None
+            target_task_name: task name
+            pcd_points_count: pcd file point count
+            annotation_count: task point count
         """
         result = {
             "error": None,
-            "file_path": file_path,
             "target_task_name": None,
             "pcd_points_count": 0,
             "annotation_count": 0,
