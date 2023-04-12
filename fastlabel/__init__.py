@@ -2484,6 +2484,8 @@ class Client:
         tasks: list,
         output_dir: str = os.path.join("output", "semantic_segmentation"),
         pallete: List[int] = const.COLOR_PALETTE,
+        classes: List = [],
+        start_index: int = 1,
     ) -> None:
         """
         Convert tasks to index color semantic segmentation (PNG files).
@@ -2493,13 +2495,16 @@ class Client:
         tasks is a list of tasks (Required).
         output_dir is output directory(default: output/semantic_segmentation)(Optional).
         pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
+        classes is fix classes list (Optional).
+        start_index is color pallet start index (Optional).
         """
-        classes = []
-        for task in tasks:
-            for annotation in task["annotations"]:
-                classes.append(annotation["value"])
-        classes = list(set(classes))
-        classes.sort()
+        target_classes = classes
+        if len(target_classes) == 0:
+            for task in tasks:
+                for annotation in task["annotations"]:
+                    target_classes.append(annotation["value"])
+            target_classes = list(set(classes))
+            target_classes.sort()
 
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
@@ -2508,7 +2513,8 @@ class Client:
                 output_dir=output_dir,
                 pallete=pallete,
                 is_instance_segmentation=False,
-                classes=classes,
+                classes=target_classes,
+                start_index=start_index,
             )
 
     def __export_index_color_image(
@@ -2518,12 +2524,13 @@ class Client:
         pallete: List[int],
         is_instance_segmentation: bool = True,
         classes: list = [],
+        start_index: int = 1,
     ) -> None:
         image = Image.new("RGB", (task["width"], task["height"]), 0)
         image = np.array(image)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        index = 1
+        index = start_index
         # In case segmentation, to avoid hollowed points overwrite other segmentation
         # in them, segmentation rendering process is different from
         # other annotation type
