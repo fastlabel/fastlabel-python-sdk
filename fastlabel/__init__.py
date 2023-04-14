@@ -2459,6 +2459,8 @@ class Client:
         tasks: list,
         output_dir: str = os.path.join("output", "instance_segmentation"),
         pallete: List[int] = const.COLOR_PALETTE,
+        classes: List = [],
+        start_index: int = 1,
     ) -> None:
         """
         Convert tasks to index color instance segmentation (PNG files).
@@ -2469,6 +2471,9 @@ class Client:
         tasks is a list of tasks (Required).
         output_dir is output directory(default: output/instance_segmentation)(Optional).
         pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
+        classes is a list of annotation values.
+            This list defines the value order that corresponds to the color index of the annotation.(Optional).
+        start_index is the first index of color index corresponding to color pallete (Optional).
         """
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
@@ -2477,6 +2482,8 @@ class Client:
                 output_dir=output_dir,
                 pallete=pallete,
                 is_instance_segmentation=True,
+                classes=classes,
+                start_index=start_index,
             )
 
     def export_semantic_segmentation(
@@ -2495,16 +2502,16 @@ class Client:
         tasks is a list of tasks (Required).
         output_dir is output directory(default: output/semantic_segmentation)(Optional).
         pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
-        classes is fix classes list (Optional).
-        start_index is color pallet start index (Optional).
+        classes is a list of annotation values.
+            This list defines the value order that corresponds to the color index of the annotation.(Optional).
+        start_index is the first index of color index corresponding to color pallete (Optional).
         """
-        target_classes = classes
-        if len(target_classes) == 0:
+        if len(classes) == 0:
             for task in tasks:
                 for annotation in task["annotations"]:
-                    target_classes.append(annotation["value"])
-            target_classes = list(set(classes))
-            target_classes.sort()
+                    classes.append(annotation["value"])
+            classes = list(set(classes))
+            classes.sort()
 
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
@@ -2513,7 +2520,7 @@ class Client:
                 output_dir=output_dir,
                 pallete=pallete,
                 is_instance_segmentation=False,
-                classes=target_classes,
+                classes=classes,
                 start_index=start_index,
             )
 
