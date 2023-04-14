@@ -2459,7 +2459,6 @@ class Client:
         tasks: list,
         output_dir: str = os.path.join("output", "instance_segmentation"),
         pallete: List[int] = const.COLOR_PALETTE,
-        classes: List = [],
         start_index: int = 1,
     ) -> None:
         """
@@ -2471,8 +2470,6 @@ class Client:
         tasks is a list of tasks (Required).
         output_dir is output directory(default: output/instance_segmentation)(Optional).
         pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
-        classes is a list of annotation values.
-            This list defines the value order that corresponds to the color index of the annotation.(Optional).
         start_index is the first index of color index corresponding to color pallete (Optional).
         """
         tasks = converters.to_pixel_coordinates(tasks)
@@ -2482,7 +2479,6 @@ class Client:
                 output_dir=output_dir,
                 pallete=pallete,
                 is_instance_segmentation=True,
-                classes=classes,
                 start_index=start_index,
             )
 
