@@ -1940,6 +1940,15 @@ class Client:
         endpoint = "tasks/" + task_id
         self.api.delete_request(endpoint)
 
+    # Task Annotations Delete
+
+    def delete_task_annotations(self, task_id: str) -> None:
+        """
+        Delete annotations in a task.
+        """
+        endpoint = "tasks/" + task_id + "/task-annotations"
+        self.api.delete_request(endpoint)
+
     # Integrate Task
 
     def find_integrated_image_task_by_prefix(
