@@ -83,21 +83,21 @@ class Client:
             return None
         return tasks[0]
 
-    def find_multi_image_task(self, task_id: str) -> dict:
+    def find_sequential_image_task(self, task_id: str) -> dict:
         """
-        Find a single multi image task.
+        Find a single sequential image task.
         """
-        endpoint = "tasks/multi-image/" + task_id
+        endpoint = "tasks/sequential-image/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_multi_image_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_sequential_image_task_by_name(self, project: str, task_name: str) -> dict:
         """
-        Find a single multi image task by name.
+        Find a single sequential image task by name.
 
         project is slug of your project (Required).
         task_name is a task name (Required).
         """
-        tasks = self.get_multi_image_tasks(project=project, task_name=task_name)
+        tasks = self.get_sequential_image_tasks(project=project, task_name=task_name)
         if not tasks:
             return None
         return tasks[0]
@@ -352,7 +352,7 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
-    def get_multi_image_tasks(
+    def get_sequential_image_tasks(
         self,
         project: str,
         status: str = None,
@@ -363,7 +363,7 @@ class Client:
         limit: int = 10,
     ) -> list:
         """
-        Returns a list of multi image tasks.
+        Returns a list of sequential image tasks.
         Returns up to 10 at a time, to get more, set offset as the starting position
         to fetch.
 
@@ -380,7 +380,7 @@ class Client:
             raise FastLabelInvalidException(
                 "Limit must be less than or equal to 10.", 422
             )
-        endpoint = "tasks/multi-image"
+        endpoint = "tasks/sequential-image"
         params = {"project": project}
         if status:
             params["status"] = status
@@ -884,7 +884,7 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
-    def create_multi_image_task(
+    def create_sequential_image_task(
         self,
         project: str,
         name: str,
@@ -896,7 +896,7 @@ class Client:
         **kwargs,
     ) -> str:
         """
-        Create a single multi image task.
+        Create a single sequential image task.
 
         project is slug of your project (Required).
         name is an unique identifier of task in your project (Required).
@@ -919,7 +919,7 @@ class Client:
         if not os.path.isdir(folder_path):
             raise FastLabelInvalidException("Folder does not exist.", 422)
 
-        endpoint = "tasks/multi-image"
+        endpoint = "tasks/sequential-image"
         file_paths = glob.glob(os.path.join(folder_path, "*"))
         if not file_paths:
             raise FastLabelInvalidException("Folder does not have any file.", 422)
@@ -1548,7 +1548,7 @@ class Client:
 
         return self.api.put_request(endpoint, payload=payload)
 
-    def update_multi_image_task(
+    def update_sequential_image_task(
         self,
         task_id: str,
         status: str = None,
@@ -1558,7 +1558,7 @@ class Client:
         **kwargs,
     ) -> str:
         """
-        Update a multi image task.
+        Update a sequential image task.
 
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
@@ -1574,7 +1574,7 @@ class Client:
         external_reviewer is slug of external review user (Optional).
         external_approver is slug of external approve user (Optional).
         """
-        endpoint = "tasks/multi-image/" + task_id
+        endpoint = "tasks/sequential-image/" + task_id
         payload = {}
         if status:
             payload["status"] = status
@@ -2744,7 +2744,7 @@ class Client:
                         if count == 0:
                             cv_draw_points = self.__get_cv_draw_points(points)
                             # For diagonal segmentation points, fillPoly cannot rendering cv_drawpoints, so convert
-                            # shape. When multiimage project can use only pixcel mode, remove it
+                            # shape. When sequentialImage project can use only pixcel mode, remove it
                             converted_points = (
                                 np.array(cv_draw_points)
                                 .reshape((-1, 1, 2))
@@ -3170,9 +3170,9 @@ class Client:
         Create a project.
 
         type can be 'image_bbox', 'image_polygon', 'image_keypoint', 'image_line',
-        'image_segmentation', 'image_classification', 'image_all', 'multi_image_bbox',
-        'multi_image_polygon', 'multi_image_keypoint', 'multi_image_line',
-        'multi_image_segmentation', 'video_bbox',
+        'image_segmentation', 'image_classification', 'image_all', 'sequential_image_bbox',
+        'sequential_image_polygon', 'sequential_image_keypoint', 'sequential_image_line',
+        'sequential_image_segmentation', 'video_bbox',
         'video_single_classification' (Required).
         name is name of your project (Required).
         slug is slug of your project (Required).
