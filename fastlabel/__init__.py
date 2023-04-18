@@ -2470,7 +2470,9 @@ class Client:
         tasks is a list of tasks (Required).
         output_dir is output directory(default: output/instance_segmentation)(Optional).
         pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
-        start_index is the first index of color index corresponding to color pallete (Optional).
+        start_index is the first index of color index corresponding to color pallete.
+            When start_index is 0, all pixels are assumed to have annotations
+            because they become the same color as the background(Optional).
         """
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
@@ -2500,7 +2502,9 @@ class Client:
         pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
         classes is a list of annotation values.
             This list defines the value order that corresponds to the color index of the annotation.(Optional).
-        start_index is the first index of color index corresponding to color pallete (Optional).
+        start_index is the first index of color index corresponding to color pallete.
+            When start_index is 0, all pixels are assumed to have annotations
+            because they become the same color as the background(Optional).
         """
         if len(classes) == 0:
             for task in tasks:
