@@ -2471,6 +2471,7 @@ class Client:
         output_dir is output directory(default: output/instance_segmentation)(Optional).
         pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
         start_index is the first index of color index corresponding to color pallete.
+            The expected values for start_index are either 0 or 1.
             When start_index is 0, all pixels are assumed to have annotations
             because they become the same color as the background(Optional).
         """
@@ -2503,6 +2504,7 @@ class Client:
         classes is a list of annotation values.
             This list defines the value order that corresponds to the color index of the annotation.(Optional).
         start_index is the first index of color index corresponding to color pallete.
+            The expected values for start_index are either 0 or 1.
             When start_index is 0, all pixels are assumed to have annotations
             because they become the same color as the background(Optional).
         """
