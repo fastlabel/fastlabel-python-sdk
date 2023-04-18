@@ -2542,7 +2542,7 @@ class Client:
             color = (
                 index
                 if is_instance_segmentation
-                else classes.index(annotation["value"]) + 1
+                else classes.index(annotation["value"]) + start_index
             )
             if annotation["type"] == AnnotationType.segmentation.value:
                 # Create each annotation's masks and merge them finally
