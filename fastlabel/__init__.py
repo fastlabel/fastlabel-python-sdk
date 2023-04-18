@@ -2468,6 +2468,7 @@ class Client:
         tasks: list,
         output_dir: str = os.path.join("output", "instance_segmentation"),
         pallete: List[int] = const.COLOR_PALETTE,
+        start_index: int = 1,
     ) -> None:
         """
         Convert tasks to index color instance segmentation (PNG files).
@@ -2478,6 +2479,10 @@ class Client:
         tasks is a list of tasks (Required).
         output_dir is output directory(default: output/instance_segmentation)(Optional).
         pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
+        start_index is the first index of color index corresponding to color pallete.
+            The expected values for start_index are either 0 or 1.
+            When start_index is 0, all pixels are assumed to have annotations
+            because they become the same color as the background(Optional).
         """
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
@@ -2486,6 +2491,7 @@ class Client:
                 output_dir=output_dir,
                 pallete=pallete,
                 is_instance_segmentation=True,
+                start_index=start_index,
             )
 
     def export_semantic_segmentation(
@@ -2493,6 +2499,8 @@ class Client:
         tasks: list,
         output_dir: str = os.path.join("output", "semantic_segmentation"),
         pallete: List[int] = const.COLOR_PALETTE,
+        classes: List = [],
+        start_index: int = 1,
     ) -> None:
         """
         Convert tasks to index color semantic segmentation (PNG files).
@@ -2502,13 +2510,19 @@ class Client:
         tasks is a list of tasks (Required).
         output_dir is output directory(default: output/semantic_segmentation)(Optional).
         pallete is color palette of index color. Ex: [255, 0, 0, ...] (Optional).
+        classes is a list of annotation values.
+            This list defines the value order that corresponds to the color index of the annotation.(Optional).
+        start_index is the first index of color index corresponding to color pallete.
+            The expected values for start_index are either 0 or 1.
+            When start_index is 0, all pixels are assumed to have annotations
+            because they become the same color as the background(Optional).
         """
-        classes = []
-        for task in tasks:
-            for annotation in task["annotations"]:
-                classes.append(annotation["value"])
-        classes = list(set(classes))
-        classes.sort()
+        if len(classes) == 0:
+            for task in tasks:
+                for annotation in task["annotations"]:
+                    classes.append(annotation["value"])
+            classes = list(set(classes))
+            classes.sort()
 
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
@@ -2518,6 +2532,7 @@ class Client:
                 pallete=pallete,
                 is_instance_segmentation=False,
                 classes=classes,
+                start_index=start_index,
             )
 
     def __export_index_color_image(
@@ -2527,12 +2542,13 @@ class Client:
         pallete: List[int],
         is_instance_segmentation: bool = True,
         classes: list = [],
+        start_index: int = 1,
     ) -> None:
         image = Image.new("RGB", (task["width"], task["height"]), 0)
         image = np.array(image)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        index = 1
+        index = start_index
         # In case segmentation, to avoid hollowed points overwrite other segmentation
         # in them, segmentation rendering process is different from
         # other annotation type
@@ -2541,7 +2557,7 @@ class Client:
             color = (
                 index
                 if is_instance_segmentation
-                else classes.index(annotation["value"]) + 1
+                else classes.index(annotation["value"]) + start_index
             )
             if annotation["type"] == AnnotationType.segmentation.value:
                 # Create each annotation's masks and merge them finally
