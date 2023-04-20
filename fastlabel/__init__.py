@@ -2518,16 +2518,15 @@ class Client:
             because they become the same color as the background(Optional).
         """
 
-        # Create target_classes they are not added to the default arguments.
-        target_classes = []
-        if len(classes) == 0:
+        # Copy classes to target_classes
+        # so that it is not added as a default argument.
+        target_classes = classes.copy()
+        if len(target_classes) == 0:
             for task in tasks:
                 for annotation in task["annotations"]:
                     target_classes.append(annotation["value"])
             target_classes = list(set(target_classes))
             target_classes.sort()
-        else:
-            target_classes.extend(classes)
 
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
