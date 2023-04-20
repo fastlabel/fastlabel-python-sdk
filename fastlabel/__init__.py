@@ -2517,12 +2517,16 @@ class Client:
             When start_index is 0, all pixels are assumed to have annotations
             because they become the same color as the background(Optional).
         """
-        if len(classes) == 0:
+
+        # Copy classes to target_classes
+        # so that it is not added as a default argument.
+        target_classes = classes.copy()
+        if len(target_classes) == 0:
             for task in tasks:
                 for annotation in task["annotations"]:
-                    classes.append(annotation["value"])
-            classes = list(set(classes))
-            classes.sort()
+                    target_classes.append(annotation["value"])
+            target_classes = list(set(target_classes))
+            target_classes.sort()
 
         tasks = converters.to_pixel_coordinates(tasks)
         for task in tasks:
@@ -2531,7 +2535,7 @@ class Client:
                 output_dir=output_dir,
                 pallete=pallete,
                 is_instance_segmentation=False,
-                classes=classes,
+                classes=target_classes,
                 start_index=start_index,
             )
 
