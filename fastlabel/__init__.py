@@ -2520,7 +2520,7 @@ class Client:
 
         # Create target_classes they are not added to the default arguments.
         target_classes = classes
-        if len(classes) == 0:
+        if len(target_classes) == 0:
             for task in tasks:
                 for annotation in task["annotations"]:
                     target_classes.append(annotation["value"])
