@@ -2680,6 +2680,46 @@ if __name__ == '__main__':
   cv2.imwrite(RESULT_IMAGE_FILE_PATH, img)
 ```
 
+## Model Monitoring
+### Create Request Results
+You can integrate the results of model endpoint calls, 
+which are targeted for aggregation in model monitoring, from an external source.
+
+
+```python
+from datetime import datetime
+import pytz
+import fastlabel
+client = fastlabel.Client()
+
+jst = pytz.timezone("Asia/Tokyo")
+dt_jst = datetime(2023, 5, 8, 12, 10, 53, tzinfo=jst)
+
+client.create_model_monitoring_request_results(
+    name="model-monitoring-name",  # The name of your model monitoring name
+    results=[
+        {
+            "status": "success",  # success or failed
+            "result": [
+                {
+                    "annotationIndex": 0,  # The index of the inference class returned by your model
+                    "value": "person",  # The value of the inference class returned by your model
+                    "points": [
+                        12.98,
+                        23.84,
+                        140.83,
+                        165.82,
+                    ],  # [x_min, y_min, x_max,y_max]
+                    "confidenceScore": 0.92,  # 0 ~ 1
+                }
+            ],
+            "resultSchema": "object_detection_base",  # Currently, only 'object_detection_base' can be selected.
+            "requestAt": dt_jst.isoformat(),  # The time when your endpoint accepted the request
+        }
+    ],
+)
+```
+
 ## API Docs
 
 Check [this](https://api.fastlabel.ai/docs/) for further information.

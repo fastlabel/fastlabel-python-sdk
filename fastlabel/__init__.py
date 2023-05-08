@@ -3633,3 +3633,19 @@ class Client:
             "file": utils.base64_encode(file_path),
         }
         return self.api.post_request(endpoint, payload=payload)
+
+    def create_model_monitoring_request_results(
+        self,
+        name: str,
+        results: list = [],
+    ) -> str:
+        """
+        Create model monitoring request results.
+        name is an unique identifier of model monitoring setting in your workspace (Required).
+        results is a list of request result to be set (Required).
+        """
+        endpoint = "model-monitorings/create"
+
+        payload = {"name": name, "results": results}
+
+        return self.api.post_request(endpoint, payload=payload)
