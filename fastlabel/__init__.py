@@ -3641,8 +3641,8 @@ class Client:
     ) -> str:
         """
         Create model monitoring request results.
-
         name is an unique identifier of model monitoring setting in your workspace (Required).
+        results is a list of request result to be set (Required).
         """
         endpoint = "model-monitorings/create"
 
