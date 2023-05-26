@@ -55,15 +55,17 @@ class Api:
         }
         r = requests.delete(self.base_url + endpoint, headers=headers, params=params)
 
-        if r.status_code != 204:
-            try:
-                error = r.json()["message"]
-            except ValueError:
-                error = r.text
-            if str(r.status_code).startswith("4"):
-                raise FastLabelInvalidException(error, r.status_code)
-            else:
-                raise FastLabelException(error, r.status_code)
+        if r.status_code == 200 or r.status_code == 204:
+            return
+
+        try:
+            error = r.json()["message"]
+        except ValueError:
+            error = r.text
+        if str(r.status_code).startswith("4"):
+            raise FastLabelInvalidException(error, r.status_code)
+        else:
+            raise FastLabelException(error, r.status_code)
 
     def post_request(self, endpoint, payload=None):
         """Makes a post request to an endpoint.
