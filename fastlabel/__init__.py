@@ -283,6 +283,13 @@ class Client:
             return None
         return tasks[0]
 
+    def find_history(self, history_id: str) -> dict:
+        """
+        Find a single history.
+        """
+        endpoint = "tasks/import/histories/" + history_id
+        return self.api.get_request(endpoint)
+
     # Task Get
 
     def get_image_tasks(
