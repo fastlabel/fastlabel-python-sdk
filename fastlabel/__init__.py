@@ -233,6 +233,17 @@ class Client:
         endpoint = "tasks/dicom/" + task_id
         return self.api.get_request(endpoint)
 
+    def find_dicom_task_by_name(self, project: str, task_name: str) -> dict:
+        """
+        Find a single DICOM task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_dicom_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
 
     def find_pcd_task(self, task_id: str) -> dict:
         """
