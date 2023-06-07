@@ -226,6 +226,14 @@ class Client:
             return None
         return tasks[0]
 
+    def find_dicom_task(self, task_id: str) -> dict:
+        """
+        Find a single DICOM task.
+        """
+        endpoint = "tasks/dicom/" + task_id
+        return self.api.get_request(endpoint)
+
+
     def find_pcd_task(self, task_id: str) -> dict:
         """
         Find a single PCD task.
