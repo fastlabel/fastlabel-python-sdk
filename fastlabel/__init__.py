@@ -3814,3 +3814,32 @@ class Client:
         payload = {"name": name, "results": results}
 
         return self.api.post_request(endpoint, payload=payload)
+
+    def get_histories(
+        self,
+        project: str,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of histories.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        project is slug of your project (Required).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "tasks/import/histories"
+        params = { "project": project }
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+
+        return self.api.get_request(endpoint, params=params)
+
