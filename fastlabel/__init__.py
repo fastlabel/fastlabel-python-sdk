@@ -3322,7 +3322,7 @@ class Client:
         type can be 'image', 'video', 'audio' (Required).
         name is name of your dataset (Required).
         slug is slug of your dataset (Required).
-        annotation_type can be 'none', 'image_bbox', 'image_segmentation' (Required).
+        annotation_type can be 'none', 'image_bbox' (Required).
         """
         endpoint = "datasets"
         payload = {
