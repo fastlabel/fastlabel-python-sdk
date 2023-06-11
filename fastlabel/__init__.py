@@ -33,7 +33,6 @@ logging.basicConfig(
 
 
 class Client:
-
     api = None
 
     def __init__(self):
@@ -3315,6 +3314,7 @@ class Client:
         type: str,
         name: str,
         slug: str,
+        annotation_type: str,
     ) -> dict:
         """
         Create a dataset.
@@ -3322,12 +3322,14 @@ class Client:
         type can be 'image', 'video', 'audio' (Required).
         name is name of your dataset (Required).
         slug is slug of your dataset (Required).
+        annotation_type can be 'none', 'image_bbox', 'image_segmentation' (Required).
         """
         endpoint = "datasets"
         payload = {
             "type": type,
             "name": name,
             "slug": slug,
+            "annotationType": annotation_type,
         }
         return self.api.post_request(endpoint, payload=payload)
 

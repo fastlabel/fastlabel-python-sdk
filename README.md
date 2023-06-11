@@ -2125,7 +2125,8 @@ Create a new dataset.
 dataset = client.create_dataset(
     name="Japanese Dogs",
     slug="japanese-dogs",
-    type="image"
+    type="image",
+    annotation_type="image_bbox"
 )
 ```
 
@@ -2681,10 +2682,11 @@ if __name__ == '__main__':
 ```
 
 ## Model Monitoring
-### Create Request Results
-You can integrate the results of model endpoint calls, 
-which are targeted for aggregation in model monitoring, from an external source.
 
+### Create Request Results
+
+You can integrate the results of model endpoint calls,
+which are targeted for aggregation in model monitoring, from an external source.
 
 ```python
 from datetime import datetime
