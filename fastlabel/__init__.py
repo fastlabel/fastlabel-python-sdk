@@ -1374,7 +1374,6 @@ class Client:
         Create a single dicom task.
 
         project is slug of your project (Required).
-        name is an unique identifier of task in your project (Required).
         file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
@@ -1397,7 +1396,7 @@ class Client:
             raise FastLabelInvalidException("Supported image size is under 40000 MB.", 422)
 
         file = utils.base64_encode(file_path)
-        payload = {"project": project}
+        payload = {"project": project, "name": os.path.basename(file_path), "file": file}
         if status:
             payload["status"] = status
         if external_status:
@@ -1407,10 +1406,6 @@ class Client:
 
         self.__fill_assign_users(payload, **kwargs)
 
-        signed_url = self.__get_signed_path(project = project, file_name = os.path.basename(file_path), file_type = "application/zip")
-        self.api.upload_zipfile(url = signed_url["url"], file_path = file_path)
-
-        payload["fileKey"] = signed_url["name"]
         return self.api.post_request(endpoint, payload=payload)
 
     def create_pcd_task(
@@ -3770,16 +3765,6 @@ class Client:
             payload["externalReviewer"] = kwargs.get("external_reviewer")
         if "external_approver" in kwargs:
             payload["externalApprover"] = kwargs.get("external_approver")
-
-    def __get_signed_path(
-        self,
-        project: str,
-        file_name: str,
-        file_type: str,
-    ):
-        endpoint = "files"
-        params = {"project": project, "fileName": file_name, "fileType": file_type}
-        return self.api.get_request(endpoint, params)
 
     def execute_endpoint(
         self,
