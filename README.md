@@ -1803,7 +1803,7 @@ Example of a single dicom task object
 ```python
 {
     "id": "YOUR_TASK_ID",
-    "name": "cat.txt",
+    "name": "dicom.zip",
     "url": "YOUR_TASK_URL",
     'height': 512,
     'width': 512,
@@ -1820,9 +1820,9 @@ Example of a single dicom task object
             "color": "#b36d18",
             "contentId": "CONTENT_ID"
             "points": [100, 200, 100, 200],
-            "title": "Cat",
-            "type": "ner",
-            "value": "cat"
+            "title": "Heart",
+            "type": "bbox",
+            "value": "heart"
         }
     ],
     "createdAt": "2021-02-22T11:25:27.158Z",
