@@ -1749,6 +1749,8 @@ Supported following project types:
 #### Create Task
 
 Create a new task.
+You should receive task import history status [Find Task Import History](#find-task-import-history).
+Once you receive the status completed, you can get the task.
 
 ```python
 history = client.create_dicom_task(
@@ -1921,6 +1923,20 @@ history = client.find_history(history_id="YOUR_HISTORY_ID")
 
 ```python
 histories = client.get_histories(project="YOUR_PROJECT_SLUG")
+```
+
+#### Response
+
+Example of a single history object
+
+```python
+{
+    "id": "YOUR_HISTORY_ID",
+    "storageType": "zip",
+    "status": "running",
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
 ```
 
 ## Annotation
