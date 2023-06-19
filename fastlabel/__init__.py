@@ -1393,7 +1393,7 @@ class Client:
                 "Supported extensions are zip.", 422
             )
         if not utils.is_dicom_supported_size(file_path):
-            raise FastLabelInvalidException("Supported image size is under 40000 MB.", 422)
+            raise FastLabelInvalidException("Supported image size is under 2 GB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": os.path.basename(file_path), "file": file}
