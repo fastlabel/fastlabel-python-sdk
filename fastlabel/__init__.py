@@ -1107,7 +1107,7 @@ class Client:
 
         project is slug of your project (Required).
         name is an unique identifier of task in your project (Required).
-        file_path is a path to data. Supported extensions are mp4 (Required).
+        file_path is a path to data. Supported extensions are mp3, wav and w4a (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
