@@ -795,6 +795,12 @@ class Client:
         file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
@@ -850,6 +856,12 @@ class Client:
         file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
@@ -905,6 +917,12 @@ class Client:
         are png, jpg, jpeg (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
@@ -984,6 +1002,12 @@ class Client:
         file_path is a path to data. Supported extensions are mp4 (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
@@ -1039,6 +1063,12 @@ class Client:
         file_path is a path to data. Supported extensions are mp4 (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
@@ -1092,6 +1122,12 @@ class Client:
         file_path is a path to data. Supported extensions are txt (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
@@ -1145,6 +1181,12 @@ class Client:
         file_path is a path to data. Supported extensions are mp4 (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
@@ -1196,6 +1238,12 @@ class Client:
         file_path is a path to data. Supported extensions are mp4 (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
@@ -1253,6 +1301,12 @@ class Client:
         file_path is a path to data. Supported extensions are mp4 (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
@@ -1308,6 +1362,12 @@ class Client:
         file_path is a path to data. Supported extensions are pcd only (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
@@ -1363,6 +1423,12 @@ class Client:
         pcd only (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
@@ -1439,6 +1505,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
@@ -1477,6 +1549,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
@@ -1522,6 +1600,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
@@ -1563,6 +1647,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
@@ -1604,6 +1694,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         tags is a list of tag to be set (Optional).
@@ -1647,6 +1743,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
@@ -1688,6 +1790,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         tags is a list of tag to be set (Optional).
@@ -1731,6 +1839,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
@@ -1772,6 +1886,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         tags is a list of tag to be set (Optional).
@@ -1815,6 +1935,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
@@ -1856,6 +1982,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
@@ -1901,6 +2033,12 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
@@ -3608,6 +3746,8 @@ class Client:
             payload["externalReviewer"] = kwargs.get("external_reviewer")
         if "external_approver" in kwargs:
             payload["externalApprover"] = kwargs.get("external_approver")
+        if "priority" in kwargs:
+            payload["priority"] = kwargs.get("priority")
 
     def execute_endpoint(
         self,
