@@ -4,7 +4,7 @@ import logging
 import os
 import re
 from concurrent.futures import ThreadPoolExecutor
-from typing import List
+from typing import List, Literal
 
 import cv2
 import numpy as np
@@ -822,6 +822,58 @@ class Client:
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
+            payload["annotations"] = annotations
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
+    def create_integrated_image_task(
+        self,
+        project: str,
+        storage_type: Literal["gcp"],
+        file_path: str,
+        status: str = None,
+        external_status: str = None,
+        annotations: list = None,
+        tags: list = None,
+        **kwargs,
+    ) -> str:
+        """
+        Create a single integrated image task.
+
+        project is slug of your project (Required).
+        storage type is the type of storage where your file resides (Required). e.g.) gcp
+        file_path is a path to data in your setting storage bucket. Supported extensions are png, jpg, jpeg (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        annotations is a list of annotation to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/integrated-image"
+        if not utils.is_image_supported_ext(file_path):
+            raise FastLabelInvalidException(
+                "Supported extensions are png, jpg, jpeg.", 422
+            )
+
+        payload = {"project": project, "filePath": file_path, "storageType": storage_type}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if annotations:
+            for annotation in annotations:
+                annotation["content"] = file_path
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags

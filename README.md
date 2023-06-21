@@ -120,6 +120,51 @@ task_id = client.create_image_task(
 
 - You can upload up to a size of 20 MB.
 
+
+#### Create Integrated Image Task
+
+Create a new task by integrated image.
+(Project storage setting should be configured in advance.)
+
+```python
+task_id = client.create_integrated_image_task(
+    project="YOUR_PROJECT_SLUG",
+    file_path="<integrated-storage-dir>/sample.jpg",
+    storage_type="gcp",
+)
+```
+
+Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
+
+```python
+task_id = client.create_image_task(
+    project="YOUR_PROJECT_SLUG",
+    file_path="<integrated-storage-dir>/sample.jpg",
+    storage_type="gcp",  
+    annotations=[{
+        "type": "bbox",
+        "value": "annotation-value",
+        "attributes": [
+            {
+                "key": "attribute-key",
+                "value": "attribute-value"
+            }
+        ],
+        "points": [
+            100,  # top-left x
+            100,  # top-left y
+            200,  # bottom-right x
+            200   # bottom-right y
+        ]
+    }]
+)
+```
+
+##### Limitation
+
+- You can upload up to a size of 20 MB.
+
+
 #### Find Task
 
 Find a single task.
