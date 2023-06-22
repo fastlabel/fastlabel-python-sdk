@@ -29,6 +29,8 @@ def is_text_supported_ext(file_path: str) -> bool:
 def is_audio_supported_ext(file_path: str) -> bool:
     return file_path.lower().endswith((".mp3", ".wav", ".m4a"))
 
+def is_dicom_supported_ext(file_path: str) -> bool:
+    return file_path.lower().endswith((".zip"))
 
 def is_pcd_supported_ext(file_path: str) -> bool:
     # .ply is not yet supported. To support it, modification of the API
@@ -55,6 +57,8 @@ def is_text_supported_size(file_path: str) -> bool:
 def is_audio_supported_size(file_path: str) -> bool:
     return os.path.getsize(file_path) <= const.SUPPORTED_AUDIO_SIZE
 
+def is_dicom_supported_size(file_path: str) -> bool:
+    return os.path.getsize(file_path) <= const.SUPPORTED_DICOM_SIZE
 
 def is_pcd_supported_size(file_path: str) -> bool:
     return os.path.getsize(file_path) <= const.SUPPORTED_PCD_SIZE

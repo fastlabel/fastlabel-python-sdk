@@ -19,6 +19,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
   - [Audio Classification](#audio-classification)
   - [PCD](#pcd)
   - [Sequential PCD](#sequential-pcd)
+  - [DICOM](#dicom)
   - [Common](#common)
 - [Annotation](#annotation)
 - [Project](#project)
@@ -1739,6 +1740,98 @@ Example of a single Sequential PCD task object
 }
 ```
 
+### DICOM
+
+Supported following project types:
+
+- DICOM -Bounding Box
+
+#### Create Task
+
+Create a new task.
+You should receive task import history status [Find Task Import History](#find-task-import-history).
+Once you receive the status completed, you can get the task.
+
+```python
+history = client.create_dicom_task(
+    project="YOUR_PROJECT_SLUG",
+    file_path="./sample.zip"
+)
+```
+
+#### Limitation
+
+- You can upload up to a size of 2 GB per file.
+
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_dicom_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_dicom_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
+#### Get Tasks
+
+Get tasks. (Up to 1000 tasks)
+
+```python
+tasks = client.get_dicom_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Update Tasks
+
+Update a single task.
+
+```python
+task_id = client.update_dicom_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"]
+)
+```
+
+#### Response
+
+Example of a single dicom task object
+
+```python
+{
+    "id": "YOUR_TASK_ID",
+    "name": "dicom.zip",
+    "url": "YOUR_TASK_URL",
+    'height': 512,
+    'width': 512,
+    "status": "registered",
+    "externalStatus": "registered",
+    "tags": [],
+    "assignee": "ASSIGNEE_NAME",
+    "reviewer": "REVIEWER_NAME",
+    "externalAssignee": "EXTERNAL_ASSIGNEE_NAME",
+    "externalReviewer": "EXTERNAL_REVIEWER_NAME",
+    "annotations": [
+        {
+            "attributes": [],
+            "color": "#b36d18",
+            "contentId": "CONTENT_ID"
+            "points": [100, 200, 100, 200],
+            "title": "Heart",
+            "type": "bbox",
+            "value": "heart"
+        }
+    ],
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
+```
+
 ### Common
 
 APIs for update and delete are same over all tasks.
@@ -1816,6 +1909,34 @@ history = client.create_task_from_aws_s3(
 history = client.get_aws_s3_import_status_by_project(
     project="YOUR_PROJECT_SLUG",
 )
+```
+
+#### Find Task Import History
+
+Find a single history.
+
+```python
+history = client.find_history(history_id="YOUR_HISTORY_ID")
+```
+
+#### Get Task Import Histories
+
+```python
+histories = client.get_histories(project="YOUR_PROJECT_SLUG")
+```
+
+#### Response
+
+Example of a single history object
+
+```python
+{
+    "id": "YOUR_HISTORY_ID",
+    "storageType": "zip",
+    "status": "running",
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
 ```
 
 ## Annotation

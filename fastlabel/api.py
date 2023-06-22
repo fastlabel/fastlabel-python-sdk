@@ -118,3 +118,12 @@ class Api:
                 raise FastLabelInvalidException(error, r.status_code)
             else:
                 raise FastLabelException(error, r.status_code)
+
+    def upload_zipfile(
+        self,
+        url: str,
+        file_path: str,
+    ):
+        files = {'file': open(file_path, 'rb')}
+        return requests.put(url, files=files)
+
