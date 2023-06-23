@@ -96,6 +96,7 @@ task_id = client.create_image_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.jpg",
     file_path="./sample.jpg",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     annotations=[{
         "type": "bbox",
         "value": "annotation-value",
@@ -228,6 +229,7 @@ Update a single task.
 task_id = client.update_image_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
     annotations=[
@@ -261,6 +263,7 @@ Example of a single image task object
     "url": "YOUR_TASK_URL",
     "status": "registered",
     "externalStatus": "registered",
+    "priority": 10,
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
@@ -300,6 +303,7 @@ Example when the project type is Image - Pose Estimation
     "url": "YOUR_TASK_URL",
     "status": "registered",
     "externalStatus": "registered",
+    "priority": 10,
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
@@ -447,6 +451,7 @@ task_id = client.create_image_classification_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.jpg",
     file_path="./sample.jpg",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     attributes=[
         {
             "key": "attribute-key",
@@ -490,6 +495,7 @@ Update a single task.
 task_id = client.update_image_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
     attributes=[
@@ -514,6 +520,7 @@ Example of a single image classification task object
     "url": "YOUR_TASK_URL",
     "status": "registered",
     "externalStatus": "registered",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
@@ -551,6 +558,7 @@ task = client.create_multi_image_task(
     project="YOUR_PROJECT_SLUG",
     name="sample",
     folder_path="./sample",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     annotations=[{
         "type": "segmentation",
         "value": "annotation-value",
@@ -615,6 +623,7 @@ task_id = client.update_multi_image_task(
     status="approved",
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     annotations=[
         {
             "type": "bbox",
@@ -647,6 +656,7 @@ Example of a single task object
     ],
     "status": "registered",
     "externalStatus": "registered",
+    "priority": 10,
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
@@ -706,6 +716,7 @@ task_id = client.create_video_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.mp4",
     file_path="./sample.mp4",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     annotations=[{
         "type": "bbox",
         "value": "person",
@@ -778,6 +789,7 @@ Update a single task.
 task_id = client.update_video_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
     annotations=[{
@@ -859,6 +871,7 @@ Example of a single vide task object
     "url": "YOUR_TASK_URL",
     "status": "registered",
     "externalStatus": "registered",
+    "priority": 10,
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
@@ -922,6 +935,7 @@ task_id = client.create_video_classification_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.mp4",
     file_path="./sample.mp4",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     attributes=[
         {
             "key": "attribute-key",
@@ -965,6 +979,7 @@ Update a single task.
 task_id = client.update_video_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
     attributes=[
@@ -1001,6 +1016,7 @@ task_id = client.create_text_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.txt",
     file_path="./sample.txt",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     annotations=[{
         "type": "ner",
         "value": "person",
@@ -1045,6 +1061,7 @@ Update a single task.
 task_id = client.update_text_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
     annotations=[{
@@ -1068,6 +1085,7 @@ Example of a single text task object
     "url": "YOUR_TASK_URL",
     "status": "registered",
     "externalStatus": "registered",
+    "priority": 10,
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
@@ -1105,6 +1123,7 @@ task_id = client.create_text_classification_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.txt",
     file_path="./sample.txt",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     attributes=[
         {
             "key": "attribute-key",
@@ -1148,6 +1167,7 @@ Update a single task.
 task_id = client.update_text_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
     attributes=[
@@ -1184,6 +1204,7 @@ task_id = client.create_audio_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.mp3",
     file_path="./sample.mp3",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     annotations=[{
         "type": "segmentation",
         "value": "person",
@@ -1227,6 +1248,7 @@ Update a single task.
 task_id = client.update_audio_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
     annotations=[{
@@ -1249,6 +1271,7 @@ Example of a single audio task object
     "url": "YOUR_TASK_URL",
     "status": "registered",
     "externalStatus": "registered",
+    "priority": 10,
     "tags": [],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
@@ -1335,6 +1358,7 @@ task_id = client.create_audio_classification_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.mp3",
     file_path="./sample.mp3",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     attributes=[
         {
             "key": "attribute-key",
@@ -1378,6 +1402,7 @@ Update a single task.
 task_id = client.update_audio_classification_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
     attributes=[
@@ -1417,6 +1442,7 @@ task_id = client.create_pcd_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.pcd",
     file_path="./sample.pcd",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     annotations=[
         {
             "type": "cuboid",
@@ -1444,6 +1470,7 @@ task_id = client.create_pcd_task(
     project="YOUR_PROJECT_SLUG",
     name="sample.pcd",
     file_path="./sample.pcd",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     annotations=[
         {
             "type": "segmentation",
@@ -1488,6 +1515,7 @@ Update a single task.
 task_id = client.update_pcd_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
     annotations=[
@@ -1521,6 +1549,7 @@ Example of a single PCD task object
     "url": "YOUR_TASK_URL",
     "status": "registered",
     "externalStatus": "registered",
+    "priority": 10,
     "tags": ["tag1", "tag2"],
     "assignee": "ASSIGNEE_NAME",
     "reviewer": "REVIEWER_NAME",
@@ -1579,6 +1608,7 @@ task_id = client.create_sequential_pcd_task(
     project="YOUR_PROJECT_SLUG",
     name="drive_record",
     folder_path="./drive_record/",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     annotations=[
         {
             "type": "cuboid", # annotation class type
@@ -1668,6 +1698,7 @@ Update a single task.
 task_id = client.update_sequential_pcd_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     assignee="USER_SLUG",
     tags=["tag1", "tag2"],
     annotations=[
@@ -1719,6 +1750,7 @@ Example of a single Sequential PCD task object
     "name": "YOUR_TASK_NAME",
     "status": "registered",
     "externalStatus": "registered",
+    "priority": 10,
     "annotations": [
         {
             "id": "YOUR_TASK_ANNOTATION_ID",
@@ -1889,6 +1921,7 @@ Update a single task status, tags and assignee.
 task_id = client.update_task(
     task_id="YOUR_TASK_ID",
     status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
     tags=["tag1", "tag2"],
     assignee="USER_SLUG"
 )
