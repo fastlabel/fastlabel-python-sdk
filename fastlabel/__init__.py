@@ -20,6 +20,7 @@ from fastlabel.const import (
     POSE_ESTIMATION_MIN_STROKE_WIDTH,
     SEPARATOER,
     AnnotationType,
+    Priority,
 )
 
 from .api import Api
@@ -783,6 +784,7 @@ class Client:
         file_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -795,13 +797,13 @@ class Client:
         file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -826,6 +828,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
@@ -844,6 +848,7 @@ class Client:
         file_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -856,13 +861,13 @@ class Client:
         file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -887,6 +892,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -903,6 +910,7 @@ class Client:
         folder_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -917,13 +925,13 @@ class Client:
         are png, jpg, jpeg (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -974,6 +982,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if annotations:
             payload["annotations"] = annotations
         if tags:
@@ -990,6 +1000,7 @@ class Client:
         file_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -1002,13 +1013,13 @@ class Client:
         file_path is a path to data. Supported extensions are mp4 (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1033,6 +1044,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
@@ -1051,6 +1064,7 @@ class Client:
         file_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -1063,13 +1077,13 @@ class Client:
         file_path is a path to data. Supported extensions are mp4 (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1094,6 +1108,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -1110,6 +1126,7 @@ class Client:
         file_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -1122,13 +1139,13 @@ class Client:
         file_path is a path to data. Supported extensions are txt (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1151,6 +1168,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
@@ -1169,6 +1188,7 @@ class Client:
         file_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -1181,13 +1201,13 @@ class Client:
         file_path is a path to data. Supported extensions are mp4 (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1210,6 +1230,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -1226,6 +1248,7 @@ class Client:
         file_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -1238,13 +1261,13 @@ class Client:
         file_path is a path to data. Supported extensions are mp4 (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1271,6 +1294,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
@@ -1289,6 +1314,7 @@ class Client:
         file_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -1301,13 +1327,13 @@ class Client:
         file_path is a path to data. Supported extensions are mp4 (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1334,6 +1360,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -1350,6 +1378,7 @@ class Client:
         file_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -1362,13 +1391,13 @@ class Client:
         file_path is a path to data. Supported extensions are pcd only (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1391,6 +1420,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
@@ -1409,6 +1440,7 @@ class Client:
         folder_path: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -1423,13 +1455,13 @@ class Client:
         pcd only (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1480,6 +1512,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if annotations:
             payload["annotations"] = annotations
         if tags:
@@ -1496,6 +1530,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         tags: list = [],
         **kwargs,
     ) -> str:
@@ -1505,13 +1540,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
         assignee is slug of assigned user (Optional).
@@ -1527,6 +1562,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if tags:
             payload["tags"] = tags
 
@@ -1539,6 +1576,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -1549,13 +1587,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
@@ -1572,6 +1610,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if tags:
             payload["tags"] = tags
         if annotations:
@@ -1590,6 +1630,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -1600,13 +1641,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1623,6 +1664,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -1637,6 +1680,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -1647,13 +1691,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
@@ -1670,6 +1714,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if tags:
             payload["tags"] = tags
         if annotations:
@@ -1684,6 +1730,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -1694,13 +1741,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
@@ -1717,6 +1764,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if tags:
             payload["tags"] = tags
         if annotations:
@@ -1733,6 +1782,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -1743,13 +1793,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1766,6 +1816,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -1780,6 +1832,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -1790,13 +1843,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
@@ -1813,6 +1866,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if tags:
             payload["tags"] = tags
         if annotations:
@@ -1829,6 +1884,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -1839,13 +1895,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1862,6 +1918,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -1876,6 +1934,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -1886,13 +1945,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
@@ -1909,6 +1968,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if tags:
             payload["tags"] = tags
         if annotations:
@@ -1925,6 +1986,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -1935,13 +1997,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         attributes is a list of attribute to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
@@ -1958,6 +2020,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if attributes:
             payload["attributes"] = attributes
         if tags:
@@ -1972,6 +2036,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -1982,13 +2047,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
@@ -2005,6 +2070,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if tags:
             payload["tags"] = tags
         if annotations:
@@ -2023,6 +2090,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -2033,13 +2101,13 @@ class Client:
         task_id is an id of the task (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
             low = 10,
             medium = 20,
             high = 30,
-        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
@@ -2056,6 +2124,8 @@ class Client:
             payload["status"] = status
         if external_status:
             payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
         if tags:
             payload["tags"] = tags
         if annotations:
@@ -3746,8 +3816,6 @@ class Client:
             payload["externalReviewer"] = kwargs.get("external_reviewer")
         if "external_approver" in kwargs:
             payload["externalApprover"] = kwargs.get("external_approver")
-        if "priority" in kwargs:
-            payload["priority"] = kwargs.get("priority")
 
     def execute_endpoint(
         self,

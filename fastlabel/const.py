@@ -228,3 +228,10 @@ class AnnotationType(Enum):
     segmentation = "segmentation"
     classification = "classification"
     pose_estimation = "pose_estimation"
+
+class Priority(Enum):
+    none = 0
+    low = 10
+    medium = 20
+    high = 30
+
