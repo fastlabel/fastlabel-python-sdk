@@ -1911,7 +1911,7 @@ Example of a single dicom task object
 
 ### Common
 
-APIs for update and delete are same over all tasks.
+APIs for update and delete and count are same over all tasks.
 
 #### Update Task
 
@@ -1947,6 +1947,15 @@ client.delete_task_annotations(task_id="YOUR_TASK_ID")
 
 ```python
 id_name_map = client.get_task_id_name_map(project="YOUR_PROJECT_SLUG")
+```
+
+#### Count Task
+```python
+task_count = client.count_tasks(
+    project="YOUR_PROJECT_SLUG",
+    status="approved", # status can be 'pending', 'registered', 'completed', 'skipped', 'reviewed' 'sent_back', 'approved', 'declined'
+    tags=["tag1", "tag2"] # up to 10 tags
+)
 ```
 
 #### Create Task from S3

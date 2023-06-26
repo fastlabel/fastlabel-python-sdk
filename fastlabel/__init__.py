@@ -292,6 +292,34 @@ class Client:
 
     # Task Get
 
+    def count_tasks(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = None,
+    ) -> int:
+        """
+        Returns task count.
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined',
+        'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        """
+        endpoint = "tasks/count"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        return self.api.get_request(endpoint, params=params)
+
     def get_image_tasks(
         self,
         project: str,
