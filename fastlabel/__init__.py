@@ -4,7 +4,7 @@ import logging
 import os
 import re
 from concurrent.futures import ThreadPoolExecutor
-from typing import List, Literal
+from typing import List
 
 import cv2
 import numpy as np
@@ -943,7 +943,7 @@ class Client:
     def create_integrated_image_task(
         self,
         project: str,
-        storage_type: Literal["gcp"],
+        storage_type: str,
         file_path: str,
         status: str = None,
         external_status: str = None,
