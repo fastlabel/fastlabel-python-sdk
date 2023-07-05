@@ -10,7 +10,7 @@ _If you are using FastLabel prototype, please install version 0.2.2._
 - [Task](#task)
   - [Image](#image)
   - [Image Classification](#image-classification)
-  - [Multi Image](#multi-image)
+  - [Sequential Image](#sequential-image)
   - [Video](#video)
   - [Video Classification](#video-classification)
   - [Text](#text)
@@ -122,7 +122,6 @@ task_id = client.create_image_task(
 
 - You can upload up to a size of 20 MB.
 
-
 #### Create Integrated Image Task
 
 Create a new task by integrated image.
@@ -142,7 +141,7 @@ Create a new task with pre-defined annotations. (Class should be configured on y
 task_id = client.create_image_task(
     project="YOUR_PROJECT_SLUG",
     file_path="<integrated-storage-dir>/sample.jpg",
-    storage_type="gcp",  
+    storage_type="gcp",
     annotations=[{
         "type": "bbox",
         "value": "annotation-value",
@@ -165,7 +164,6 @@ task_id = client.create_image_task(
 ##### Limitation
 
 - You can upload up to a size of 20 MB.
-
 
 #### Find Task
 
@@ -539,22 +537,22 @@ Example of a single image classification task object
 }
 ```
 
-### Multi Image
+### Sequential Image
 
 Supported following project types:
 
-- Multi Image - Bounding Box
-- Multi Image - Polygon
-- Multi Image - Keypoint
-- Multi Image - Line
-- Multi Image - Segmentation
+- Sequential Image - Bounding Box
+- Sequential Image - Polygon
+- Sequential Image - Keypoint
+- Sequential Image - Line
+- Sequential Image - Segmentation
 
 #### Create Task
 
 Create a new task.
 
 ```python
-task = client.create_multi_image_task(
+task = client.create_sequential_image_task(
     project="YOUR_PROJECT_SLUG",
     name="sample",
     folder_path="./sample",
@@ -596,13 +594,13 @@ task = client.create_multi_image_task(
 Find a single task.
 
 ```python
-task = client.find_multi_image_task(task_id="YOUR_TASK_ID")
+task = client.find_sequential_image_task(task_id="YOUR_TASK_ID")
 ```
 
 Find a single task by name.
 
 ```python
-tasks = client.find_multi_image_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+tasks = client.find_sequential_image_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
 ```
 
 #### Get Tasks
@@ -610,7 +608,7 @@ tasks = client.find_multi_image_task_by_name(project="YOUR_PROJECT_SLUG", task_n
 Get tasks.
 
 ```python
-tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
+tasks = client.get_sequential_image_tasks(project="YOUR_PROJECT_SLUG")
 ```
 
 #### Update Task
@@ -618,7 +616,7 @@ tasks = client.get_multi_image_tasks(project="YOUR_PROJECT_SLUG")
 Update a single task.
 
 ```python
-task_id = client.update_multi_image_task(
+task_id = client.update_sequential_image_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     assignee="USER_SLUG",
@@ -1950,6 +1948,7 @@ id_name_map = client.get_task_id_name_map(project="YOUR_PROJECT_SLUG")
 ```
 
 #### Count Task
+
 ```python
 task_count = client.count_tasks(
     project="YOUR_PROJECT_SLUG",
