@@ -1054,6 +1054,62 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def create_integrated_image_classification_task(
+        self,
+        project: str,
+        file_path: str,
+        storage_type: str,
+        status: str = None,
+        external_status: str = None,
+        priority: Priority = None,
+        attributes: list = None,
+        tags: list = None,
+        **kwargs,
+    ) -> str:
+        """
+        Create a single integrated image classification task.
+
+        project is slug of your project (Required).
+        storage type is the type of storage where your file resides (Required). e.g.) gcp
+        file_path is a path to data in your setting storage bucket. Supported extensions are png, jpg, jpeg (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/integrated-image/classification"
+        payload = {"project": project, "filePath": file_path, "storageType": storage_type}
+        attributes = attributes or []
+        tags = tags or []
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
+        if attributes:
+            payload["attributes"] = attributes
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
     def create_sequential_image_task(
         self,
         project: str,
