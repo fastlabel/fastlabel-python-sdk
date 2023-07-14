@@ -463,6 +463,19 @@ task_id = client.create_image_classification_task(
 
 - You can upload up to a size of 20 MB.
 
+#### Create Integrated Image Classification Task
+
+Create a new classification task by integrated image.
+(Project storage setting should be configured in advance.)
+
+```python
+task_id = client.create_integrated_image_classification_task(
+    project="YOUR_PROJECT_SLUG",
+    file_path="<integrated-storage-dir>/sample.jpg",
+    storage_type="gcp",
+)
+```
+
 #### Find Task
 
 Find a single task.
