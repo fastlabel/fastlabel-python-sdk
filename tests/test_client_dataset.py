@@ -7,6 +7,12 @@ import pytest
 
 from fastlabel import Client, FastLabelInvalidException
 
+OBJECT_SIGNED_URL_KEY = "objectSignedUrl"
+
+
+def remove_object_signed_url(d: dict) -> dict:
+    return {k: v for k, v in d.items() if k != OBJECT_SIGNED_URL_KEY}
+
 
 @pytest.fixture
 def client() -> Client:
@@ -112,7 +118,9 @@ class TestImageDataset:
         # Act
         result = client.find_dataset_object(dataset_object_id=dataset_object["id"])
         # Assert
-        assert result == dataset_object
+        assert remove_object_signed_url(result) == remove_object_signed_url(
+            dataset_object
+        )
 
     def test_get_dataset_object(self, client: Client, testing_image_dataset: dict):
         # Arrange
@@ -132,45 +140,49 @@ class TestImageDataset:
         # Assert
         assert results is not None
         assert len(results) == 2
-        assert results[0] == dataset_object1
-        assert results[1] == dataset_object2
+        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
+            dataset_object1
+        )
+        assert remove_object_signed_url(results[1]) == remove_object_signed_url(
+            dataset_object2
+        )
 
     def test_delete_dataset_object(self, client: Client, testing_image_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_image.jpg"
-        dataset_object1 = client.create_image_dataset_object(
-            dataset_id=testing_image_dataset["id"],
-            name="test_image1.jpg",
-            file_path=str(target_file),
-        )
-        dataset_object2 = client.create_image_dataset_object(
-            dataset_id=testing_image_dataset["id"],
-            name="test_image2.jpg",
-            file_path=str(target_file),
-        )
-        dataset_object3 = client.create_image_dataset_object(
-            dataset_id=testing_image_dataset["id"],
-            name="test_image3.jpg",
-            file_path=str(target_file),
-        )
+        dataset_object_names = ["test_image1.jpg", "test_image2.jpg", "test_image3.jpg"]
+        created = [
+            client.create_image_dataset_object(
+                dataset_id=testing_image_dataset["id"],
+                name=name,
+                file_path=str(target_file),
+            )
+            for name in dataset_object_names
+        ]
         dataset_objects = client.get_dataset_objects(
             dataset_id=testing_image_dataset["id"]
         )
         assert dataset_objects is not None
         assert len(dataset_objects) == 3
-        assert dataset_objects[0] == dataset_object1
-        assert dataset_objects[1] == dataset_object2
-        assert dataset_objects[2] == dataset_object3
+        for i, dataset_object in enumerate(dataset_objects):
+            assert OBJECT_SIGNED_URL_KEY in dataset_object
+            assert OBJECT_SIGNED_URL_KEY in created[i]
+            assert remove_object_signed_url(dataset_object) == remove_object_signed_url(
+                created[i]
+            )
+
         # Act
         client.delete_dataset_objects(
             dataset_id=testing_image_dataset["id"],
-            dataset_object_ids=[dataset_object1["id"], dataset_object3["id"]],
+            dataset_object_ids=[created[0]["id"], created[2]["id"]],
         )
         # Assert
         results = client.get_dataset_objects(dataset_id=testing_image_dataset["id"])
         assert results is not None
         assert len(results) == 1
-        assert results[0] == dataset_object2
+        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
+            created[1]
+        )
 
 
 class TestVideoDataset:
@@ -240,7 +252,9 @@ class TestVideoDataset:
         # Act
         result = client.find_dataset_object(dataset_object_id=dataset_object["id"])
         # Assert
-        assert result == dataset_object
+        assert remove_object_signed_url(result) == remove_object_signed_url(
+            dataset_object
+        )
 
     def test_get_dataset_object(self, client: Client, testing_video_dataset: dict):
         # Arrange
@@ -260,45 +274,50 @@ class TestVideoDataset:
         # Assert
         assert results is not None
         assert len(results) == 2
-        assert results[0] == dataset_object1
-        assert results[1] == dataset_object2
+        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
+            dataset_object1
+        )
+        assert remove_object_signed_url(results[1]) == remove_object_signed_url(
+            dataset_object2
+        )
 
     def test_delete_dataset_object(self, client: Client, testing_video_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_video.mp4"
-        dataset_object1 = client.create_video_dataset_object(
-            dataset_id=testing_video_dataset["id"],
-            name="test_video1.mp4",
-            file_path=str(target_file),
-        )
-        dataset_object2 = client.create_video_dataset_object(
-            dataset_id=testing_video_dataset["id"],
-            name="test_video2.mp4",
-            file_path=str(target_file),
-        )
-        dataset_object3 = client.create_video_dataset_object(
-            dataset_id=testing_video_dataset["id"],
-            name="test_video3.mp4",
-            file_path=str(target_file),
-        )
+        dataset_object_names = ["test_video1.mp4", "test_video2.mp4", "test_video3.mp4"]
+        created = [
+            client.create_video_dataset_object(
+                dataset_id=testing_video_dataset["id"],
+                name=name,
+                file_path=str(target_file),
+            )
+            for name in dataset_object_names
+        ]
+
         dataset_objects = client.get_dataset_objects(
             dataset_id=testing_video_dataset["id"]
         )
         assert dataset_objects is not None
         assert len(dataset_objects) == 3
-        assert dataset_objects[0] == dataset_object1
-        assert dataset_objects[1] == dataset_object2
-        assert dataset_objects[2] == dataset_object3
+        for i, dataset_object in enumerate(dataset_objects):
+            assert OBJECT_SIGNED_URL_KEY in dataset_object
+            assert OBJECT_SIGNED_URL_KEY in created[i]
+            assert remove_object_signed_url(dataset_object) == remove_object_signed_url(
+                created[i]
+            )
+
         # Act
         client.delete_dataset_objects(
             dataset_id=testing_video_dataset["id"],
-            dataset_object_ids=[dataset_object1["id"], dataset_object3["id"]],
+            dataset_object_ids=[created[0]["id"], created[2]["id"]],
         )
         # Assert
         results = client.get_dataset_objects(dataset_id=testing_video_dataset["id"])
         assert results is not None
         assert len(results) == 1
-        assert results[0] == dataset_object2
+        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
+            created[1]
+        )
 
 
 class TestAudioDataset:
@@ -370,7 +389,9 @@ class TestAudioDataset:
         # Act
         result = client.find_dataset_object(dataset_object_id=dataset_object["id"])
         # Assert
-        assert result == dataset_object
+        assert remove_object_signed_url(result) == remove_object_signed_url(
+            dataset_object
+        )
 
     def test_get_dataset_object(self, client: Client, testing_audio_dataset: dict):
         # Arrange
@@ -390,45 +411,47 @@ class TestAudioDataset:
         # Assert
         assert results is not None
         assert len(results) == 2
-        assert results[0] == dataset_object1
-        assert results[1] == dataset_object2
+        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
+            dataset_object1
+        )
+        assert remove_object_signed_url(results[1]) == remove_object_signed_url(
+            dataset_object2
+        )
 
     def test_delete_dataset_object(self, client: Client, testing_audio_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_audio.mp3"
-        dataset_object1 = client.create_audio_dataset_object(
-            dataset_id=testing_audio_dataset["id"],
-            name="test_audio1.mp3",
-            file_path=str(target_file),
-        )
-        dataset_object2 = client.create_audio_dataset_object(
-            dataset_id=testing_audio_dataset["id"],
-            name="test_audio2.mp3",
-            file_path=str(target_file),
-        )
-        dataset_object3 = client.create_audio_dataset_object(
-            dataset_id=testing_audio_dataset["id"],
-            name="test_audio3.mp3",
-            file_path=str(target_file),
-        )
+        dataset_object_names = ["test_audio1.mp3", "test_audio2.mp3", "test_audio3.mp3"]
+        created = [
+            client.create_audio_dataset_object(
+                dataset_id=testing_audio_dataset["id"],
+                name=name,
+                file_path=str(target_file),
+            )
+            for name in dataset_object_names
+        ]
         dataset_objects = client.get_dataset_objects(
             dataset_id=testing_audio_dataset["id"]
         )
-        assert dataset_objects is not None
-        assert len(dataset_objects) == 3
-        assert dataset_objects[0] == dataset_object1
-        assert dataset_objects[1] == dataset_object2
-        assert dataset_objects[2] == dataset_object3
+        for i, dataset_object in enumerate(dataset_objects):
+            assert OBJECT_SIGNED_URL_KEY in dataset_object
+            assert OBJECT_SIGNED_URL_KEY in created[i]
+            assert remove_object_signed_url(dataset_object) == remove_object_signed_url(
+                created[i]
+            )
+
         # Act
         client.delete_dataset_objects(
             dataset_id=testing_audio_dataset["id"],
-            dataset_object_ids=[dataset_object1["id"], dataset_object3["id"]],
+            dataset_object_ids=[created[0]["id"], created[2]["id"]],
         )
         # Assert
         results = client.get_dataset_objects(dataset_id=testing_audio_dataset["id"])
         assert results is not None
         assert len(results) == 1
-        assert results[0] == dataset_object2
+        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
+            created[1]
+        )
 
 
 class TestDatasetObjectImportHistories:

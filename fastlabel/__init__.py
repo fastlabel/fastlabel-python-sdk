@@ -976,7 +976,11 @@ class Client:
                 "Supported extensions are png, jpg, jpeg.", 422
             )
 
-        payload = {"project": project, "filePath": file_path, "storageType": storage_type}
+        payload = {
+            "project": project,
+            "filePath": file_path,
+            "storageType": storage_type,
+        }
         if status:
             payload["status"] = status
         if external_status:
@@ -1607,13 +1611,10 @@ class Client:
         """
         endpoint = "tasks/dicom"
         if not utils.is_dicom_supported_ext(file_path):
-            raise FastLabelInvalidException(
-                "Supported extensions are zip.", 422
-            )
+            raise FastLabelInvalidException("Supported extensions are zip.", 422)
         if not utils.is_dicom_supported_size(file_path):
             raise FastLabelInvalidException("Supported image size is under 2 GB.", 422)
 
-        file = utils.base64_encode(file_path)
         payload = {"project": project}
         if status:
             payload["status"] = status
@@ -1624,8 +1625,12 @@ class Client:
 
         self.__fill_assign_users(payload, **kwargs)
 
-        signed_url = self.__get_signed_path(project = project, file_name = os.path.basename(file_path), file_type = "application/zip")
-        self.api.upload_zipfile(url = signed_url["url"], file_path = file_path)
+        signed_url = self.__get_signed_path(
+            project=project,
+            file_name=os.path.basename(file_path),
+            file_type="application/zip",
+        )
+        self.api.upload_zipfile(url=signed_url["url"], file_path=file_path)
 
         payload["fileKey"] = signed_url["name"]
         return self.api.post_request(endpoint, payload=payload)
@@ -3622,7 +3627,6 @@ class Client:
 
         return self.api.put_request(endpoint, payload=payload)
 
-
     def get_projects(
         self,
         slug: str = None,
@@ -3820,7 +3824,6 @@ class Client:
         type: str,
         name: str,
         slug: str,
-        annotation_type: str,
     ) -> dict:
         """
         Create a dataset.
@@ -3828,14 +3831,12 @@ class Client:
         type can be 'image', 'video', 'audio' (Required).
         name is name of your dataset (Required).
         slug is slug of your dataset (Required).
-        annotation_type can be 'none', 'image_bbox' (Required).
         """
         endpoint = "datasets"
         payload = {
             "type": type,
             "name": name,
             "slug": slug,
-            "annotationType": annotation_type,
         }
         return self.api.post_request(endpoint, payload=payload)
 
@@ -4188,11 +4189,10 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tasks/import/histories"
-        params = { "project": project }
+        params = {"project": project}
         if offset:
             params["offset"] = offset
         if limit:
             params["limit"] = limit
 
         return self.api.get_request(endpoint, params=params)
-
