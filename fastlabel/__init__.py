@@ -3922,7 +3922,6 @@ class Client:
         """
         endpoint = "dataset-objects"
         # TODO: add jfif, pjpeg, pjp?
-        print(file_path)
         if not utils.is_image_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are png, jpg, jpeg.", 422
