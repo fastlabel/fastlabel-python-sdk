@@ -469,21 +469,21 @@ class TestDatasetObjectImportHistories:
             file_path=str(target_file),
         )
         # Act
-        import_histoies = client.get_dataset_object_import_histories(
-            dataset_id=testing_image_dataset["id"]
+        import_histories = client.get_dataset_object_import_histories(
+            dataset_version_id=testing_image_dataset["version"]["id"]
         )
         # Assert
-        assert import_histoies is not None
-        assert len(import_histoies) == 2
-        assert import_histoies[0]["type"] == "local"
-        assert import_histoies[0]["status"] == "completed"
-        assert import_histoies[0]["msgCode"] == "none"
-        assert import_histoies[0]["msgLevel"] == "none"
-        assert import_histoies[0]["userName"] is not None
-        assert import_histoies[0]["count"] == 1
-        assert import_histoies[0]["type"] == "local"
-        assert import_histoies[0]["status"] == "completed"
-        assert import_histoies[0]["msgCode"] == "none"
-        assert import_histoies[0]["msgLevel"] == "none"
-        assert import_histoies[0]["userName"] is not None
-        assert import_histoies[0]["count"] == 1
+        assert import_histories is not None
+        assert len(import_histories) == 2
+        assert import_histories[0]["type"] == "local"
+        assert import_histories[0]["status"] == "completed"
+        assert import_histories[0]["msgCode"] == "none"
+        assert import_histories[0]["msgLevel"] == "none"
+        assert import_histories[0]["userName"] is not None
+        assert import_histories[0]["count"] == 1
+        assert import_histories[0]["type"] == "local"
+        assert import_histories[0]["status"] == "completed"
+        assert import_histories[0]["msgCode"] == "none"
+        assert import_histories[0]["msgLevel"] == "none"
+        assert import_histories[0]["userName"] is not None
+        assert import_histories[0]["count"] == 1

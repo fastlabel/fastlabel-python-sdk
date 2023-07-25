@@ -1096,7 +1096,11 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/integrated-image/classification"
-        payload = {"project": project, "filePath": file_path, "storageType": storage_type}
+        payload = {
+            "project": project,
+            "filePath": file_path,
+            "storageType": storage_type,
+        }
         attributes = attributes or []
         tags = tags or []
         if status:
@@ -3780,7 +3784,7 @@ class Client:
 
     def find_dataset(self, dataset_id: str) -> dict:
         """
-        Find a dataset.
+        Find a dataset with latest version.
         """
         endpoint = "datasets/" + dataset_id
         return self.api.get_request(endpoint)
@@ -3793,7 +3797,7 @@ class Client:
         limit: int = 100,
     ) -> list:
         """
-        Returns a list of datasets.
+        Returns a list of datasets with latest version.
 
         Returns up to 1000 at a time, to get more, set offset as the starting position
         to fetch.
@@ -3873,7 +3877,7 @@ class Client:
 
     def get_dataset_objects(
         self,
-        dataset_id: str = None,
+        dataset_version_id: str,
         keyword: str = None,
         offset: int = None,
         limit: int = 100,
@@ -3884,7 +3888,7 @@ class Client:
         Returns up to 1000 at a time, to get more, set offset as the starting position
         to fetch.
 
-        dataset_id is dataset object in dataset (Required).
+        dataset_version_id is dataset object in dataset version (Required).
         keyword are search terms in the dataset object name (Optional).
         offset is the starting position number to fetch (Optional).
         limit is the max number to fetch (Optional).
@@ -3894,7 +3898,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "dataset-objects"
-        params = {"datasetId": dataset_id}
+        params = {"datasetVersionId": dataset_version_id}
         if keyword:
             params["keyword"] = keyword
         if offset:
@@ -3905,19 +3909,20 @@ class Client:
 
     def create_image_dataset_object(
         self,
-        dataset_id: str,
+        dataset_version_id: str,
         name: str,
         file_path: str,
     ) -> dict:
         """
         Create a image dataset object.
 
-        dataset_id is dataset object in dataset (Required).
+        dataset_version_id is dataset object in dataset version (Required).
         name is an unique identifier of dataset object in your dataset (Required).
         file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
         """
         endpoint = "dataset-objects"
         # TODO: add jfif, pjpeg, pjp?
+        print(file_path)
         if not utils.is_image_supported_ext(file_path):
             raise FastLabelInvalidException(
                 "Supported extensions are png, jpg, jpeg.", 422
@@ -3926,7 +3931,7 @@ class Client:
             raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
 
         payload = {
-            "datasetId": dataset_id,
+            "datasetVersionId": dataset_version_id,
             "name": name,
             "file": utils.base64_encode(file_path),
             "type": "image",
@@ -3935,14 +3940,14 @@ class Client:
 
     def create_video_dataset_object(
         self,
-        dataset_id: str,
+        dataset_version_id: str,
         name: str,
         file_path: str,
     ) -> dict:
         """
         Create a video dataset object.
 
-        dataset_id is dataset object in dataset (Required).
+        dataset_version_id is dataset object in dataset version (Required).
         name is an unique identifier of dataset object in your dataset (Required).
         file_path is a path to data. Supported extensions are mp4 (Required).
         """
@@ -3956,7 +3961,7 @@ class Client:
             )
 
         payload = {
-            "datasetId": dataset_id,
+            "datasetVersionId": dataset_version_id,
             "name": name,
             "file": utils.base64_encode(file_path),
             "type": "video",
@@ -3965,14 +3970,14 @@ class Client:
 
     def create_audio_dataset_object(
         self,
-        dataset_id: str,
+        dataset_version_id: str,
         name: str,
         file_path: str,
     ) -> dict:
         """
         Create a audio dataset object.
 
-        dataset_id is dataset object in dataset (Required).
+        dataset_version_id is dataset object in dataset version (Required).
         name is an unique identifier of dataset object in your dataset (Required).
         file_path is a path to data. Supported extensions are mp3, wav, w4a (Required).
         """
@@ -3988,7 +3993,7 @@ class Client:
             )
 
         payload = {
-            "datasetId": dataset_id,
+            "datasetVersionId": dataset_version_id,
             "name": name,
             "file": utils.base64_encode(file_path),
             "type": "audio",
@@ -4007,17 +4012,17 @@ class Client:
 
     def get_dataset_object_import_histories(
         self,
-        dataset_id: str = None,
+        dataset_version_id: str,
         offset: int = None,
         limit: int = 5,
     ) -> list:
         """
-        Returns a list of dataset objects.
+        Returns a list of dataset object import histories.
 
         Returns up to 1000 at a time, to get more, set offset as the starting position
         to fetch.
 
-        dataset_id is import histories in dataset (Required).
+        dataset_version_id is import histories in dataset version (Required).
         offset is the starting position number to fetch (Optional).
         limit is the max number to fetch (Optional).
         """
@@ -4026,7 +4031,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "dataset-objects/imports/histories"
-        params = {"datasetId": dataset_id}
+        params = {"datasetVersionId": dataset_version_id}
         if offset:
             params["offset"] = offset
         if limit:
