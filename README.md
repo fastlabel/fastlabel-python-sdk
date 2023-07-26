@@ -2426,7 +2426,7 @@ There are type-specific methods. but they can be used in the same way.
 
 ```python
 dataset_object = client.create_image_dataset_object(
-    dataset_id="YOUR_DATASET_ID",
+    dataset_version_id="YOUR_DATASET_VERSION_ID",
     name="brushwood_dog.jpg",
     file_path="./brushwood_dog.jpg",
 )
@@ -2466,7 +2466,7 @@ Success response is the same as when created.
 Get all dataset object in the dataset. (Up to 1000 tasks)
 
 ```python
-dataset_objects = client.get_dataset_objects(dataset_id="YOUR_DATASET_ID")
+dataset_objects = client.get_dataset_objects(dataset_version_id="YOUR_DATASET_VERSION_ID")
 ```
 
 The success response is the same as when created, but it is an array.
@@ -2475,7 +2475,7 @@ You can filter by keywords.
 
 ```python
 dataset_objects = client.get_dataset_objects(
-    dataset_id="YOUR_DATASET_ID", keyword="dog"
+    dataset_version_id="YOUR_DATASET_VERSION_ID", keyword="dog"
 )
 ```
 
@@ -2503,7 +2503,7 @@ Get all import histories in the dataset. (Up to 1000 tasks)
 
 ```python
 datasets = client.get_dataset_object_import_histories(
-    dataset_id="YOUR_DATASET_ID"
+    dataset_version_id="YOUR_DATASET_VERSION_ID"
 )
 ```
 
