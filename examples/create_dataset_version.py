@@ -6,6 +6,6 @@ client = fastlabel.Client()
 
 dataset_version = client.create_dataset_version(
     dataset_id="YOUR_DATASET_ID",
-    version="1.5",
+    version="version",
 )
 pprint(dataset_version)

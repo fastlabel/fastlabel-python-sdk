@@ -2428,7 +2428,7 @@ client.get_dataset_attributes()
 You can filter by dataset_version_id.
 
 ```python
-datasets = client.get_dataset_attributes(
+client.get_dataset_attributes(
     dataset_version_id="YOUR_DATASET_VERSION_ID"
 )
 ```
@@ -2669,7 +2669,6 @@ See API docs for details.
             'datasetId': 'YOUR_DATASET_ID',
             'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
             'datasetVersionName': 'YOUR_DATASET_VERSION_NAME',
-            'datasetWorkspaceId': 'YOUR_DATASET_WORKSPACE_ID',
             'exportType': 'json',
             'id': 'YOUR_DATASET_EXPORT_ID',
             'msgCode': 'none',
@@ -2689,7 +2688,7 @@ See API docs for details.
 Create a new dataset version.
 
 ```python
-dataset_version = client.create_dataset_version(
+client.create_dataset_version(
     dataset_id="YOUR_DATASET_ID",
     version="1.1" # Only numeric characters + dot is available
 )
@@ -2702,7 +2701,7 @@ See API docs for details.
 ```python
 {
     'id': 'YOUR_DATASET_VERSION_ID',
-    'version': '1.0.0',
+    'version': '1.1',
     'clusters': None,
     'createdBy': 'example@fastlabel.ai',
     'datasetId': 'YOUR_DATASET_ID',
@@ -2719,7 +2718,7 @@ See API docs for details.
 Find a dataset version.
 
 ```python
-dataset = client.find_dataset_version(
+client.find_dataset_version(
     id="YOUR_DATASET_VERSION_ID"
 )
 ```

@@ -4179,7 +4179,7 @@ class Client:
         limit: int = 5,
     ) -> list:
         """
-        Returns a list of dataset versions.
+        Returns a list of dataset version create histories.
 
         Returns up to 1000 at a time, to get more, set offset as the starting position
         to fetch.
