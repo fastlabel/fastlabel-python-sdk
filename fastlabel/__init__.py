@@ -4049,40 +4049,6 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
-    def get_dataset_object_tags(
-        self, dataset_object_id: str = None, dataset_version_id: str = None
-    ) -> list:
-        """
-        Returns a list of dataset object tags.
-
-        dataset_object_id is id of your dataset object (Optional).
-        dataset_version_id is id of your dataset version (Optional).
-        """
-        endpoint = "dataset-objects/tags"
-        params = {}
-        if dataset_object_id:
-            params["datasetObjectId"] = dataset_object_id
-        if dataset_version_id:
-            params["datasetVersionId"] = dataset_version_id
-        return self.api.get_request(endpoint, params=params)
-
-    def get_dataset_object_attributes(
-        self, dataset_object_id: str = None, dataset_version_id: str = None
-    ) -> list:
-        """
-        Returns a list of dataset object attributes.
-
-        dataset_object_id is id of your dataset object (Optional).
-        dataset_version_id is id of your dataset version (Optional).
-        """
-        endpoint = "dataset-objects/attributes"
-        params = {}
-        if dataset_object_id:
-            params["datasetObjectId"] = dataset_object_id
-        if dataset_version_id:
-            params["datasetVersionId"] = dataset_version_id
-        return self.api.get_request(endpoint, params=params)
-
     def get_dataset_object_annotations(self, dataset_object_id: str) -> list:
         """
         Returns a list of dataset object annotations.
@@ -4156,30 +4122,6 @@ class Client:
             params["limit"] = limit
         if status:
             params["status"] = status
-        return self.api.get_request(endpoint, params=params)
-
-    def get_dataset_download_datasets(
-        self, offset: int = None, limit: int = 20
-    ) -> list:
-        """
-        Returns a list of dataset download datasets.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
-
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
-        """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        endpoint = "dataset-usages/download/datasets"
-        params = {}
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
     # Dataset Version
