@@ -2417,6 +2417,47 @@ Delete a single dataset.
 client.delete_dataset(dataset_id="YOUR_DATASET_ID")
 ```
 
+### Get Dataset Attribute
+
+Get all dataset attributes in the workspace.
+
+```python
+client.get_dataset_attributes()
+```
+
+You can filter by dataset_version_id.
+
+```python
+client.get_dataset_attributes(
+    dataset_version_id="YOUR_DATASET_VERSION_ID"
+)
+```
+
+#### Response Dataset Attribute
+
+See API docs for details.
+
+```python
+[
+    {
+        'name': {
+            'id': 'YOUR_DATASET_ATTRIBUTE_NAME_ID',
+            'name': 'Name',
+            'createdAt': '2022-10-31T02:20:00.248Z',
+            'updatedAt': '2022-10-31T02:20:00.248Z'
+        },
+        'values': [
+            {
+                'id': 'YOUR_DATASET_ATTRIBUTE_VALUE_ID',
+                'value': 'Value',
+                'createdAt': '2022-10-31T02:20:00.248Z',
+                'updatedAt': '2022-10-31T02:20:00.248Z'
+            }
+        ]
+    }
+]
+```
+
 ### Create Dataset Object
 
 Create object in the dataset.
@@ -2524,6 +2565,227 @@ See API docs for details.
         'createdAt': '2022-10-30T08:31:31.588Z',
         'updatedAt': '2022-11-02T07:36:07.636Z'
   }
+]
+```
+
+### Get Dataset Object Annotation
+
+Get dataset object annotations.
+
+```python
+client.get_dataset_object_annotations(
+    dataset_object_id="YOUR_DATASET_OBJECT_ID"
+)
+```
+
+#### Response Dataset Object Annotation
+
+See API docs for details.
+
+```python
+[
+    {
+        'id': 'YOUR_DATASET_OBJECT_ANNOTATION_ID',
+        "datasetVersionId": "YOUR_DATASET_VERSION_ID",
+        "datasetObjectId": "YOUR_DATASET_OBJECT_ID",
+        "datasetAnnotationClass": {
+            'id': 'YOUR_DATASET_ANNOTATION_CLASS_ID',
+            'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
+            'type': 'bbox',
+            'value': 'value',
+            'title': 'title',
+            'color': '#FF0000',
+            'order': 1,
+            'createdAt': '2022-10-30T08:31:31.588Z',
+            'updatedAt': '2022-11-02T07:36:07.636Z'
+        },
+        'createdAt': '2022-10-30T08:31:31.588Z',
+        'updatedAt': '2022-11-02T07:36:07.636Z'
+    }
+]
+```
+
+### Get Dataset Usage
+
+Get dataset usages. (Up to 1000 usages)
+
+```python
+client.get_dataset_usages()
+```
+
+#### Response Dataset Usage
+
+See API docs for details.
+
+```python
+[
+    {
+        'datasetId': 'YOUR_DATASET_ID',
+        'datasetName': 'YOUR_DATASET_NAME',
+        'datasetSlug': 'YOUR_DATASET_SLUG',
+        'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
+        'datasetVersionName': 'YOUR_DATASET_VERSION_NAME',
+        'downloadCount': 1,
+        'id': 'YOUR_DATASET_USAGE_ID'
+    }
+]
+```
+
+### Count Dataset Download
+
+Count dataset download.
+
+```python
+client.count_dataset_download()
+```
+
+### Get Dataset Download Requests
+
+Get dataset download requests. (Up to 1000 usages)
+
+```python
+client.get_dataset_download_requests()
+```
+
+You can filter by status.
+
+```python
+client.get_dataset_download_requests(
+    status="approvalPending" # status can be 'running', 'completed', 'failed', 'approvalPending', 'approved', 'rejected'
+)
+```
+
+#### Response Dataset Download Requests
+
+See API docs for details.
+
+```python
+[
+    {
+        'datasetName': 'YOUR_DATASET_NAME',
+        'exportDetail': {
+            'conditions': '{}',
+            'createdAt': '2023-07-28T07:02:27.736Z',
+            'datasetId': 'YOUR_DATASET_ID',
+            'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
+            'datasetVersionName': 'YOUR_DATASET_VERSION_NAME',
+            'exportType': 'json',
+            'id': 'YOUR_DATASET_EXPORT_ID',
+            'msgCode': 'none',
+            'name': '2023-07-28-16-02-27',
+            'requestUserName': 'DOWNLOAD_REQUEST_USER_NAME',
+            'status': 'approvalPending',
+            'storageType': 'local'
+        },
+        'requestUserEmail': 'example@fastlabel.ai',
+        'requestUserWorkspaceName': 'fastlabel'
+    }
+]
+```
+
+### Create Dataset Version
+
+Create a new dataset version.
+
+```python
+client.create_dataset_version(
+    dataset_id="YOUR_DATASET_ID",
+    version="1.1" # Only numeric characters + dot is available
+)
+```
+
+#### Response Dataset Version
+
+See API docs for details.
+
+```python
+{
+    'id': 'YOUR_DATASET_VERSION_ID',
+    'version': '1.1',
+    'clusters': None,
+    'createdBy': 'example@fastlabel.ai',
+    'datasetId': 'YOUR_DATASET_ID',
+    'description': [],
+    'tags': [],
+    'attributes': [],
+    'createdAt': '2023-07-28T09:54:28.147Z',
+    'updatedAt': '2023-07-28T09:54:28.147Z'
+}
+```
+
+### Find Dataset Version
+
+Find a dataset version.
+
+```python
+client.find_dataset_version(
+    id="YOUR_DATASET_VERSION_ID"
+)
+```
+
+Success response is the same as when created.
+
+### Get Dataset Versions
+
+Get dataset versions. (Up to 1000 versions)
+
+```python
+client.get_dataset_versions(
+    dataset_id="YOUR_DATASET_ID"
+)
+```
+
+#### Response Dataset Versions
+
+Success response is the same as when created.
+
+### Get Dataset Version Create Histories
+
+Get dataset version create histories. (Up to 1000 histories)
+
+```python
+client.get_dataset_version_create_histories(
+    dataset_id="YOUR_DATASET_ID"
+)
+```
+
+#### Response Dataset Version Create Histories
+
+See API docs for details.
+
+```python
+[
+    {
+        'id': 'YOUR_DATASET_CREATE_HISTORY_ID',
+        'status': 'completed',
+        'userName': 'example@fastlabel.ai',
+        'datasetId': 'YOUR_DATASET_ID',
+        'createdAt': '2023-07-28T05:29:34.618Z',
+        'destDatasetVersion': {
+            'attributes': [],
+            'clusters': None,
+            'createdAt': '2023-07-28T05:29:34.615Z',
+            'createdBy': 'example@fastlabel.ai',
+            'datasetId': 'YOUR_DATASET_ID',
+            'description': [],
+            'id': 'YOUR_DATASET_VERSION_ID',
+            'tags': [],
+            'updatedAt': '2023-07-28T05:29:34.615Z',
+            'version': '1.1'
+        },
+        'srcDatasetVersion': {
+            'attributes': [],
+            'clusters': None,
+            'createdAt': '2023-07-28T05:21:53.114Z',
+            'createdBy': 'example@fastlabel.ai',
+            'datasetId': 'YOUR_DATASET_ID',
+            'description': [],
+            'id': 'YOUR_DATASET_VERSION_ID',
+            'tags': [],
+            'updatedAt': '2023-07-28T05:21:53.114Z',
+            'version': '1'
+        }
+    },
 ]
 ```
 
