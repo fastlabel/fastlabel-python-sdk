@@ -4058,6 +4058,36 @@ class Client:
         endpoint = "dataset-objects/" + dataset_object_id + "/annotations"
         return self.api.get_request(endpoint)
 
+    def get_dataset_object_annotation_stats(self, dataset_version_id: str) -> list:
+        """
+        Return a dataset object annotation stats.
+
+        dataset_version_id is id in dataset version (Required).
+        """
+        endpoint = "dataset-objects/stats/annotations"
+        params = {"datasetVersionId": dataset_version_id}
+        return self.api.get_request(endpoint, params=params)
+
+    def get_dataset_object_tag_stats(self, dataset_version_id: str) -> list:
+        """
+        Return a dataset object tag stats.
+
+        dataset_version_id is id in dataset version (Required).
+        """
+        endpoint = "dataset-objects/stats/tags"
+        params = {"datasetVersionId": dataset_version_id}
+        return self.api.get_request(endpoint, params=params)
+
+    def get_dataset_object_attribute_stats(self, dataset_version_id: str) -> list:
+        """
+        Return a dataset object attribute stats.
+
+        dataset_version_id is id in dataset version (Required).
+        """
+        endpoint = "dataset-objects/stats/attributes"
+        params = {"datasetVersionId": dataset_version_id}
+        return self.api.get_request(endpoint, params=params)
+
     # Dataset Usage
 
     def get_dataset_usages(

@@ -2605,6 +2605,79 @@ See API docs for details.
 ]
 ```
 
+### Get Dataset Object Annotation Stats
+
+Get dataset object annotation stats.
+
+```python
+client.get_dataset_object_annotation_stats(
+    dataset_version_id="YOUR_DATASET_VERSION_ID"
+)
+```
+
+#### Response Dataset Object Annotation Stats
+
+See API docs for details.
+
+```python
+[
+    {
+        'count': 1,
+        'ratio': 100,
+        'value': 'value'
+    }
+]
+```
+
+### Get Dataset Object Tag Stats
+
+Get dataset object tag stats.
+
+```python
+client.get_dataset_object_tag_stats(
+    dataset_version_id="YOUR_DATASET_VERSION_ID"
+)
+```
+
+#### Response Dataset Object Tag Stats
+
+See API docs for details.
+
+```python
+[
+    {
+        'count': 1,
+        'ratio': 100,
+        'value': 'value'
+    }
+]
+```
+
+### Get Dataset Object Attribute Stats
+
+Get dataset object attribute stats.
+
+```python
+client.get_dataset_object_attribute_stats(
+    dataset_version_id="YOUR_DATASET_VERSION_ID"
+)
+```
+
+#### Response Dataset Object Attribute Stats
+
+See API docs for details.
+
+```python
+[
+    {
+        'count': 1,
+        'ratio': 100,
+        'name': 'name',
+        'value': 'value'
+    }
+]
+```
+
 ### Get Dataset Usage
 
 Get dataset usages. (Up to 1000 usages)
