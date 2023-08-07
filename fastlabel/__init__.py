@@ -3866,18 +3866,6 @@ class Client:
         endpoint = "datasets/" + dataset_id
         self.api.delete_request(endpoint)
 
-    def get_dataset_attributes(self, dataset_version_id: str = None) -> list:
-        """
-        Returns a list of dataset attributes.
-
-        dataset_version_id is id of your dataset version (Optional).
-        """
-        endpoint = "datasets/attributes"
-        params = {}
-        if dataset_version_id:
-            params["datasetVersionId"] = dataset_version_id
-        return self.api.get_request(endpoint, params=params)
-
     # Dataset Object
 
     def find_dataset_object(self, dataset_object_id: str) -> dict:

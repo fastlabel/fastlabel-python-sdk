@@ -2417,47 +2417,6 @@ Delete a single dataset.
 client.delete_dataset(dataset_id="YOUR_DATASET_ID")
 ```
 
-### Get Dataset Attribute
-
-Get all dataset attributes in the workspace.
-
-```python
-client.get_dataset_attributes()
-```
-
-You can filter by dataset_version_id.
-
-```python
-client.get_dataset_attributes(
-    dataset_version_id="YOUR_DATASET_VERSION_ID"
-)
-```
-
-#### Response Dataset Attribute
-
-See API docs for details.
-
-```python
-[
-    {
-        'name': {
-            'id': 'YOUR_DATASET_ATTRIBUTE_NAME_ID',
-            'name': 'Name',
-            'createdAt': '2022-10-31T02:20:00.248Z',
-            'updatedAt': '2022-10-31T02:20:00.248Z'
-        },
-        'values': [
-            {
-                'id': 'YOUR_DATASET_ATTRIBUTE_VALUE_ID',
-                'value': 'Value',
-                'createdAt': '2022-10-31T02:20:00.248Z',
-                'updatedAt': '2022-10-31T02:20:00.248Z'
-            }
-        ]
-    }
-]
-```
-
 ### Create Dataset Object
 
 Create object in the dataset.
@@ -2707,7 +2666,6 @@ See API docs for details.
     'datasetId': 'YOUR_DATASET_ID',
     'description': [],
     'tags': [],
-    'attributes': [],
     'createdAt': '2023-07-28T09:54:28.147Z',
     'updatedAt': '2023-07-28T09:54:28.147Z'
 }
@@ -2762,7 +2720,6 @@ See API docs for details.
         'datasetId': 'YOUR_DATASET_ID',
         'createdAt': '2023-07-28T05:29:34.618Z',
         'destDatasetVersion': {
-            'attributes': [],
             'clusters': None,
             'createdAt': '2023-07-28T05:29:34.615Z',
             'createdBy': 'example@fastlabel.ai',
@@ -2774,7 +2731,6 @@ See API docs for details.
             'version': '1.1'
         },
         'srcDatasetVersion': {
-            'attributes': [],
             'clusters': None,
             'createdAt': '2023-07-28T05:21:53.114Z',
             'createdBy': 'example@fastlabel.ai',
