@@ -2649,7 +2649,7 @@ Create a new dataset version.
 ```python
 client.create_dataset_version(
     dataset_id="YOUR_DATASET_ID",
-    version="1.1" # Only alphanumeric characters, dots, and hyphens are available
+    version="1.1" # Only alphanumeric characters, dots, and hyphens are available. Dots and hyphens cannot begin or end.
 )
 ```
 
