@@ -4,7 +4,5 @@ import fastlabel
 
 client = fastlabel.Client()
 
-dataset = client.create_dataset(
-    name="Japanese Dogs", slug="japanese-dogs", type="image"
-)
+dataset = client.create_dataset(name="object-detection", type="image")
 pprint(dataset)

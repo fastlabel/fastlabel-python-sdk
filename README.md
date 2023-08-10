@@ -2343,8 +2343,7 @@ Create a new dataset.
 
 ```python
 dataset = client.create_dataset(
-    name="Japanese Dogs",
-    slug="japanese-dogs",
+    name="object-detection", # Only lowercase alphanumeric characters + hyphen is available
     type="image"
 )
 ```
@@ -2356,8 +2355,7 @@ See API docs for details.
 ```python
 {
     'id': 'YOUR_DATASET_ID',
-    'name': 'Japanese Dogs',
-    'slug': 'japanese-dogs',
+    'name': 'object-detection',
     'type': 'image',
     'createdAt': '2022-10-31T02:20:00.248Z',
     'updatedAt': '2022-10-31T02:20:00.248Z'
@@ -2394,18 +2392,6 @@ datasets = client.get_datasets(
 ```
 
 If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get-tasks).
-
-### Update Dataset
-
-Update a single dataset.
-
-```python
-dataset = client.update_dataset(
-    dataset_id="YOUR_DATASET_ID", name="World dogs"
-)
-```
-
-Success response is the same as when created.
 
 ### Delete Dataset
 
