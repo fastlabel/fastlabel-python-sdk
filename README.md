@@ -2567,7 +2567,6 @@ See API docs for details.
     {
         'datasetId': 'YOUR_DATASET_ID',
         'datasetName': 'YOUR_DATASET_NAME',
-        'datasetSlug': 'YOUR_DATASET_SLUG',
         'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
         'datasetVersionName': 'YOUR_DATASET_VERSION_NAME',
         'downloadCount': 1,
