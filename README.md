@@ -2396,7 +2396,6 @@ Create a new dataset.
 dataset = client.create_dataset(
     name="Japanese Dogs",
     slug="japanese-dogs",
-    type="image"
 )
 ```
 
@@ -2439,7 +2438,6 @@ You can filter by type and keywords.
 
 ```python
 datasets = client.get_datasets(
-    type="image", # 'image', 'video', 'audio'
     keyword="dog"
 )
 ```

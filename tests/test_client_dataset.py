@@ -23,7 +23,7 @@ def client() -> Client:
 def testing_image_dataset(client: Client) -> dict:
     # Arrange
     name = f"test-{uuid4()}"
-    dataset = client.create_dataset(name=name, slug=name, type="image")
+    dataset = client.create_dataset(name=name, slug=name)
     yield dataset
     # Cleanup
     client.delete_dataset(dataset_id=dataset["id"])
@@ -33,7 +33,7 @@ def testing_image_dataset(client: Client) -> dict:
 def testing_video_dataset(client: Client) -> dict:
     # Arrange
     name = f"test-{uuid4()}"
-    dataset = client.create_dataset(name=name, slug=name, type="video")
+    dataset = client.create_dataset(name=name, slug=name)
     yield dataset
     # Cleanup
     client.delete_dataset(dataset_id=dataset["id"])
@@ -43,7 +43,7 @@ def testing_video_dataset(client: Client) -> dict:
 def testing_audio_dataset(client: Client) -> dict:
     # Arrange
     name = f"test-{uuid4()}"
-    dataset = client.create_dataset(name=name, slug=name, type="audio")
+    dataset = client.create_dataset(name=name, slug=name)
     yield dataset
     # Cleanup
     client.delete_dataset(dataset_id=dataset["id"])
@@ -99,7 +99,7 @@ class TestImageDataset:
         with pytest.raises(
             expected_exception=FastLabelInvalidException,
             match=re.escape(
-                "<Response [422]> Supported extensions are png, jpg, jpeg."
+                "<Response [422]> Supported extensions are png, jpg, jpeg, bmp."
             ),
         ) as _:
             client.create_image_dataset_object(

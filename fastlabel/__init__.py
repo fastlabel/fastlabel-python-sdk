@@ -3831,7 +3831,6 @@ class Client:
     def get_datasets(
         self,
         keyword: str = None,
-        type: str = None,
         offset: int = None,
         limit: int = 100,
     ) -> list:
@@ -3842,7 +3841,6 @@ class Client:
         to fetch.
 
         keyword are search terms in the dataset slug (Optional).
-        type is type of your dataset (Optional).
         offset is the starting position number to fetch (Optional).
         limit is the max number to fetch (Optional).
         """
@@ -3864,20 +3862,17 @@ class Client:
 
     def create_dataset(
         self,
-        type: str,
         name: str,
         slug: str,
     ) -> dict:
         """
         Create a dataset.
 
-        type can be 'image', 'video', 'audio' (Required).
         name is name of your dataset (Required).
         slug is slug of your dataset (Required).
         """
         endpoint = "datasets"
         payload = {
-            "type": type,
             "name": name,
             "slug": slug,
         }
@@ -3956,14 +3951,17 @@ class Client:
         Create a image dataset object.
 
         dataset_version_id is dataset object in dataset version (Required).
-        name is an unique identifier of dataset object in your dataset (Required).
         file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
         """
         endpoint = "dataset-objects"
         # TODO: add jfif, pjpeg, pjp?
         if not utils.is_image_supported_ext(file_path):
             raise FastLabelInvalidException(
-                "Supported extensions are png, jpg, jpeg.", 422
+                "Supported extensions are png, jpg, jpeg, bmp.", 422
+            )
+        if not utils.is_image_supported_ext(name):
+            raise FastLabelInvalidException(
+                "name must end with supported extensions.", 422
             )
         if not utils.is_image_supported_size(file_path):
             raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
@@ -3972,7 +3970,6 @@ class Client:
             "datasetVersionId": dataset_version_id,
             "name": name,
             "file": utils.base64_encode(file_path),
-            "type": "image",
         }
         return self.api.post_request(endpoint, payload=payload)
 
@@ -3993,6 +3990,10 @@ class Client:
         # TODO: add m4v, mov, avi?
         if not utils.is_video_supported_ext(file_path):
             raise FastLabelInvalidException("Supported extensions are mp4.", 422)
+        if not utils.is_video_supported_ext(name):
+            raise FastLabelInvalidException(
+                "name must end with supported extensions.", 422
+            )
         if not utils.is_video_supported_size(file_path):
             raise FastLabelInvalidException(
                 "Supported video size is under 250 MB.", 422
@@ -4002,7 +4003,6 @@ class Client:
             "datasetVersionId": dataset_version_id,
             "name": name,
             "file": utils.base64_encode(file_path),
-            "type": "video",
         }
         return self.api.post_request(endpoint, payload=payload)
 
@@ -4025,6 +4025,10 @@ class Client:
             raise FastLabelInvalidException(
                 "Supported extensions are mp3, wav and w4a.", 422
             )
+        if not utils.is_audio_supported_ext(name):
+            raise FastLabelInvalidException(
+                "name must end with supported extensions.", 422
+            )
         if not utils.is_audio_supported_size(file_path):
             raise FastLabelInvalidException(
                 "Supported audio size is under 120 MB.", 422
@@ -4034,7 +4038,6 @@ class Client:
             "datasetVersionId": dataset_version_id,
             "name": name,
             "file": utils.base64_encode(file_path),
-            "type": "audio",
         }
         return self.api.post_request(endpoint, payload=payload)
 
