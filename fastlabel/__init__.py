@@ -3780,6 +3780,45 @@ class Client:
         endpoint = "projects/copy"
         return self.api.post_request(endpoint, payload=payload)
 
+    # Tags
+
+    def get_tags(
+        self,
+        project: str,
+        keyword: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of tags.
+        Returns up to 1000 at a time, to get more,
+        project is slug of your project (Required).
+        keyword are search terms in the tag name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "tags"
+        params = {"project": project}
+        if keyword:
+            params["keyword"] = keyword
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def delete_tags(self, tag_ids: List[str]) -> None:
+        """
+        Delete a tags.
+        """
+        endpoint = "tags/delete/multi"
+        payload = {"tagIds": tag_ids}
+        self.api.post_request(endpoint, payload=payload)
+
     # Dataset
 
     def find_dataset(self, dataset_id: str) -> dict:
