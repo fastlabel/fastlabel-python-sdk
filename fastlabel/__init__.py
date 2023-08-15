@@ -3772,7 +3772,7 @@ class Client:
         endpoint = "projects/copy"
         return self.api.post_request(endpoint, payload=payload)
 
-    # Project Tags
+    # Tags
 
     def get_tags(
         self,
