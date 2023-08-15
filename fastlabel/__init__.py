@@ -3782,7 +3782,7 @@ class Client:
         limit: int = 100,
     ) -> list:
         """
-        Returns a list of project tags.
+        Returns a list of tags.
         Returns up to 1000 at a time, to get more,
         project is slug of your project (Required).
         keyword are search terms in the tag name (Optional).
