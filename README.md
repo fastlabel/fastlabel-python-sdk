@@ -2335,6 +2335,57 @@ Copy a project.
 project_id = client.copy_project(project_id="YOUR_PROJECT_ID")
 ```
 
+## Tags
+
+### Get Tags
+
+Get tags. (Up to 1000 tags)
+
+keyword are search terms in the tag name (Optional).
+offset is the starting position number to fetch (Optional).
+limit is the max number to fetch (Optional).
+
+If you need to fetch more than 1000 tags, please loop this method using offset and limit.
+In the sample code below, you can fetch 1000 tags starting from the 2001st position.
+
+```python
+projects = client.get_tags(
+    project="YOUR_PROJECT_SLUG",
+    keyword="dog", # (Optional)
+    offset=2000,  # (Optional)
+    limit=1000,  # (Optional. Default is 100.)
+)
+```
+
+### Response
+
+Example of tags object
+
+```python
+[
+    {
+        "id": "YOUR_TAG_ID",
+        "name": "YOUR_TAG_NAME",
+        "order": 1,
+        "createdAt": "2023-08-14T11: 32: 36.462Z",
+        "updatedAt": "2023-08-14T11: 32: 36.462Z"
+    }
+]
+```
+
+### Delete Tags
+
+Delete tags.
+
+```python
+client.delete_tags(
+    tag_ids=[
+        "YOUR_TAG_ID_1",
+        "YOUR_TAG_ID_2",
+    ],
+)
+```
+
 ## Dataset
 
 ### Create Dataset
@@ -2697,7 +2748,7 @@ Supported bbox annotation type.
 
 Convert annotation file of YOLO format as a Fastlabel format and create task.
 
-classes_file_path: YOLO classes text file path  
+classes_file_path: YOLO classes text file path
 dataset_folder_path: Folder path containing YOLO Images and annotation
 
 ```python
