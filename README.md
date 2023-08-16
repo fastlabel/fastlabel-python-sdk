@@ -3192,18 +3192,10 @@ client.create_model_monitoring_request_results(
             "status": "success",  # success or failed
             "result": [
                 {
-                    "annotationIndex": 0,  # The index of the inference class returned by your model
                     "value": "person",  # The value of the inference class returned by your model
-                    "points": [
-                        12.98,
-                        23.84,
-                        140.83,
-                        165.82,
-                    ],  # [x_min, y_min, x_max,y_max]
                     "confidenceScore": 0.92,  # 0 ~ 1
                 }
             ],
-            "resultSchema": "object_detection_base",  # Currently, only 'object_detection_base' can be selected.
             "requestAt": dt_jst.isoformat(),  # The time when your endpoint accepted the request
         }
     ],
