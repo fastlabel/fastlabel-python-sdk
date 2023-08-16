@@ -2408,7 +2408,6 @@ See API docs for details.
     'id': 'YOUR_DATASET_ID',
     'name': 'Japanese Dogs',
     'slug': 'japanese-dogs',
-    'type': 'image',
     'createdAt': '2022-10-31T02:20:00.248Z',
     'updatedAt': '2022-10-31T02:20:00.248Z'
 }
@@ -2564,7 +2563,6 @@ See API docs for details.
 [
     {
         'id': 'YOUR_DATASET_OBJECT_IMPORT_HISTORY_ID',
-        'type': 'local',
         'status': 'completed',
         'msgCode': 'none',
         'msgLevel': 'none',
