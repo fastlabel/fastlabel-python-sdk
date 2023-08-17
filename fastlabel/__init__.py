@@ -3841,6 +3841,20 @@ class Client:
         }
         return self.api.post_request(endpoint, payload=payload)
 
+    def update_dataset(
+        self,
+        dataset_id: str,
+        name: str = None,
+    ) -> dict:
+        """
+        Update a dataset.
+        dataset_id is an id of the dataset (Required).
+        name is name of your dataset (Required).
+        """
+        endpoint = "datasets/" + dataset_id
+        payload = {"name": name}
+        return self.api.put_request(endpoint, payload=payload)
+
     def delete_dataset(self, dataset_id: str) -> None:
         """
         Delete a dataset.

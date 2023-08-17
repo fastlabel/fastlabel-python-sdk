@@ -2393,6 +2393,18 @@ datasets = client.get_datasets(
 
 If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get-tasks).
 
+### Update Dataset
+
+Update a single dataset.
+
+```python
+dataset = client.update_dataset(
+    dataset_id="YOUR_DATASET_ID", name="object-detection"
+)
+```
+
+Success response is the same as when created.
+
 ### Delete Dataset
 
 Delete a single dataset.
