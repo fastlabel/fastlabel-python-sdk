@@ -3848,6 +3848,7 @@ class Client:
     ) -> dict:
         """
         Update a dataset.
+
         dataset_id is an id of the dataset (Required).
         name is name of your dataset (Required).
         """
