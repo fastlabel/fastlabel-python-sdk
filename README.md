@@ -1,7 +1,5 @@
 # FastLabel Python SDK
 
-_If you are using FastLabel prototype, please install version 0.2.2._
-
 ## Table of Contents
 
 - [Installation](#installation)
