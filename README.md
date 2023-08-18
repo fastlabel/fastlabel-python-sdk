@@ -2440,7 +2440,7 @@ datasets = client.get_datasets(
 )
 ```
 
-If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get-tasks).
+If you wish to retrieve more than 1000 datasets, please refer to the Task [sample code](#get-tasks).
 
 ### Update Dataset
 
