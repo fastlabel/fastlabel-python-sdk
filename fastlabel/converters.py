@@ -74,6 +74,7 @@ def to_coco(
                     "annotation_type": annotation["type"],
                     "annotation_points": get_annotation_points(annotation, index),
                     "annotation_keypoints": annotation.get("keypoints"),
+                    "annotation_attributes": annotation.get("attributes"),
                     "categories": categories,
                     "image_id": task_image["id"],
                 }
@@ -204,6 +205,7 @@ def __to_coco_annotation(data: dict) -> dict:
     annotation_type = data["annotation_type"]
     annotation_value = data["annotation_value"]
     annotation_id = 0
+    annotation_attributes = data["annotation_attributes"]
 
     if annotation_type not in [
         AnnotationType.bbox.value,
@@ -226,7 +228,7 @@ def __to_coco_annotation(data: dict) -> dict:
         return None
 
     return __get_coco_annotation(
-        annotation_id, points, keypoints, category["id"], image_id, annotation_type
+        annotation_id, points, keypoints, category["id"], image_id, annotation_type, annotation_attributes
     )
 
 
@@ -259,6 +261,7 @@ def __get_coco_annotation(
     category_id: int,
     image_id: str,
     annotation_type: str,
+    annotation_attributes: dict[str, any],
 ) -> dict:
     annotation = {}
     annotation["num_keypoints"] = len(keypoints) if keypoints else 0
@@ -272,6 +275,7 @@ def __get_coco_annotation(
     annotation["bbox"] = __to_bbox(annotation_type, points)
     annotation["category_id"] = category_id
     annotation["id"] = id_
+    annotation["attributes"] = annotation_attributes
     return annotation
 
 
