@@ -74,7 +74,9 @@ def to_coco(
                     "annotation_type": annotation["type"],
                     "annotation_points": get_annotation_points(annotation, index),
                     "annotation_keypoints": annotation.get("keypoints"),
-                    "annotation_attributes": annotation.get("attributes"),
+                    "annotation_attributes": _get_coco_annotation_attributes(
+                        annotation
+                    ),
                     "categories": categories,
                     "image_id": task_image["id"],
                 }
@@ -228,7 +230,13 @@ def __to_coco_annotation(data: dict) -> dict:
         return None
 
     return __get_coco_annotation(
-        annotation_id, points, keypoints, category["id"], image_id, annotation_type, annotation_attributes
+        annotation_id,
+        points,
+        keypoints,
+        category["id"],
+        image_id,
+        annotation_type,
+        annotation_attributes,
     )
 
 
@@ -852,6 +860,12 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
 
         annotations = []
         for target_coco_annotation in target_coco_annotations:
+            attributes = [
+                {"key": attribute_key, "value": attribute_value}
+                for attribute_key, attribute_value in target_coco_annotation[
+                    "attributes"
+                ].items()
+            ]
             category_name = coco_categories[target_coco_annotation["category_id"]]
             if not category_name:
                 return
@@ -871,6 +885,7 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
                         "value": category_name,
                         "points": segmentation,
                         "type": annotation_type,
+                        "attributes": attributes,
                     }
                 )
             elif annotation_type == AnnotationType.pose_estimation.value:
@@ -902,6 +917,7 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
                         "value": category_name,
                         "type": annotation_type,
                         "keypoints": keypoints,
+                        "attributes": attributes,
                     }
                 )
             else:
@@ -1111,3 +1127,13 @@ def _get_annotation_points_for_video_annotation(annotation: dict, index: int):
 
 def _get_annotation_points_for_image_annotation(annotation: dict):
     return annotation.get("points")
+
+
+def _get_coco_annotation_attributes(annotation: dict) -> dict[str, any]:
+    coco_attributes = {}
+    attributes = annotation.get("attributes")
+    if not attributes:
+        return coco_attributes
+    for attribute in attributes:
+        coco_attributes[attribute["key"]] = attribute["value"]
+    return coco_attributes
