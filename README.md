@@ -2392,8 +2392,7 @@ Create a new dataset.
 
 ```python
 dataset = client.create_dataset(
-    name="Japanese Dogs",
-    slug="japanese-dogs",
+    name="object-detection", # Only lowercase alphanumeric characters + hyphen is available
     type="image"
 )
 ```
@@ -2405,8 +2404,7 @@ See API docs for details.
 ```python
 {
     'id': 'YOUR_DATASET_ID',
-    'name': 'Japanese Dogs',
-    'slug': 'japanese-dogs',
+    'name': 'object-detection',
     'type': 'image',
     'createdAt': '2022-10-31T02:20:00.248Z',
     'updatedAt': '2022-10-31T02:20:00.248Z'
@@ -2450,7 +2448,7 @@ Update a single dataset.
 
 ```python
 dataset = client.update_dataset(
-    dataset_id="YOUR_DATASET_ID", name="World dogs"
+    dataset_id="YOUR_DATASET_ID", name="object-detection"
 )
 ```
 
@@ -2630,7 +2628,6 @@ See API docs for details.
     {
         'datasetId': 'YOUR_DATASET_ID',
         'datasetName': 'YOUR_DATASET_NAME',
-        'datasetSlug': 'YOUR_DATASET_SLUG',
         'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
         'datasetVersionName': 'YOUR_DATASET_VERSION_NAME',
         'downloadCount': 1,
