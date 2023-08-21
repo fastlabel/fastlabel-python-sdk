@@ -1,5 +1,5 @@
 import math
-from typing import Union
+from typing import Union, List
 from enum import Enum
 
 # only 57 types
@@ -222,7 +222,7 @@ SUPPORTED_PCD_SIZE = 30 * math.pow(1024, 2)
 
 SUPPORTED_INFERENCE_IMAGE_SIZE = 6 * math.pow(1024, 2)
 
-AttributeValue = Union[str, list[str], float, list[float]]
+AttributeValue = Union[str, List[str], float, List[float]]
 
 
 class AnnotationType(Enum):
