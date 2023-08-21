@@ -2644,50 +2644,6 @@ Count dataset download.
 client.count_dataset_download()
 ```
 
-### Get Dataset Download Requests
-
-Get dataset download requests. (Up to 1000 usages)
-
-```python
-client.get_dataset_download_requests()
-```
-
-You can filter by status.
-
-```python
-client.get_dataset_download_requests(
-    status="approvalPending" # status can be 'running', 'completed', 'failed', 'approvalPending', 'approved', 'rejected'
-)
-```
-
-#### Response Dataset Download Requests
-
-See API docs for details.
-
-```python
-[
-    {
-        'datasetName': 'YOUR_DATASET_NAME',
-        'exportDetail': {
-            'conditions': '{}',
-            'createdAt': '2023-07-28T07:02:27.736Z',
-            'datasetId': 'YOUR_DATASET_ID',
-            'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
-            'datasetVersionName': 'YOUR_DATASET_VERSION_NAME',
-            'exportType': 'json',
-            'id': 'YOUR_DATASET_EXPORT_ID',
-            'msgCode': 'none',
-            'name': '2023-07-28-16-02-27',
-            'requestUserName': 'DOWNLOAD_REQUEST_USER_NAME',
-            'status': 'approvalPending',
-            'storageType': 'local'
-        },
-        'requestUserEmail': 'example@fastlabel.ai',
-        'requestUserWorkspaceName': 'fastlabel'
-    }
-]
-```
-
 ## Converter
 
 ### FastLabel To COCO

@@ -4117,37 +4117,6 @@ class Client:
         endpoint = "dataset-usages/download/count"
         return self.api.get_request(endpoint)
 
-    def get_dataset_download_requests(
-        self,
-        offset: int = None,
-        limit: int = 20,
-        status: str = "approvalPending",
-    ) -> list:
-        """
-        Returns a list of dataset download requests.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
-
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
-        status can be 'running', 'completed', 'failed',
-        'approvalPending', 'approved', 'rejected' (default: approvalPending) (Optional).
-        """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        endpoint = "dataset-usages/download/requests"
-        params = {}
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
-        if status:
-            params["status"] = status
-        return self.api.get_request(endpoint, params=params)
-
     def update_aws_s3_storage(
         self, project: str, bucket_name: str, bucket_region: str, prefix: str = None
     ) -> str:
