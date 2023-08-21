@@ -4073,15 +4073,6 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
-    def get_dataset_object_annotations(self, dataset_object_id: str) -> list:
-        """
-        Returns a list of dataset object annotations.
-
-        dataset_object_id is id of your dataset object (Required).
-        """
-        endpoint = "dataset-objects/" + dataset_object_id + "/annotations"
-        return self.api.get_request(endpoint)
-
     def update_aws_s3_storage(
         self, project: str, bucket_name: str, bucket_region: str, prefix: str = None
     ) -> str:

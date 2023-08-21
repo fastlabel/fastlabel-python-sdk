@@ -2574,43 +2574,6 @@ See API docs for details.
 ]
 ```
 
-### Get Dataset Object Annotation
-
-Get dataset object annotations.
-
-```python
-client.get_dataset_object_annotations(
-    dataset_object_id="YOUR_DATASET_OBJECT_ID"
-)
-```
-
-#### Response Dataset Object Annotation
-
-See API docs for details.
-
-```python
-[
-    {
-        'id': 'YOUR_DATASET_OBJECT_ANNOTATION_ID',
-        "datasetVersionId": "YOUR_DATASET_VERSION_ID",
-        "datasetObjectId": "YOUR_DATASET_OBJECT_ID",
-        "datasetAnnotationClass": {
-            'id': 'YOUR_DATASET_ANNOTATION_CLASS_ID',
-            'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
-            'type': 'bbox',
-            'value': 'value',
-            'title': 'title',
-            'color': '#FF0000',
-            'order': 1,
-            'createdAt': '2022-10-30T08:31:31.588Z',
-            'updatedAt': '2022-11-02T07:36:07.636Z'
-        },
-        'createdAt': '2022-10-30T08:31:31.588Z',
-        'updatedAt': '2022-11-02T07:36:07.636Z'
-    }
-]
-```
-
 ## Converter
 
 ### FastLabel To COCO
