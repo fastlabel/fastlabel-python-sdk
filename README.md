@@ -2611,31 +2611,6 @@ See API docs for details.
 ]
 ```
 
-### Get Dataset Usage
-
-Get dataset usages. (Up to 1000 usages)
-
-```python
-client.get_dataset_usages()
-```
-
-#### Response Dataset Usage
-
-See API docs for details.
-
-```python
-[
-    {
-        'datasetId': 'YOUR_DATASET_ID',
-        'datasetName': 'YOUR_DATASET_NAME',
-        'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
-        'datasetVersionName': 'YOUR_DATASET_VERSION_NAME',
-        'downloadCount': 1,
-        'id': 'YOUR_DATASET_USAGE_ID'
-    }
-]
-```
-
 ## Converter
 
 ### FastLabel To COCO

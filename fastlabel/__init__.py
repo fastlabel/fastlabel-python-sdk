@@ -4082,34 +4082,6 @@ class Client:
         endpoint = "dataset-objects/" + dataset_object_id + "/annotations"
         return self.api.get_request(endpoint)
 
-    # Dataset Usage
-
-    def get_dataset_usages(
-        self,
-        offset: int = None,
-        limit: int = 20,
-    ) -> list:
-        """
-        Returns a list of dataset usages.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
-
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
-        """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        endpoint = "dataset-usages"
-        params = {}
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
-        return self.api.get_request(endpoint, params=params)
-
     def update_aws_s3_storage(
         self, project: str, bucket_name: str, bucket_region: str, prefix: str = None
     ) -> str:
