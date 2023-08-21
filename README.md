@@ -2528,52 +2528,6 @@ dataset_objects = client.get_dataset_objects(
 
 If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get-tasks).
 
-### Delete Dataset Object
-
-Delete a multi dataset objects.
-
-**⚠️ Related tasks will also be deleted, so please check them carefully before execution.**
-
-```python
-client.delete_dataset_objects(
-    dataset_id="YOUR_DATASET_ID",
-    dataset_object_ids=[
-        "YOUR_DATASET_OBJECT_ID_1",
-        "YOUR_DATASET_OBJECT_ID_2",
-    ],
-)
-```
-
-### Get Import Histories For Dataset Object
-
-Get all import histories in the dataset. (Up to 1000 tasks)
-
-```python
-datasets = client.get_dataset_object_import_histories(
-    dataset_version_id="YOUR_DATASET_VERSION_ID"
-)
-```
-
-#### Response Dataset Object Import Histories
-
-See API docs for details.
-
-```python
-[
-    {
-        'id': 'YOUR_DATASET_OBJECT_IMPORT_HISTORY_ID',
-        'type': 'local',
-        'status': 'completed',
-        'msgCode': 'none',
-        'msgLevel': 'none',
-        'userName': 'admin',
-        'count': 1,
-        'createdAt': '2022-10-30T08:31:31.588Z',
-        'updatedAt': '2022-11-02T07:36:07.636Z'
-  }
-]
-```
-
 ## Converter
 
 ### FastLabel To COCO

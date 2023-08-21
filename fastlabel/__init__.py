@@ -4035,44 +4035,6 @@ class Client:
         }
         return self.api.post_request(endpoint, payload=payload)
 
-    def delete_dataset_objects(
-        self, dataset_id: str, dataset_object_ids: List[str]
-    ) -> None:
-        """
-        Delete a dataset objects.
-        """
-        endpoint = "dataset-objects/delete/multi"
-        payload = {"datasetId": dataset_id, "datasetObjectIds": dataset_object_ids}
-        self.api.post_request(endpoint, payload=payload)
-
-    def get_dataset_object_import_histories(
-        self,
-        dataset_version_id: str,
-        offset: int = None,
-        limit: int = 5,
-    ) -> list:
-        """
-        Returns a list of dataset object import histories.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
-
-        dataset_version_id is import histories in dataset version (Required).
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
-        """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        endpoint = "dataset-objects/imports/histories"
-        params = {"datasetVersionId": dataset_version_id}
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
-        return self.api.get_request(endpoint, params=params)
-
     def update_aws_s3_storage(
         self, project: str, bucket_name: str, bucket_region: str, prefix: str = None
     ) -> str:
