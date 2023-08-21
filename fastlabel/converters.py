@@ -15,7 +15,7 @@ import geojson
 import numpy as np
 import requests
 
-from fastlabel.const import AnnotationType
+from fastlabel.const import AnnotationType, AttributeValue
 from fastlabel.exceptions import FastLabelInvalidException
 from fastlabel.utils import is_video_project_type
 
@@ -74,6 +74,9 @@ def to_coco(
                     "annotation_type": annotation["type"],
                     "annotation_points": get_annotation_points(annotation, index),
                     "annotation_keypoints": annotation.get("keypoints"),
+                    "annotation_attributes": _get_coco_annotation_attributes(
+                        annotation
+                    ),
                     "categories": categories,
                     "image_id": task_image["id"],
                 }
@@ -204,6 +207,7 @@ def __to_coco_annotation(data: dict) -> dict:
     annotation_type = data["annotation_type"]
     annotation_value = data["annotation_value"]
     annotation_id = 0
+    annotation_attributes = data["annotation_attributes"]
 
     if annotation_type not in [
         AnnotationType.bbox.value,
@@ -226,7 +230,13 @@ def __to_coco_annotation(data: dict) -> dict:
         return None
 
     return __get_coco_annotation(
-        annotation_id, points, keypoints, category["id"], image_id, annotation_type
+        annotation_id,
+        points,
+        keypoints,
+        category["id"],
+        image_id,
+        annotation_type,
+        annotation_attributes,
     )
 
 
@@ -259,6 +269,7 @@ def __get_coco_annotation(
     category_id: int,
     image_id: str,
     annotation_type: str,
+    annotation_attributes: dict[str, AttributeValue],
 ) -> dict:
     annotation = {}
     annotation["num_keypoints"] = len(keypoints) if keypoints else 0
@@ -272,6 +283,7 @@ def __get_coco_annotation(
     annotation["bbox"] = __to_bbox(annotation_type, points)
     annotation["category_id"] = category_id
     annotation["id"] = id_
+    annotation["attributes"] = annotation_attributes
     return annotation
 
 
@@ -848,6 +860,11 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
 
         annotations = []
         for target_coco_annotation in target_coco_annotations:
+            attributes_items = target_coco_annotation.get("attributes", {})
+            attributes = [
+                {"key": attribute_key, "value": attribute_value}
+                for attribute_key, attribute_value in attributes_items.items()
+            ]
             category_name = coco_categories[target_coco_annotation["category_id"]]
             if not category_name:
                 return
@@ -867,6 +884,7 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
                         "value": category_name,
                         "points": segmentation,
                         "type": annotation_type,
+                        "attributes": attributes,
                     }
                 )
             elif annotation_type == AnnotationType.pose_estimation.value:
@@ -898,6 +916,7 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
                         "value": category_name,
                         "type": annotation_type,
                         "keypoints": keypoints,
+                        "attributes": attributes,
                     }
                 )
             else:
@@ -1107,3 +1126,13 @@ def _get_annotation_points_for_video_annotation(annotation: dict, index: int):
 
 def _get_annotation_points_for_image_annotation(annotation: dict):
     return annotation.get("points")
+
+
+def _get_coco_annotation_attributes(annotation: dict) -> dict[str, AttributeValue]:
+    coco_attributes = {}
+    attributes = annotation.get("attributes")
+    if not attributes:
+        return coco_attributes
+    for attribute in attributes:
+        coco_attributes[attribute["key"]] = attribute["value"]
+    return coco_attributes
