@@ -860,11 +860,10 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
 
         annotations = []
         for target_coco_annotation in target_coco_annotations:
+            attributes_items = target_coco_annotation.get("attributes", {})
             attributes = [
                 {"key": attribute_key, "value": attribute_value}
-                for attribute_key, attribute_value in target_coco_annotation[
-                    "attributes"
-                ].items()
+                for attribute_key, attribute_value in attributes_items.items()
             ]
             category_name = coco_categories[target_coco_annotation["category_id"]]
             if not category_name:
