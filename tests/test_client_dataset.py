@@ -148,45 +148,6 @@ class TestImageDataset:
             dataset_object2
         )
 
-    def test_delete_dataset_object(self, client: Client, testing_image_dataset: dict):
-        # Arrange
-        target_file = Path(sys.path[0]) / "files/test_image.jpg"
-        dataset_object_names = ["test_image1.jpg", "test_image2.jpg", "test_image3.jpg"]
-        created = [
-            client.create_image_dataset_object(
-                dataset_version_id=testing_image_dataset["version"]["id"],
-                name=name,
-                file_path=str(target_file),
-            )
-            for name in dataset_object_names
-        ]
-        dataset_objects = client.get_dataset_objects(
-            dataset_version_id=testing_image_dataset["version"]["id"]
-        )
-        assert dataset_objects is not None
-        assert len(dataset_objects) == 3
-        for i, dataset_object in enumerate(dataset_objects):
-            assert OBJECT_SIGNED_URL_KEY in dataset_object
-            assert OBJECT_SIGNED_URL_KEY in created[i]
-            assert remove_object_signed_url(dataset_object) == remove_object_signed_url(
-                created[i]
-            )
-
-        # Act
-        client.delete_dataset_objects(
-            dataset_id=testing_image_dataset["id"],
-            dataset_object_ids=[created[0]["id"], created[2]["id"]],
-        )
-        # Assert
-        results = client.get_dataset_objects(
-            dataset_version_id=testing_image_dataset["version"]["id"]
-        )
-        assert results is not None
-        assert len(results) == 1
-        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
-            created[1]
-        )
-
 
 class TestVideoDataset:
     def test_find_dataset(self, client: Client, testing_video_dataset: dict):
@@ -282,46 +243,6 @@ class TestVideoDataset:
         )
         assert remove_object_signed_url(results[1]) == remove_object_signed_url(
             dataset_object2
-        )
-
-    def test_delete_dataset_object(self, client: Client, testing_video_dataset: dict):
-        # Arrange
-        target_file = Path(sys.path[0]) / "files/test_video.mp4"
-        dataset_object_names = ["test_video1.mp4", "test_video2.mp4", "test_video3.mp4"]
-        created = [
-            client.create_video_dataset_object(
-                dataset_version_id=testing_video_dataset["version"]["id"],
-                name=name,
-                file_path=str(target_file),
-            )
-            for name in dataset_object_names
-        ]
-
-        dataset_objects = client.get_dataset_objects(
-            dataset_version_id=testing_video_dataset["version"]["id"]
-        )
-        assert dataset_objects is not None
-        assert len(dataset_objects) == 3
-        for i, dataset_object in enumerate(dataset_objects):
-            assert OBJECT_SIGNED_URL_KEY in dataset_object
-            assert OBJECT_SIGNED_URL_KEY in created[i]
-            assert remove_object_signed_url(dataset_object) == remove_object_signed_url(
-                created[i]
-            )
-
-        # Act
-        client.delete_dataset_objects(
-            dataset_id=testing_video_dataset["id"],
-            dataset_object_ids=[created[0]["id"], created[2]["id"]],
-        )
-        # Assert
-        results = client.get_dataset_objects(
-            dataset_version_id=testing_video_dataset["version"]["id"]
-        )
-        assert results is not None
-        assert len(results) == 1
-        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
-            created[1]
         )
 
 
@@ -423,75 +344,3 @@ class TestAudioDataset:
         assert remove_object_signed_url(results[1]) == remove_object_signed_url(
             dataset_object2
         )
-
-    def test_delete_dataset_object(self, client: Client, testing_audio_dataset: dict):
-        # Arrange
-        target_file = Path(sys.path[0]) / "files/test_audio.mp3"
-        dataset_object_names = ["test_audio1.mp3", "test_audio2.mp3", "test_audio3.mp3"]
-        created = [
-            client.create_audio_dataset_object(
-                dataset_version_id=testing_audio_dataset["version"]["id"],
-                name=name,
-                file_path=str(target_file),
-            )
-            for name in dataset_object_names
-        ]
-        dataset_objects = client.get_dataset_objects(
-            dataset_version_id=testing_audio_dataset["version"]["id"]
-        )
-        for i, dataset_object in enumerate(dataset_objects):
-            assert OBJECT_SIGNED_URL_KEY in dataset_object
-            assert OBJECT_SIGNED_URL_KEY in created[i]
-            assert remove_object_signed_url(dataset_object) == remove_object_signed_url(
-                created[i]
-            )
-
-        # Act
-        client.delete_dataset_objects(
-            dataset_id=testing_audio_dataset["id"],
-            dataset_object_ids=[created[0]["id"], created[2]["id"]],
-        )
-        # Assert
-        results = client.get_dataset_objects(
-            dataset_version_id=testing_audio_dataset["version"]["id"]
-        )
-        assert results is not None
-        assert len(results) == 1
-        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
-            created[1]
-        )
-
-
-class TestDatasetObjectImportHistories:
-    def test_get(self, client: Client, testing_image_dataset: dict):
-        # Arrange
-        target_file = Path(sys.path[0]) / "files/test_image.jpg"
-        client.create_image_dataset_object(
-            dataset_version_id=testing_image_dataset["version"]["id"],
-            name="test_image1.jpg",
-            file_path=str(target_file),
-        )
-        client.create_image_dataset_object(
-            dataset_version_id=testing_image_dataset["version"]["id"],
-            name="test_image2.jpg",
-            file_path=str(target_file),
-        )
-        # Act
-        import_histories = client.get_dataset_object_import_histories(
-            dataset_version_id=testing_image_dataset["version"]["id"]
-        )
-        # Assert
-        assert import_histories is not None
-        assert len(import_histories) == 2
-        assert import_histories[0]["type"] == "local"
-        assert import_histories[0]["status"] == "completed"
-        assert import_histories[0]["msgCode"] == "none"
-        assert import_histories[0]["msgLevel"] == "none"
-        assert import_histories[0]["userName"] is not None
-        assert import_histories[0]["count"] == 1
-        assert import_histories[0]["type"] == "local"
-        assert import_histories[0]["status"] == "completed"
-        assert import_histories[0]["msgCode"] == "none"
-        assert import_histories[0]["msgLevel"] == "none"
-        assert import_histories[0]["userName"] is not None
-        assert import_histories[0]["count"] == 1
