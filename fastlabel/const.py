@@ -1,4 +1,5 @@
 import math
+from typing import Union
 from enum import Enum
 
 # only 57 types
@@ -221,6 +222,8 @@ SUPPORTED_PCD_SIZE = 30 * math.pow(1024, 2)
 
 SUPPORTED_INFERENCE_IMAGE_SIZE = 6 * math.pow(1024, 2)
 
+AttributeValue = Union[str, list[str], float, list[float]]
+
 
 class AnnotationType(Enum):
     bbox = "bbox"
@@ -232,9 +235,9 @@ class AnnotationType(Enum):
     classification = "classification"
     pose_estimation = "pose_estimation"
 
+
 class Priority(Enum):
     none = 0
     low = 10
     medium = 20
     high = 30
-

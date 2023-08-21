@@ -15,7 +15,7 @@ import geojson
 import numpy as np
 import requests
 
-from fastlabel.const import AnnotationType
+from fastlabel.const import AnnotationType, AttributeValue
 from fastlabel.exceptions import FastLabelInvalidException
 from fastlabel.utils import is_video_project_type
 
@@ -269,7 +269,7 @@ def __get_coco_annotation(
     category_id: int,
     image_id: str,
     annotation_type: str,
-    annotation_attributes: dict[str, any],
+    annotation_attributes: dict[str, AttributeValue],
 ) -> dict:
     annotation = {}
     annotation["num_keypoints"] = len(keypoints) if keypoints else 0
@@ -1129,7 +1129,7 @@ def _get_annotation_points_for_image_annotation(annotation: dict):
     return annotation.get("points")
 
 
-def _get_coco_annotation_attributes(annotation: dict) -> dict[str, any]:
+def _get_coco_annotation_attributes(annotation: dict) -> dict[str, AttributeValue]:
     coco_attributes = {}
     attributes = annotation.get("attributes")
     if not attributes:
