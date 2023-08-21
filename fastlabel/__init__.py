@@ -4110,13 +4110,6 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
-    def count_dataset_download(self) -> int:
-        """
-        Return dataset download count.
-        """
-        endpoint = "dataset-usages/download/count"
-        return self.api.get_request(endpoint)
-
     def update_aws_s3_storage(
         self, project: str, bucket_name: str, bucket_region: str, prefix: str = None
     ) -> str:

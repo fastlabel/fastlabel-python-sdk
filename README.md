@@ -2636,14 +2636,6 @@ See API docs for details.
 ]
 ```
 
-### Count Dataset Download
-
-Count dataset download.
-
-```python
-client.count_dataset_download()
-```
-
 ## Converter
 
 ### FastLabel To COCO
