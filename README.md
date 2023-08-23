@@ -1,7 +1,5 @@
 # FastLabel Python SDK
 
-_If you are using FastLabel prototype, please install version 0.2.2._
-
 ## Table of Contents
 
 - [Installation](#installation)
@@ -2394,8 +2392,7 @@ Create a new dataset.
 
 ```python
 dataset = client.create_dataset(
-    name="Japanese Dogs",
-    slug="japanese-dogs",
+    name="object-detection", # Only lowercase alphanumeric characters + hyphen is available
 )
 ```
 
@@ -2406,8 +2403,7 @@ See API docs for details.
 ```python
 {
     'id': 'YOUR_DATASET_ID',
-    'name': 'Japanese Dogs',
-    'slug': 'japanese-dogs',
+    'name': 'object-detection',
     'createdAt': '2022-10-31T02:20:00.248Z',
     'updatedAt': '2022-10-31T02:20:00.248Z'
 }
@@ -2441,7 +2437,7 @@ datasets = client.get_datasets(
 )
 ```
 
-If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get-tasks).
+If you wish to retrieve more than 1000 datasets, please refer to the Task [sample code](#get-tasks).
 
 ### Update Dataset
 
@@ -2449,7 +2445,7 @@ Update a single dataset.
 
 ```python
 dataset = client.update_dataset(
-    dataset_id="YOUR_DATASET_ID", name="World dogs"
+    dataset_id="YOUR_DATASET_ID", name="object-detection"
 )
 ```
 
@@ -2528,269 +2524,6 @@ dataset_objects = client.get_dataset_objects(
 ```
 
 If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get-tasks).
-
-### Delete Dataset Object
-
-Delete a multi dataset objects.
-
-**⚠️ Related tasks will also be deleted, so please check them carefully before execution.**
-
-```python
-client.delete_dataset_objects(
-    dataset_id="YOUR_DATASET_ID",
-    dataset_object_ids=[
-        "YOUR_DATASET_OBJECT_ID_1",
-        "YOUR_DATASET_OBJECT_ID_2",
-    ],
-)
-```
-
-### Get Import Histories For Dataset Object
-
-Get all import histories in the dataset. (Up to 1000 tasks)
-
-```python
-datasets = client.get_dataset_object_import_histories(
-    dataset_version_id="YOUR_DATASET_VERSION_ID"
-)
-```
-
-#### Response Dataset Object Import Histories
-
-See API docs for details.
-
-```python
-[
-    {
-        'id': 'YOUR_DATASET_OBJECT_IMPORT_HISTORY_ID',
-        'status': 'completed',
-        'msgCode': 'none',
-        'msgLevel': 'none',
-        'userName': 'admin',
-        'count': 1,
-        'createdAt': '2022-10-30T08:31:31.588Z',
-        'updatedAt': '2022-11-02T07:36:07.636Z'
-  }
-]
-```
-
-### Get Dataset Object Annotation
-
-Get dataset object annotations.
-
-```python
-client.get_dataset_object_annotations(
-    dataset_object_id="YOUR_DATASET_OBJECT_ID"
-)
-```
-
-#### Response Dataset Object Annotation
-
-See API docs for details.
-
-```python
-[
-    {
-        'id': 'YOUR_DATASET_OBJECT_ANNOTATION_ID',
-        "datasetVersionId": "YOUR_DATASET_VERSION_ID",
-        "datasetObjectId": "YOUR_DATASET_OBJECT_ID",
-        "datasetAnnotationClass": {
-            'id': 'YOUR_DATASET_ANNOTATION_CLASS_ID',
-            'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
-            'type': 'bbox',
-            'value': 'value',
-            'title': 'title',
-            'color': '#FF0000',
-            'order': 1,
-            'createdAt': '2022-10-30T08:31:31.588Z',
-            'updatedAt': '2022-11-02T07:36:07.636Z'
-        },
-        'createdAt': '2022-10-30T08:31:31.588Z',
-        'updatedAt': '2022-11-02T07:36:07.636Z'
-    }
-]
-```
-
-### Get Dataset Usage
-
-Get dataset usages. (Up to 1000 usages)
-
-```python
-client.get_dataset_usages()
-```
-
-#### Response Dataset Usage
-
-See API docs for details.
-
-```python
-[
-    {
-        'datasetId': 'YOUR_DATASET_ID',
-        'datasetName': 'YOUR_DATASET_NAME',
-        'datasetSlug': 'YOUR_DATASET_SLUG',
-        'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
-        'datasetVersionName': 'YOUR_DATASET_VERSION_NAME',
-        'downloadCount': 1,
-        'id': 'YOUR_DATASET_USAGE_ID'
-    }
-]
-```
-
-### Count Dataset Download
-
-Count dataset download.
-
-```python
-client.count_dataset_download()
-```
-
-### Get Dataset Download Requests
-
-Get dataset download requests. (Up to 1000 usages)
-
-```python
-client.get_dataset_download_requests()
-```
-
-You can filter by status.
-
-```python
-client.get_dataset_download_requests(
-    status="approvalPending" # status can be 'running', 'completed', 'failed', 'approvalPending', 'approved', 'rejected'
-)
-```
-
-#### Response Dataset Download Requests
-
-See API docs for details.
-
-```python
-[
-    {
-        'datasetName': 'YOUR_DATASET_NAME',
-        'exportDetail': {
-            'conditions': '{}',
-            'createdAt': '2023-07-28T07:02:27.736Z',
-            'datasetId': 'YOUR_DATASET_ID',
-            'datasetVersionId': 'YOUR_DATASET_VERSION_ID',
-            'datasetVersionName': 'YOUR_DATASET_VERSION_NAME',
-            'exportType': 'json',
-            'id': 'YOUR_DATASET_EXPORT_ID',
-            'msgCode': 'none',
-            'name': '2023-07-28-16-02-27',
-            'requestUserName': 'DOWNLOAD_REQUEST_USER_NAME',
-            'status': 'approvalPending',
-            'storageType': 'local'
-        },
-        'requestUserEmail': 'example@fastlabel.ai',
-        'requestUserWorkspaceName': 'fastlabel'
-    }
-]
-```
-
-### Create Dataset Version
-
-Create a new dataset version.
-
-```python
-client.create_dataset_version(
-    dataset_id="YOUR_DATASET_ID",
-    version="1.1" # Only alphanumeric characters, dots, and hyphens are available. Dots and hyphens cannot begin or end.
-)
-```
-
-#### Response Dataset Version
-
-See API docs for details.
-
-```python
-{
-    'id': 'YOUR_DATASET_VERSION_ID',
-    'version': '1.1',
-    'clusters': None,
-    'createdBy': 'example@fastlabel.ai',
-    'datasetId': 'YOUR_DATASET_ID',
-    'description': [],
-    'tags': [],
-    'createdAt': '2023-07-28T09:54:28.147Z',
-    'updatedAt': '2023-07-28T09:54:28.147Z'
-}
-```
-
-### Find Dataset Version
-
-Find a dataset version.
-
-```python
-client.find_dataset_version(
-    id="YOUR_DATASET_VERSION_ID"
-)
-```
-
-Success response is the same as when created.
-
-### Get Dataset Versions
-
-Get dataset versions. (Up to 1000 versions)
-
-```python
-client.get_dataset_versions(
-    dataset_id="YOUR_DATASET_ID"
-)
-```
-
-#### Response Dataset Versions
-
-Success response is the same as when created.
-
-### Get Dataset Version Create Histories
-
-Get dataset version create histories. (Up to 1000 histories)
-
-```python
-client.get_dataset_version_create_histories(
-    dataset_id="YOUR_DATASET_ID"
-)
-```
-
-#### Response Dataset Version Create Histories
-
-See API docs for details.
-
-```python
-[
-    {
-        'id': 'YOUR_DATASET_CREATE_HISTORY_ID',
-        'status': 'completed',
-        'userName': 'example@fastlabel.ai',
-        'datasetId': 'YOUR_DATASET_ID',
-        'createdAt': '2023-07-28T05:29:34.618Z',
-        'destDatasetVersion': {
-            'clusters': None,
-            'createdAt': '2023-07-28T05:29:34.615Z',
-            'createdBy': 'example@fastlabel.ai',
-            'datasetId': 'YOUR_DATASET_ID',
-            'description': [],
-            'id': 'YOUR_DATASET_VERSION_ID',
-            'tags': [],
-            'updatedAt': '2023-07-28T05:29:34.615Z',
-            'version': '1.1'
-        },
-        'srcDatasetVersion': {
-            'clusters': None,
-            'createdAt': '2023-07-28T05:21:53.114Z',
-            'createdBy': 'example@fastlabel.ai',
-            'datasetId': 'YOUR_DATASET_ID',
-            'description': [],
-            'id': 'YOUR_DATASET_VERSION_ID',
-            'tags': [],
-            'updatedAt': '2023-07-28T05:21:53.114Z',
-            'version': '1'
-        }
-    },
-]
-```
 
 ## Converter
 
@@ -3188,18 +2921,10 @@ client.create_model_monitoring_request_results(
             "status": "success",  # success or failed
             "result": [
                 {
-                    "annotationIndex": 0,  # The index of the inference class returned by your model
                     "value": "person",  # The value of the inference class returned by your model
-                    "points": [
-                        12.98,
-                        23.84,
-                        140.83,
-                        165.82,
-                    ],  # [x_min, y_min, x_max,y_max]
                     "confidenceScore": 0.92,  # 0 ~ 1
                 }
             ],
-            "resultSchema": "object_detection_base",  # Currently, only 'object_detection_base' can be selected.
             "requestAt": dt_jst.isoformat(),  # The time when your endpoint accepted the request
         }
     ],

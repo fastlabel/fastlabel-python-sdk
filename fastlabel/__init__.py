@@ -3863,18 +3863,15 @@ class Client:
     def create_dataset(
         self,
         name: str,
-        slug: str,
     ) -> dict:
         """
         Create a dataset.
 
-        name is name of your dataset (Required).
-        slug is slug of your dataset (Required).
+        name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
         """
         endpoint = "datasets"
         payload = {
             "name": name,
-            "slug": slug,
         }
         return self.api.post_request(endpoint, payload=payload)
 
@@ -4040,207 +4037,6 @@ class Client:
             "file": utils.base64_encode(file_path),
         }
         return self.api.post_request(endpoint, payload=payload)
-
-    def delete_dataset_objects(
-        self, dataset_id: str, dataset_object_ids: List[str]
-    ) -> None:
-        """
-        Delete a dataset objects.
-        """
-        endpoint = "dataset-objects/delete/multi"
-        payload = {"datasetId": dataset_id, "datasetObjectIds": dataset_object_ids}
-        self.api.post_request(endpoint, payload=payload)
-
-    def get_dataset_object_import_histories(
-        self,
-        dataset_version_id: str,
-        offset: int = None,
-        limit: int = 5,
-    ) -> list:
-        """
-        Returns a list of dataset object import histories.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
-
-        dataset_version_id is import histories in dataset version (Required).
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
-        """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        endpoint = "dataset-objects/imports/histories"
-        params = {"datasetVersionId": dataset_version_id}
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
-        return self.api.get_request(endpoint, params=params)
-
-    def get_dataset_object_annotations(self, dataset_object_id: str) -> list:
-        """
-        Returns a list of dataset object annotations.
-
-        dataset_object_id is id of your dataset object (Required).
-        """
-        endpoint = "dataset-objects/" + dataset_object_id + "/annotations"
-        return self.api.get_request(endpoint)
-
-    # Dataset Usage
-
-    def get_dataset_usages(
-        self,
-        offset: int = None,
-        limit: int = 20,
-    ) -> list:
-        """
-        Returns a list of dataset usages.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
-
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
-        """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        endpoint = "dataset-usages"
-        params = {}
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
-        return self.api.get_request(endpoint, params=params)
-
-    def count_dataset_download(self) -> int:
-        """
-        Return dataset download count.
-        """
-        endpoint = "dataset-usages/download/count"
-        return self.api.get_request(endpoint)
-
-    def get_dataset_download_requests(
-        self,
-        offset: int = None,
-        limit: int = 20,
-        status: str = "approvalPending",
-    ) -> list:
-        """
-        Returns a list of dataset download requests.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
-
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
-        status can be 'running', 'completed', 'failed',
-        'approvalPending', 'approved', 'rejected' (default: approvalPending) (Optional).
-        """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        endpoint = "dataset-usages/download/requests"
-        params = {}
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
-        if status:
-            params["status"] = status
-        return self.api.get_request(endpoint, params=params)
-
-    # Dataset Version
-
-    def get_dataset_versions(
-        self,
-        dataset_id: str,
-        offset: int = None,
-        limit: int = 20,
-    ) -> list:
-        """
-        Returns a list of dataset versions.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
-
-        dataset_id is id of your dataset (Required).
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
-        """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        endpoint = "dataset-versions"
-        params = {"datasetId": dataset_id}
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
-        return self.api.get_request(endpoint, params=params)
-
-    def create_dataset_version(
-        self,
-        dataset_id: str,
-        version: str,
-    ) -> dict:
-        """
-        Create a dataset version.
-
-        dataset_id is id of your dataset (Required).
-        version is name of your dataset version. Only numeric characters + dot is available (Required).
-        """
-        endpoint = "dataset-versions"
-        payload = {
-            "datasetId": dataset_id,
-            "version": version,
-        }
-        return self.api.post_request(endpoint, payload=payload)
-
-    def get_dataset_version_create_histories(
-        self,
-        dataset_id: str,
-        offset: int = None,
-        limit: int = 5,
-    ) -> list:
-        """
-        Returns a list of dataset version create histories.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
-
-        dataset_id is id of your dataset (Required).
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
-        """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        endpoint = "dataset-versions/histories"
-        params = {"datasetId": dataset_id}
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
-        return self.api.get_request(endpoint, params=params)
-
-    def find_dataset_version(
-        self,
-        id: str,
-    ) -> dict:
-        """
-        Return dataset version.
-
-        id is your dataset version (Required).
-        """
-        endpoint = "dataset-versions/" + id
-        return self.api.get_request(endpoint)
 
     def update_aws_s3_storage(
         self, project: str, bucket_name: str, bucket_region: str, prefix: str = None
