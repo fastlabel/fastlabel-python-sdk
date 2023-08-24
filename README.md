@@ -2469,7 +2469,7 @@ The types of objects that can be created are "image", "video", and "audio".
 There are type-specific methods. but they can be used in the same way.
 
 ```python
-dataset_object = client.create_image_dataset_object(
+dataset_object = client.create_dataset_object(
     dataset_version_id="YOUR_DATASET_VERSION_ID",
     name="brushwood_dog.jpg",
     file_path="./brushwood_dog.jpg",

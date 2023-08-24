@@ -1,11 +1,10 @@
-import re
 import sys
 from pathlib import Path
 from uuid import uuid4
 
 import pytest
 
-from fastlabel import Client, FastLabelInvalidException
+from fastlabel import Client
 
 OBJECT_SIGNED_URL_KEY = "objectSignedUrl"
 
@@ -20,65 +19,45 @@ def client() -> Client:
 
 
 @pytest.fixture
-def testing_image_dataset(client: Client) -> dict:
+def testing_dataset(client: Client) -> dict:
     # Arrange
     name = f"test-{uuid4()}"
-    dataset = client.create_dataset(name=name, slug=name)
-    yield dataset
-    # Cleanup
-    client.delete_dataset(dataset_id=dataset["id"])
-
-
-@pytest.fixture
-def testing_video_dataset(client: Client) -> dict:
-    # Arrange
-    name = f"test-{uuid4()}"
-    dataset = client.create_dataset(name=name, slug=name)
-    yield dataset
-    # Cleanup
-    client.delete_dataset(dataset_id=dataset["id"])
-
-
-@pytest.fixture
-def testing_audio_dataset(client: Client) -> dict:
-    # Arrange
-    name = f"test-{uuid4()}"
-    dataset = client.create_dataset(name=name, slug=name)
+    dataset = client.create_dataset(name=name)
     yield dataset
     # Cleanup
     client.delete_dataset(dataset_id=dataset["id"])
 
 
 class TestImageDataset:
-    def test_find_dataset(self, client: Client, testing_image_dataset: dict):
+    def test_find_dataset(self, client: Client, testing_dataset: dict):
         # Act
-        dataset = client.find_dataset(dataset_id=testing_image_dataset["id"])
+        dataset = client.find_dataset(dataset_id=testing_dataset["id"])
         # Assert
-        assert dataset == testing_image_dataset
+        assert dataset == testing_dataset
 
-    def test_get_dataset(self, client: Client, testing_image_dataset: dict):
+    def test_get_dataset(self, client: Client, testing_dataset: dict):
         # Act
-        datasets = client.get_datasets(keyword=testing_image_dataset["slug"])
+        datasets = client.get_datasets(keyword=testing_dataset["name"])
         # Assert
         assert datasets is not None
         assert len(datasets) == 1
-        assert datasets[0] == testing_image_dataset
+        assert datasets[0] == testing_dataset
 
-    def test_update_dataset(self, client: Client, testing_image_dataset: dict):
+    def test_update_dataset(self, client: Client, testing_dataset: dict):
         # Act
         dataset = client.update_dataset(
-            dataset_id=testing_image_dataset["id"],
-            name="update name",
+            dataset_id=testing_dataset["id"],
+            name="update-name",
         )
         # Assert
-        assert dataset["name"] == "update name"
+        assert dataset["name"] == "update-name"
 
-    def test_create_dataset_object(self, client: Client, testing_image_dataset: dict):
+    def test_create_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_image.jpg"
         # Act
-        dataset_object = client.create_image_dataset_object(
-            dataset_version_id=testing_image_dataset["version"]["id"],
+        dataset_object = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_image.jpg",
             file_path=str(target_file),
         )
@@ -90,29 +69,11 @@ class TestImageDataset:
         assert dataset_object["width"] == 225
         assert dataset_object["groupId"] is None
 
-    def test_create_dataset_object_file_type_violation(
-        self, client: Client, testing_image_dataset: dict
-    ):
-        # Arrange
-        target_file = Path(sys.path[0]) / "files/test_video.mp4"
-        # Act
-        with pytest.raises(
-            expected_exception=FastLabelInvalidException,
-            match=re.escape(
-                "<Response [422]> Supported extensions are png, jpg, jpeg, bmp."
-            ),
-        ) as _:
-            client.create_image_dataset_object(
-                dataset_version_id=testing_image_dataset["version"]["id"],
-                name="test_video.mp4",
-                file_path=str(target_file),
-            )
-
-    def test_find_dataset_object(self, client: Client, testing_image_dataset: dict):
+    def test_find_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_image.jpg"
-        dataset_object = client.create_image_dataset_object(
-            dataset_version_id=testing_image_dataset["version"]["id"],
+        dataset_object = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_image.jpg",
             file_path=str(target_file),
         )
@@ -121,22 +82,22 @@ class TestImageDataset:
         # Assert
         assert result["name"] == dataset_object["name"]
 
-    def test_get_dataset_object(self, client: Client, testing_image_dataset: dict):
+    def test_get_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_image.jpg"
-        dataset_object1 = client.create_image_dataset_object(
-            dataset_version_id=testing_image_dataset["version"]["id"],
+        dataset_object1 = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_image1.jpg",
             file_path=str(target_file),
         )
-        dataset_object2 = client.create_image_dataset_object(
-            dataset_version_id=testing_image_dataset["version"]["id"],
+        dataset_object2 = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_image2.jpg",
             file_path=str(target_file),
         )
         # Act
         results = client.get_dataset_objects(
-            dataset_version_id=testing_image_dataset["version"]["id"]
+            dataset_version_id=testing_dataset["version"]["id"]
         )
         # Assert
         assert results is not None
@@ -150,34 +111,34 @@ class TestImageDataset:
 
 
 class TestVideoDataset:
-    def test_find_dataset(self, client: Client, testing_video_dataset: dict):
+    def test_find_dataset(self, client: Client, testing_dataset: dict):
         # Act
-        dataset = client.find_dataset(dataset_id=testing_video_dataset["id"])
+        dataset = client.find_dataset(dataset_id=testing_dataset["id"])
         # Assert
-        assert dataset == testing_video_dataset
+        assert dataset == testing_dataset
 
-    def test_get_dataset(self, client: Client, testing_video_dataset: dict):
+    def test_get_dataset(self, client: Client, testing_dataset: dict):
         # Act
-        datasets = client.get_datasets(keyword=testing_video_dataset["slug"])
+        datasets = client.get_datasets(keyword=testing_dataset["name"])
         # Assert
         assert datasets is not None
         assert len(datasets) == 1
-        assert datasets[0] == testing_video_dataset
+        assert datasets[0] == testing_dataset
 
-    def test_update_dataset(self, client: Client, testing_video_dataset: dict):
+    def test_update_dataset(self, client: Client, testing_dataset: dict):
         # Act
         dataset = client.update_dataset(
-            dataset_id=testing_video_dataset["id"], name="update name"
+            dataset_id=testing_dataset["id"], name="update-name"
         )
         # Assert
-        assert dataset["name"] == "update name"
+        assert dataset["name"] == "update-name"
 
-    def test_create_dataset_object(self, client: Client, testing_video_dataset: dict):
+    def test_create_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_video.mp4"
         # Act
-        dataset_object = client.create_video_dataset_object(
-            dataset_version_id=testing_video_dataset["version"]["id"],
+        dataset_object = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_video.mp4",
             file_path=str(target_file),
         )
@@ -189,27 +150,11 @@ class TestVideoDataset:
         assert dataset_object["width"] == 320
         assert dataset_object["groupId"] is None
 
-    def test_create_dataset_object_file_type_violation(
-        self, client: Client, testing_video_dataset: dict
-    ):
-        # Arrange
-        target_file = Path(sys.path[0]) / "files/test_image.jpg"
-        # Act
-        with pytest.raises(
-            expected_exception=FastLabelInvalidException,
-            match=re.escape("<Response [422]> Supported extensions are mp4."),
-        ) as _:
-            client.create_video_dataset_object(
-                dataset_version_id=testing_video_dataset["version"]["id"],
-                name="test_image.jpg",
-                file_path=str(target_file),
-            )
-
-    def test_find_dataset_object(self, client: Client, testing_video_dataset: dict):
+    def test_find_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_video.mp4"
-        dataset_object = client.create_video_dataset_object(
-            dataset_version_id=testing_video_dataset["version"]["id"],
+        dataset_object = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_video.mp4",
             file_path=str(target_file),
         )
@@ -218,22 +163,22 @@ class TestVideoDataset:
         # Assert
         assert result["name"] == dataset_object["name"]
 
-    def test_get_dataset_object(self, client: Client, testing_video_dataset: dict):
+    def test_get_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_video.mp4"
-        dataset_object1 = client.create_video_dataset_object(
-            dataset_version_id=testing_video_dataset["version"]["id"],
+        dataset_object1 = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_video1.mp4",
             file_path=str(target_file),
         )
-        dataset_object2 = client.create_video_dataset_object(
-            dataset_version_id=testing_video_dataset["version"]["id"],
+        dataset_object2 = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_video2.mp4",
             file_path=str(target_file),
         )
         # Act
         results = client.get_dataset_objects(
-            dataset_version_id=testing_video_dataset["version"]["id"]
+            dataset_version_id=testing_dataset["version"]["id"]
         )
         # Assert
         assert results is not None
@@ -247,35 +192,35 @@ class TestVideoDataset:
 
 
 class TestAudioDataset:
-    def test_find_dataset(self, client: Client, testing_audio_dataset: dict):
+    def test_find_dataset(self, client: Client, testing_dataset: dict):
         # Act
-        dataset = client.find_dataset(dataset_id=testing_audio_dataset["id"])
+        dataset = client.find_dataset(dataset_id=testing_dataset["id"])
         # Assert
-        assert dataset == testing_audio_dataset
+        assert dataset == testing_dataset
 
-    def test_get_dataset(self, client: Client, testing_audio_dataset: dict):
+    def test_get_dataset(self, client: Client, testing_dataset: dict):
         # Act
-        datasets = client.get_datasets(keyword=testing_audio_dataset["slug"])
+        datasets = client.get_datasets(keyword=testing_dataset["name"])
         # Assert
         assert datasets is not None
         assert len(datasets) == 1
-        assert datasets[0] == testing_audio_dataset
+        assert datasets[0] == testing_dataset
 
-    def test_update_dataset(self, client: Client, testing_audio_dataset: dict):
+    def test_update_dataset(self, client: Client, testing_dataset: dict):
         # Act
         dataset = client.update_dataset(
-            dataset_id=testing_audio_dataset["id"],
-            name="update name",
+            dataset_id=testing_dataset["id"],
+            name="update-name",
         )
         # Assert
-        assert dataset["name"] == "update name"
+        assert dataset["name"] == "update-name"
 
-    def test_create_dataset_object(self, client: Client, testing_audio_dataset: dict):
+    def test_create_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_audio.mp3"
         # Act
-        dataset_object = client.create_audio_dataset_object(
-            dataset_version_id=testing_audio_dataset["version"]["id"],
+        dataset_object = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_audio.mp3",
             file_path=str(target_file),
         )
@@ -287,29 +232,11 @@ class TestAudioDataset:
         assert dataset_object["width"] == 0
         assert dataset_object["groupId"] is None
 
-    def test_create_dataset_object_file_type_violation(
-        self, client: Client, testing_audio_dataset: dict
-    ):
-        # Arrange
-        target_file = Path(sys.path[0]) / "files/test_image.jpg"
-        # Act
-        with pytest.raises(
-            expected_exception=FastLabelInvalidException,
-            match=re.escape(
-                "<Response [422]> Supported extensions are mp3, wav and w4a."
-            ),
-        ) as _:
-            client.create_audio_dataset_object(
-                dataset_version_id=testing_audio_dataset["version"]["id"],
-                name="test_image.jpg",
-                file_path=str(target_file),
-            )
-
-    def test_find_dataset_object(self, client: Client, testing_audio_dataset: dict):
+    def test_find_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_audio.mp3"
-        dataset_object = client.create_audio_dataset_object(
-            dataset_version_id=testing_audio_dataset["version"]["id"],
+        dataset_object = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_audio.mp3",
             file_path=str(target_file),
         )
@@ -318,22 +245,22 @@ class TestAudioDataset:
         # Assert
         assert result["name"] == dataset_object["name"]
 
-    def test_get_dataset_object(self, client: Client, testing_audio_dataset: dict):
+    def test_get_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_audio.mp3"
-        dataset_object1 = client.create_audio_dataset_object(
-            dataset_version_id=testing_audio_dataset["version"]["id"],
+        dataset_object1 = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_audio1.mp3",
             file_path=str(target_file),
         )
-        dataset_object2 = client.create_audio_dataset_object(
-            dataset_version_id=testing_audio_dataset["version"]["id"],
+        dataset_object2 = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
             name="test_audio2.mp3",
             file_path=str(target_file),
         )
         # Act
         results = client.get_dataset_objects(
-            dataset_version_id=testing_audio_dataset["version"]["id"]
+            dataset_version_id=testing_dataset["version"]["id"]
         )
         # Assert
         assert results is not None
@@ -344,3 +271,26 @@ class TestAudioDataset:
         assert remove_object_signed_url(results[1]) == remove_object_signed_url(
             dataset_object2
         )
+
+
+class TestMixingDataset:
+    def test_find_dataset(self, client: Client, testing_dataset: dict):
+        dataset = client.find_dataset(dataset_id=testing_dataset["id"])
+        assert dataset == testing_dataset
+
+    def test_create_dataset_object(self, client: Client, testing_dataset: dict):
+        # Arrange
+        target_file = Path(sys.path[0]) / "files/test_other_file.txt"
+        # Act
+        dataset_object = client.create_dataset_object(
+            dataset_version_id=testing_dataset["version"]["id"],
+            name="test_other_file.txt",
+            file_path=str(target_file),
+        )
+        # Assert
+        assert dataset_object is not None
+        assert dataset_object["name"] == "test_other_file.txt"
+        assert dataset_object["size"] == 3090
+        assert dataset_object["height"] == 0
+        assert dataset_object["width"] == 0
+        assert dataset_object["groupId"] is None
