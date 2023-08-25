@@ -3860,19 +3860,14 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
-    def create_dataset(
-        self,
-        name: str,
-    ) -> dict:
+    def create_dataset(self, name: str, license: str = "") -> dict:
         """
         Create a dataset.
 
         name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
         """
         endpoint = "datasets"
-        payload = {
-            "name": name,
-        }
+        payload = {"name": name, "license": license}
         return self.api.post_request(endpoint, payload=payload)
 
     def update_dataset(
