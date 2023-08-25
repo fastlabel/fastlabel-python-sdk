@@ -3946,7 +3946,7 @@ class Client:
 
         dataset_version_id is dataset object in dataset version (Required).
         name is a unique identifier of dataset object in your dataset (Required).
-        file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
+        file_path is a path to data. (Required).
         """
         endpoint = "dataset-objects"
         if not utils.is_object_supported_size(file_path):
