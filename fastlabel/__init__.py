@@ -3865,6 +3865,7 @@ class Client:
         Create a dataset.
 
         name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
+        license is a license name of your dataset. (Optional)
         """
         endpoint = "datasets"
         payload = {"name": name, "license": license}

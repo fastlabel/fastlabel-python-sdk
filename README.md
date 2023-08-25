@@ -2393,7 +2393,7 @@ Create a new dataset.
 ```python
 dataset = client.create_dataset(
     name="object-detection", # Only lowercase alphanumeric characters + hyphen is available
-    license="The MIT "
+    license="The MIT License" # Optional
 )
 ```
 
