@@ -3831,7 +3831,6 @@ class Client:
     def get_datasets(
         self,
         keyword: str = None,
-        type: str = None,
         offset: int = None,
         limit: int = 100,
     ) -> list:
@@ -3842,7 +3841,6 @@ class Client:
         to fetch.
 
         keyword are search terms in the dataset slug (Optional).
-        type is type of your dataset (Optional).
         offset is the starting position number to fetch (Optional).
         limit is the max number to fetch (Optional).
         """
@@ -3864,18 +3862,15 @@ class Client:
 
     def create_dataset(
         self,
-        type: str,
         name: str,
     ) -> dict:
         """
         Create a dataset.
 
-        type can be 'image', 'video', 'audio' (Required).
         name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
         """
         endpoint = "datasets"
         payload = {
-            "type": type,
             "name": name,
         }
         return self.api.post_request(endpoint, payload=payload)
@@ -3943,95 +3938,25 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
-    def create_image_dataset_object(
-        self,
-        dataset_version_id: str,
-        name: str,
-        file_path: str,
+    def create_dataset_object(
+        self, dataset_version_id: str, name: str, file_path: str
     ) -> dict:
         """
-        Create a image dataset object.
+        Create a dataset object.
 
         dataset_version_id is dataset object in dataset version (Required).
-        name is an unique identifier of dataset object in your dataset (Required).
-        file_path is a path to data. Supported extensions are png, jpg, jpeg (Required).
+        name is a unique identifier of dataset object in your dataset (Required).
+        file_path is a path to data. (Required).
         """
         endpoint = "dataset-objects"
-        # TODO: add jfif, pjpeg, pjp?
-        if not utils.is_image_supported_ext(file_path):
+        if not utils.is_object_supported_size(file_path):
             raise FastLabelInvalidException(
-                "Supported extensions are png, jpg, jpeg.", 422
+                "Supported object size is under 250 MB.", 422
             )
-        if not utils.is_image_supported_size(file_path):
-            raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
-
         payload = {
             "datasetVersionId": dataset_version_id,
             "name": name,
             "file": utils.base64_encode(file_path),
-            "type": "image",
-        }
-        return self.api.post_request(endpoint, payload=payload)
-
-    def create_video_dataset_object(
-        self,
-        dataset_version_id: str,
-        name: str,
-        file_path: str,
-    ) -> dict:
-        """
-        Create a video dataset object.
-
-        dataset_version_id is dataset object in dataset version (Required).
-        name is an unique identifier of dataset object in your dataset (Required).
-        file_path is a path to data. Supported extensions are mp4 (Required).
-        """
-        endpoint = "dataset-objects"
-        # TODO: add m4v, mov, avi?
-        if not utils.is_video_supported_ext(file_path):
-            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
-        if not utils.is_video_supported_size(file_path):
-            raise FastLabelInvalidException(
-                "Supported video size is under 250 MB.", 422
-            )
-
-        payload = {
-            "datasetVersionId": dataset_version_id,
-            "name": name,
-            "file": utils.base64_encode(file_path),
-            "type": "video",
-        }
-        return self.api.post_request(endpoint, payload=payload)
-
-    def create_audio_dataset_object(
-        self,
-        dataset_version_id: str,
-        name: str,
-        file_path: str,
-    ) -> dict:
-        """
-        Create a audio dataset object.
-
-        dataset_version_id is dataset object in dataset version (Required).
-        name is an unique identifier of dataset object in your dataset (Required).
-        file_path is a path to data. Supported extensions are mp3, wav, w4a (Required).
-        """
-        endpoint = "dataset-objects"
-        # TODO: add mp2?
-        if not utils.is_audio_supported_ext(file_path):
-            raise FastLabelInvalidException(
-                "Supported extensions are mp3, wav and w4a.", 422
-            )
-        if not utils.is_audio_supported_size(file_path):
-            raise FastLabelInvalidException(
-                "Supported audio size is under 120 MB.", 422
-            )
-
-        payload = {
-            "datasetVersionId": dataset_version_id,
-            "name": name,
-            "file": utils.base64_encode(file_path),
-            "type": "audio",
         }
         return self.api.post_request(endpoint, payload=payload)
 

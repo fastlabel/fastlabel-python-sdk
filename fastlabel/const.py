@@ -1,6 +1,6 @@
 import math
-from typing import Union, List
 from enum import Enum
+from typing import List, Union
 
 # only 57 types
 COLOR_PALETTE = [
@@ -218,6 +218,9 @@ SUPPORTED_DICOM_SIZE = 2000 * math.pow(1024, 2)
 
 # API can accept under 30 MB
 SUPPORTED_PCD_SIZE = 30 * math.pow(1024, 2)
+
+# API can accept under 250 MB
+SUPPORTED_OBJECT_SIZE = 250 * math.pow(1024, 2)
 
 
 SUPPORTED_INFERENCE_IMAGE_SIZE = 6 * math.pow(1024, 2)
