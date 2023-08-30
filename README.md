@@ -2405,6 +2405,7 @@ See API docs for details.
 {
     'id': 'YOUR_DATASET_ID',
     'name': 'object-detection',
+    'license': 'The MIT License',
     'createdAt': '2022-10-31T02:20:00.248Z',
     'updatedAt': '2022-10-31T02:20:00.248Z'
 }
