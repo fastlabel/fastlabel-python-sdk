@@ -3863,16 +3863,24 @@ class Client:
     def create_dataset(
         self,
         name: str,
+        tags: List[str] = [],
+        visibility: str = None,
     ) -> dict:
         """
         Create a dataset.
 
         name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
+        tags is a list of tag (Optional).
+        visibility is visibility of your dataset. visibility can be 'workspace' or 'public' (Optional).
         """
         endpoint = "datasets"
         payload = {
             "name": name,
         }
+        if tags:
+            payload["tags"] = tags
+        if visibility:
+            payload["visibility"] = visibility
         return self.api.post_request(endpoint, payload=payload)
 
     def update_dataset(
