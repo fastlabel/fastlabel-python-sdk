@@ -40,7 +40,7 @@
 pip install --upgrade fastlabel
 ```
 
-> Python version 3.7 or greater is required
+> Python version 3.8 or greater is required
 
 ## Usage
 
