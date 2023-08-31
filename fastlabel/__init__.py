@@ -3887,15 +3887,19 @@ class Client:
         self,
         dataset_id: str,
         name: str = None,
+        tags: List[str] = [],
     ) -> dict:
         """
         Update a dataset.
 
         dataset_id is an id of the dataset (Required).
         name is name of your dataset (Required).
+        tags is a list of tag (Optional).
         """
         endpoint = "datasets/" + dataset_id
         payload = {"name": name}
+        if tags:
+            payload["tags"] = tags
         return self.api.put_request(endpoint, payload=payload)
 
     def delete_dataset(self, dataset_id: str) -> None:

@@ -2449,7 +2449,7 @@ Update a single dataset.
 
 ```python
 dataset = client.update_dataset(
-    dataset_id="YOUR_DATASET_ID", name="object-detection"
+    dataset_id="YOUR_DATASET_ID", name="object-detection", tags=["cat", "dog"]
 )
 ```
 
