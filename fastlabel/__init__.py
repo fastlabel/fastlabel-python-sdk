@@ -3831,33 +3831,24 @@ class Client:
     def get_datasets(
         self,
         keyword: str = None,
-        offset: int = None,
-        limit: int = 100,
+        tags: List[str] = [],
+        visibility: str = None,
     ) -> list:
         """
-        Returns a list of datasets with latest version.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
+        Returns a list of datasets.
 
         keyword are search terms in the dataset slug (Optional).
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
+        tags are search terms in the dataset tags (Optional).
+        visibility are search terms in the dataset visibility. visibility can be 'workspace' or 'public' (Optional).
         """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
         endpoint = "datasets"
         params = {}
         if keyword:
             params["keyword"] = keyword
-        if type:
-            params["type"] = type
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
+        if tags:
+            params["tags"] = tags
+        if visibility:
+            params["visibility"] = visibility
         return self.api.get_request(endpoint, params=params)
 
     def create_dataset(

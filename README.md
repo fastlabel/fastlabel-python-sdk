@@ -2433,11 +2433,13 @@ datasets = client.get_datasets()
 
 The success response is the same as when created, but it is an array.
 
-You can filter by type and keywords.
+You can filter by keywords and visibility, tags.
 
 ```python
 datasets = client.get_datasets(
-    keyword="dog"
+    keyword="dog",
+    tags=["cat", "dog"],
+    visibility="workspace", # visibility can be 'workspace' or 'public'.
 )
 ```
 
