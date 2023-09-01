@@ -3852,10 +3852,7 @@ class Client:
         return self.api.get_request(endpoint, params=params)
 
     def create_dataset(
-        self,
-        name: str,
-        tags: List[str] = [],
-        visibility: str = None,
+        self, name: str, tags: List[str] = [], visibility: str = None, license: str = ""
     ) -> dict:
         """
         Create a dataset.
@@ -3863,11 +3860,10 @@ class Client:
         name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
         tags is a list of tag (Optional).
         visibility is visibility of your dataset. visibility can be 'workspace' or 'public' (Optional).
+        license is a license name of your dataset. (Optional)
         """
         endpoint = "datasets"
-        payload = {
-            "name": name,
-        }
+        payload = {"name": name, "license": license}
         if tags:
             payload["tags"] = tags
         if visibility:

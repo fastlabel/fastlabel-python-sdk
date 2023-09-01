@@ -2395,6 +2395,7 @@ dataset = client.create_dataset(
     name="object-detection", # Only lowercase alphanumeric characters + hyphen is available
     tags=["cat", "dog"],
     visibility="workspace", # visibility can be 'workspace' or 'public'. workspace is only visible to your workspace members. public is visible to all users.
+    license="The MIT License" # Optional
 )
 ```
 
@@ -2408,6 +2409,7 @@ See API docs for details.
     'name': 'object-detection',
     'tags': ['cat', 'dog'],
     'visibility': 'workspace',
+    'license': 'The MIT License',
     'createdAt': '2022-10-31T02:20:00.248Z',
     'updatedAt': '2022-10-31T02:20:00.248Z'
 }
