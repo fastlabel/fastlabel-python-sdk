@@ -2393,7 +2393,7 @@ Create a new dataset.
 ```python
 dataset = client.create_dataset(
     name="object-detection", # Only lowercase alphanumeric characters + hyphen is available
-    tags=["cat", "dog"],
+    tags=["cat", "dog"], # max 5 tags per dataset.
     visibility="workspace", # visibility can be 'workspace' or 'public'. workspace is only visible to your workspace members. public is visible to all users.
     license="The MIT License" # Optional
 )
@@ -2440,7 +2440,7 @@ You can filter by keywords and visibility, tags.
 ```python
 datasets = client.get_datasets(
     keyword="dog",
-    tags=["cat", "dog"],
+    tags=["cat", "dog"], # max 5 tags per dataset.
     visibility="workspace", # visibility can be 'workspace' or 'public'.
 )
 ```
