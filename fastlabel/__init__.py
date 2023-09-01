@@ -3839,7 +3839,7 @@ class Client:
 
         keyword are search terms in the dataset slug (Optional).
         tags are search terms in the dataset tags (Optional).
-        visibility are search terms in the dataset visibility. visibility can be 'workspace' or 'public' (Optional).
+        visibility are search terms in the dataset visibility.(Optional).
         """
         endpoint = "datasets"
         params = {}
@@ -3859,7 +3859,7 @@ class Client:
 
         name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
         tags is a list of tag (Optional).
-        visibility is visibility of your dataset. visibility can be 'workspace' or 'public' (Optional).
+        visibility are search terms in the dataset visibility.(Optional).
         license is a license name of your dataset. (Optional)
         """
         endpoint = "datasets"
