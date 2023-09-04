@@ -3831,59 +3831,62 @@ class Client:
     def get_datasets(
         self,
         keyword: str = None,
-        offset: int = None,
-        limit: int = 100,
+        tags: List[str] = [],
+        visibility: str = None,
     ) -> list:
         """
-        Returns a list of datasets with latest version.
-
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
+        Returns a list of datasets.
 
         keyword are search terms in the dataset slug (Optional).
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
+        tags are search terms in the dataset tags (Optional).
+        visibility are search terms in the dataset visibility.(Optional).
         """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
         endpoint = "datasets"
         params = {}
         if keyword:
             params["keyword"] = keyword
-        if type:
-            params["type"] = type
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
+        if tags:
+            params["tags"] = tags
+        if visibility:
+            params["visibility"] = visibility
         return self.api.get_request(endpoint, params=params)
 
-    def create_dataset(self, name: str, license: str = "") -> dict:
+    def create_dataset(
+        self, name: str, tags: List[str] = [], visibility: str = None, license: str = ""
+    ) -> dict:
         """
         Create a dataset.
 
         name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
+        tags is a list of tag (Optional).
+        visibility are search terms in the dataset visibility.(Optional).
         license is a license name of your dataset. (Optional)
         """
         endpoint = "datasets"
         payload = {"name": name, "license": license}
+        if tags:
+            payload["tags"] = tags
+        if visibility:
+            payload["visibility"] = visibility
         return self.api.post_request(endpoint, payload=payload)
 
     def update_dataset(
         self,
         dataset_id: str,
         name: str = None,
+        tags: List[str] = [],
     ) -> dict:
         """
         Update a dataset.
 
         dataset_id is an id of the dataset (Required).
         name is name of your dataset (Required).
+        tags is a list of tag (Optional).
         """
         endpoint = "datasets/" + dataset_id
         payload = {"name": name}
+        if tags:
+            payload["tags"] = tags
         return self.api.put_request(endpoint, payload=payload)
 
     def delete_dataset(self, dataset_id: str) -> None:

@@ -2393,6 +2393,8 @@ Create a new dataset.
 ```python
 dataset = client.create_dataset(
     name="object-detection", # Only lowercase alphanumeric characters + hyphen is available
+    tags=["cat", "dog"], # max 5 tags per dataset.
+    visibility="workspace", # visibility can be 'workspace' or 'public'. workspace is only visible to your workspace members. public is visible to all users.
     license="The MIT License" # Optional
 )
 ```
@@ -2405,6 +2407,8 @@ See API docs for details.
 {
     'id': 'YOUR_DATASET_ID',
     'name': 'object-detection',
+    'tags': ['cat', 'dog'],
+    'visibility': 'workspace',
     'license': 'The MIT License',
     'createdAt': '2022-10-31T02:20:00.248Z',
     'updatedAt': '2022-10-31T02:20:00.248Z'
@@ -2431,11 +2435,13 @@ datasets = client.get_datasets()
 
 The success response is the same as when created, but it is an array.
 
-You can filter by type and keywords.
+You can filter by keywords and visibility, tags.
 
 ```python
 datasets = client.get_datasets(
-    keyword="dog"
+    keyword="dog",
+    tags=["cat", "dog"], # max 5 tags per dataset.
+    visibility="workspace", # visibility can be 'workspace' or 'public'.
 )
 ```
 
@@ -2447,7 +2453,7 @@ Update a single dataset.
 
 ```python
 dataset = client.update_dataset(
-    dataset_id="YOUR_DATASET_ID", name="object-detection"
+    dataset_id="YOUR_DATASET_ID", name="object-detection", tags=["cat", "dog"]
 )
 ```
 
