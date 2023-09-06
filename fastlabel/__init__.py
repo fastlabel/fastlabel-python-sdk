@@ -3907,45 +3907,41 @@ class Client:
 
     def get_dataset_objects(
         self,
-        dataset_version_id: str,
-        keyword: str = None,
-        offset: int = None,
-        limit: int = 100,
+        dataset: str,
+        version: str = None,
+        tags: List[str] = [],
     ) -> list:
         """
         Returns a list of dataset objects.
 
-        Returns up to 1000 at a time, to get more, set offset as the starting position
-        to fetch.
-
-        dataset_version_id is dataset object in dataset version (Required).
-        keyword are search terms in the dataset object name (Optional).
-        offset is the starting position number to fetch (Optional).
-        limit is the max number to fetch (Optional).
+        dataset is dataset name (Required).
+        version is dataset version (Optional).
+        tags is a list of tag (Optional).
         """
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
         endpoint = "dataset-objects"
-        params = {"datasetVersionId": dataset_version_id}
-        if keyword:
-            params["keyword"] = keyword
-        if offset:
-            params["offset"] = offset
-        if limit:
-            params["limit"] = limit
+        params = {"dataset": dataset}
+        if version:
+            params["version"] = version
+        if tags:
+            params["tags"] = tags
         return self.api.get_request(endpoint, params=params)
 
     def create_dataset_object(
-        self, dataset_version_id: str, name: str, file_path: str
+        self,
+        dataset: str,
+        name: str,
+        file_path: str,
+        tags: List[str] = [],
+        annotations: List[dict] = [],
     ) -> dict:
         """
         Create a dataset object.
 
-        dataset_version_id is dataset object in dataset version (Required).
+        dataset is dataset name (Required).
         name is a unique identifier of dataset object in your dataset (Required).
         file_path is a path to data. (Required).
+        tags is a list of tag (Optional).
+        annotations is a list of annotation (Optional).
         """
         endpoint = "dataset-objects"
         if not utils.is_object_supported_size(file_path):
@@ -3953,11 +3949,22 @@ class Client:
                 "Supported object size is under 250 MB.", 422
             )
         payload = {
-            "datasetVersionId": dataset_version_id,
+            "dataset": dataset,
             "name": name,
-            "file": utils.base64_encode(file_path),
+            "filePath": utils.base64_encode(file_path),
         }
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            payload["annotations"] = annotations
         return self.api.post_request(endpoint, payload=payload)
+
+    def delete_dataset_object(self, dataset_object_id: str) -> None:
+        """
+        Delete a dataset object.
+        """
+        endpoint = "dataset-objects/" + dataset_object_id
+        self.api.delete_request(endpoint)
 
     def update_aws_s3_storage(
         self, project: str, bucket_name: str, bucket_region: str, prefix: str = None

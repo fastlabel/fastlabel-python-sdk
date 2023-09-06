@@ -2476,11 +2476,41 @@ Create object in the dataset.
 The types of objects that can be created are "image", "video", and "audio".
 There are type-specific methods. but they can be used in the same way.
 
+Created object are automatically assigned to the "latest" dataset version.
+
 ```python
 dataset_object = client.create_dataset_object(
-    dataset_version_id="YOUR_DATASET_VERSION_ID",
+    dataset="YOUR_DATASET_NAME",
     name="brushwood_dog.jpg",
     file_path="./brushwood_dog.jpg",
+    tags=["dog"], # max 5 tags per dataset object.
+    annotations=[
+        {
+        "keypoints": [
+            {
+                "value": [
+                   102.59,
+                   23.04,
+                   1
+                ],
+                "key": "head"
+            }
+        ],
+        "attributes": [
+            {
+                "value": "Scottish field",
+                "key": "kind"
+            }
+        ],
+        "confidenceScore": 0,
+        "rotation": 0,
+        "points": [
+            0
+        ],
+        "value": "dog",
+        "type": "bbox" # type can be 'bbox', 'segmentation'.
+        }
+    ]
 )
 ```
 
@@ -2495,7 +2525,46 @@ See API docs for details.
     'size': 6717,
     'height': 225,
     'width': 225,
-    'groupId': None,
+    'tags': [
+        'dog'
+    ],
+    "annotations": [
+        {
+            "id": "YOUR_DATASET_OBJECT_ANNOTATION_ID",
+            "type": "bbox",
+            "title": "dog",
+            "value": "dog",
+            "points": [
+                0
+            ],
+            "attributes": [
+                {
+                    "value": "Scottish field",
+                    "key": "kind",
+                    "name": "Kind",
+                    "type": "text"
+                }
+            ],
+            "keypoints": [
+                {
+                    "edges": [
+                        "right_shoulder",
+                        "left_shoulder"
+                    ],
+                    "value": [
+                        102.59,
+                        23.04,
+                        1
+                    ],
+                    "key": "head",
+                    "name": "頭"
+                }
+            ],
+            "rotation": 0,
+            "color": "#FF0000",
+            "confidence_score": -1
+        }
+    ],
     'createdAt': '2022-10-30T08:32:20.748Z',
     'updatedAt': '2022-10-30T08:32:20.748Z'
 }
@@ -2518,20 +2587,28 @@ Success response is the same as when created.
 Get all dataset object in the dataset. (Up to 1000 tasks)
 
 ```python
-dataset_objects = client.get_dataset_objects(dataset_version_id="YOUR_DATASET_VERSION_ID")
+dataset_objects = client.get_dataset_objects(dataset="YOUR_DATASET_NAME")
 ```
 
 The success response is the same as when created, but it is an array.
 
-You can filter by keywords.
+You can filter by version and tags.
 
 ```python
 dataset_objects = client.get_dataset_objects(
-    dataset_version_id="YOUR_DATASET_VERSION_ID", keyword="dog"
+    dataset="YOUR_DATASET_NAME",
+    version="latest", # default is "latest"
+    tags=["cat"],
 )
 ```
 
-If you wish to retrieve more than 1000 data sets, please refer to the Task [sample code](#get-tasks).
+### Delete Dataset Object
+
+Delete a single dataset object.
+
+```python
+client.delete_dataset_object(dataset_object_id="YOUR_DATASET_OBJECT_ID")
+```
 
 ## Converter
 
