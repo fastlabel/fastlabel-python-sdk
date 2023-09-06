@@ -2486,29 +2486,29 @@ dataset_object = client.create_dataset_object(
     tags=["dog"], # max 5 tags per dataset object.
     annotations=[
         {
-        "keypoints": [
-            {
-                "value": [
-                   102.59,
-                   23.04,
-                   1
-                ],
-                "key": "head"
-            }
-        ],
-        "attributes": [
-            {
-                "value": "Scottish field",
-                "key": "kind"
-            }
-        ],
-        "confidenceScore": 0,
-        "rotation": 0,
-        "points": [
-            0
-        ],
-        "value": "dog",
-        "type": "bbox" # type can be 'bbox', 'segmentation'.
+            "keypoints": [
+                {
+                    "value": [
+                    102.59,
+                    23.04,
+                    1
+                    ],
+                    "key": "head"
+                }
+            ],
+            "attributes": [
+                {
+                    "value": "Scottish field",
+                    "key": "kind"
+                }
+            ],
+            "confidenceScore": 0,
+            "rotation": 0,
+            "points": [
+                0
+            ],
+            "value": "dog",
+            "type": "bbox" # type can be 'bbox', 'segmentation'.
         }
     ]
 )
