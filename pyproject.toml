@@ -1,0 +1,28 @@
+[project]
+name = "fastlabel"
+version = "0.14.0.dev0"
+description = "The official Python SDK for FastLabel API, the Data Platform for AI"
+authors = [
+    { name = "eisuke-ueta", email = "eisuke.ueta@fastlabel.ai" }
+]
+dependencies = [
+    "requests>=2.31.0",
+    "numpy>=1.24.4",
+    "geojson>=3.0.1",
+    "xmltodict>=0.13.0",
+    "Pillow>=10.0.0",
+    "opencv-python-headless>=4.8.0.76",
+]
+readme = "README.md"
+requires-python = ">=3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
