@@ -8,7 +8,7 @@ authors = [
 dependencies = [
     "requests>=2.31.0",
     "numpy>=1.24.4",
-    "geojson>=3.0.1",
+    "geojson<3",
     "xmltodict>=0.13.0",
     "Pillow>=10.0.0",
     "opencv-python-headless>=4.8.0.76",
