@@ -2562,7 +2562,7 @@ See API docs for details.
             ],
             "rotation": 0,
             "color": "#FF0000",
-            "confidence_score": -1
+            "confidenceScore": -1
         }
     ],
     'createdAt': '2022-10-30T08:32:20.748Z',
