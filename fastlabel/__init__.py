@@ -4,7 +4,7 @@ import logging
 import os
 import re
 from concurrent.futures import ThreadPoolExecutor
-from typing import List
+from typing import List, Optional
 
 import cv2
 import numpy as np
@@ -3832,6 +3832,7 @@ class Client:
         self,
         keyword: str = None,
         tags: List[str] = [],
+        license: Optional[str] = None,
         visibility: str = None,
     ) -> list:
         """
@@ -3847,6 +3848,8 @@ class Client:
             params["keyword"] = keyword
         if tags:
             params["tags"] = tags
+        if license:
+            params["license"] = license
         if visibility:
             params["visibility"] = visibility
         return self.api.get_request(endpoint, params=params)
