@@ -2489,9 +2489,9 @@ dataset_object = client.create_dataset_object(
             "keypoints": [
                 {
                     "value": [
-                    102.59,
-                    23.04,
-                    1
+                        102.59,
+                        23.04,
+                        1
                     ],
                     "key": "head"
                 }
