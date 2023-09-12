@@ -2441,6 +2441,7 @@ You can filter by keywords and visibility, tags.
 datasets = client.get_datasets(
     keyword="dog",
     tags=["cat", "dog"], # max 5 tags per dataset.
+    license="mit",
     visibility="workspace", # visibility can be 'workspace' or 'public' or 'organization'.
 )
 ```
