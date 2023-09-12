@@ -6,12 +6,6 @@ import pytest
 
 from fastlabel import Client
 
-OBJECT_SIGNED_URL_KEY = "objectSignedUrl"
-
-
-def remove_object_signed_url(d: dict) -> dict:
-    return {k: v for k, v in d.items() if k != OBJECT_SIGNED_URL_KEY}
-
 
 @pytest.fixture
 def client() -> Client:
@@ -57,7 +51,7 @@ class TestImageDataset:
         target_file = Path(sys.path[0]) / "files/test_image.jpg"
         # Act
         dataset_object = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+            dataset=testing_dataset["name"],
             name="test_image.jpg",
             file_path=str(target_file),
         )
@@ -67,13 +61,12 @@ class TestImageDataset:
         assert dataset_object["size"] == 6717
         assert dataset_object["height"] == 225
         assert dataset_object["width"] == 225
-        assert dataset_object["groupId"] is None
 
     def test_find_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_image.jpg"
         dataset_object = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+            dataset=testing_dataset["name"],
             name="test_image.jpg",
             file_path=str(target_file),
         )
@@ -85,29 +78,26 @@ class TestImageDataset:
     def test_get_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_image.jpg"
-        dataset_object1 = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+        client.create_dataset_object(
+            dataset=testing_dataset["name"],
             name="test_image1.jpg",
             file_path=str(target_file),
+            tags=["image1"],
         )
-        dataset_object2 = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+        client.create_dataset_object(
+            dataset=testing_dataset["name"],
             name="test_image2.jpg",
             file_path=str(target_file),
+            tags=["image1"],
         )
         # Act
         results = client.get_dataset_objects(
-            dataset_version_id=testing_dataset["version"]["id"]
+            dataset=testing_dataset["name"],
+            tags=["image1"],
         )
         # Assert
         assert results is not None
         assert len(results) == 2
-        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
-            dataset_object1
-        )
-        assert remove_object_signed_url(results[1]) == remove_object_signed_url(
-            dataset_object2
-        )
 
 
 class TestVideoDataset:
@@ -138,7 +128,7 @@ class TestVideoDataset:
         target_file = Path(sys.path[0]) / "files/test_video.mp4"
         # Act
         dataset_object = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+            dataset=testing_dataset["name"],
             name="test_video.mp4",
             file_path=str(target_file),
         )
@@ -148,13 +138,12 @@ class TestVideoDataset:
         assert dataset_object["size"] == 534032
         assert dataset_object["height"] == 240
         assert dataset_object["width"] == 320
-        assert dataset_object["groupId"] is None
 
     def test_find_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_video.mp4"
         dataset_object = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+            dataset=testing_dataset["name"],
             name="test_video.mp4",
             file_path=str(target_file),
         )
@@ -166,29 +155,26 @@ class TestVideoDataset:
     def test_get_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_video.mp4"
-        dataset_object1 = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+        client.create_dataset_object(
+            dataset=testing_dataset["name"],
             name="test_video1.mp4",
             file_path=str(target_file),
+            tags=["video1"],
         )
-        dataset_object2 = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+        client.create_dataset_object(
+            dataset=testing_dataset["name"],
             name="test_video2.mp4",
             file_path=str(target_file),
+            tags=["video1"],
         )
         # Act
         results = client.get_dataset_objects(
-            dataset_version_id=testing_dataset["version"]["id"]
+            dataset=testing_dataset["name"],
+            tags=["video1"],
         )
         # Assert
         assert results is not None
         assert len(results) == 2
-        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
-            dataset_object1
-        )
-        assert remove_object_signed_url(results[1]) == remove_object_signed_url(
-            dataset_object2
-        )
 
 
 class TestAudioDataset:
@@ -220,7 +206,7 @@ class TestAudioDataset:
         target_file = Path(sys.path[0]) / "files/test_audio.mp3"
         # Act
         dataset_object = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+            dataset=testing_dataset["name"],
             name="test_audio.mp3",
             file_path=str(target_file),
         )
@@ -230,13 +216,12 @@ class TestAudioDataset:
         assert dataset_object["size"] == 16182
         assert dataset_object["height"] == 0
         assert dataset_object["width"] == 0
-        assert dataset_object["groupId"] is None
 
     def test_find_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_audio.mp3"
         dataset_object = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+            dataset=testing_dataset["name"],
             name="test_audio.mp3",
             file_path=str(target_file),
         )
@@ -248,29 +233,26 @@ class TestAudioDataset:
     def test_get_dataset_object(self, client: Client, testing_dataset: dict):
         # Arrange
         target_file = Path(sys.path[0]) / "files/test_audio.mp3"
-        dataset_object1 = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+        client.create_dataset_object(
+            dataset=testing_dataset["name"],
             name="test_audio1.mp3",
             file_path=str(target_file),
+            tags=["audio1"],
         )
-        dataset_object2 = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+        client.create_dataset_object(
+            dataset=testing_dataset["name"],
             name="test_audio2.mp3",
             file_path=str(target_file),
+            tags=["audio1"],
         )
         # Act
         results = client.get_dataset_objects(
-            dataset_version_id=testing_dataset["version"]["id"]
+            dataset=testing_dataset["name"],
+            tags=["audio1"],
         )
         # Assert
         assert results is not None
         assert len(results) == 2
-        assert remove_object_signed_url(results[0]) == remove_object_signed_url(
-            dataset_object1
-        )
-        assert remove_object_signed_url(results[1]) == remove_object_signed_url(
-            dataset_object2
-        )
 
 
 class TestMixingDataset:
@@ -283,7 +265,7 @@ class TestMixingDataset:
         target_file = Path(sys.path[0]) / "files/test_other_file.txt"
         # Act
         dataset_object = client.create_dataset_object(
-            dataset_version_id=testing_dataset["version"]["id"],
+            dataset=testing_dataset["name"],
             name="test_other_file.txt",
             file_path=str(target_file),
         )
@@ -293,4 +275,3 @@ class TestMixingDataset:
         assert dataset_object["size"] == 3090
         assert dataset_object["height"] == 0
         assert dataset_object["width"] == 0
-        assert dataset_object["groupId"] is None

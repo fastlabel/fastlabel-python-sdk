@@ -5,7 +5,7 @@ import fastlabel
 client = fastlabel.Client()
 
 dataset_object = client.create_dataset_object(
-    dataset_version_id="YOUR_DATASET_VERSION_ID",
+    dataset="YOUR_DATASET_NAME",
     name="NAME",
     file_path="FILE_PATH",
 )

@@ -4,7 +4,5 @@ import fastlabel
 
 client = fastlabel.Client()
 
-dataset_objects = client.get_dataset_objects(
-    dataset_version_id="YOUR_DATASET_VERSION_ID"
-)
+dataset_objects = client.get_dataset_objects(dataset="YOUR_DATASET_NAME")
 pprint(dataset_objects)

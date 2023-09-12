@@ -1,12 +1,12 @@
 import os
-import requests
 from typing import Union
+
+import requests
 
 from .exceptions import FastLabelException, FastLabelInvalidException
 
 
 class Api:
-
     base_url = "https://api.fastlabel.ai/v1/"
     access_token = None
 
@@ -124,6 +124,5 @@ class Api:
         url: str,
         file_path: str,
     ):
-        files = {'file': open(file_path, 'rb')}
+        files = {"file": open(file_path, "rb")}
         return requests.put(url, files=files)
-
