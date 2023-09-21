@@ -2603,6 +2603,22 @@ dataset_objects = client.get_dataset_objects(
 )
 ```
 
+### Download Dataset Objects
+
+Download dataset objects in the dataset to specific directories.
+
+You can filter by version, tags and types.
+
+```python
+client.download_dataset_objects(
+  dataset="YOUR_DATASET_NAME",
+  path="YOUR_DOWNLOAD_PATH",
+  version="latest", # default is "latest"
+  tags=["cat"],
+  types=["train", "valid"],
+)
+```
+
 ### Delete Dataset Object
 
 Delete a single dataset object.
