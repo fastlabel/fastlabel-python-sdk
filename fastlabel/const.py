@@ -222,6 +222,9 @@ SUPPORTED_PCD_SIZE = 30 * math.pow(1024, 2)
 # API can accept under 250 MB
 SUPPORTED_OBJECT_SIZE = 250 * math.pow(1024, 2)
 
+# Only 'avc1' and 'H264' are supported for video task creation.
+SUPPORTED_CODECS = ["avc1", "H264"]
+
 
 SUPPORTED_INFERENCE_IMAGE_SIZE = 6 * math.pow(1024, 2)
 
