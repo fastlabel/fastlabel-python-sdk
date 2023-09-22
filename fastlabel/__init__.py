@@ -1252,6 +1252,10 @@ class Client:
             raise FastLabelInvalidException(
                 "Supported video size is under 250 MB.", 422
             )
+        if not utils.is_video_supported_codec(file_path):
+            raise FastLabelInvalidException(
+                "Supported video encoding for registration through the SDK is only H.264.", 422
+            )
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}
@@ -1315,6 +1319,10 @@ class Client:
         if not utils.is_video_supported_size(file_path):
             raise FastLabelInvalidException(
                 "Supported video size is under 250 MB.", 422
+            )
+        if not utils.is_video_supported_codec(file_path):
+            raise FastLabelInvalidException(
+                "Supported video encoding for registration through the SDK is only H.264.", 422
             )
 
         file = utils.base64_encode(file_path)

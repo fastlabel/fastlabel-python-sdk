@@ -5,6 +5,7 @@ from typing import List
 
 import geojson
 import numpy as np
+import cv2
 
 from fastlabel import const
 
@@ -16,6 +17,10 @@ def base64_encode(file_path: str) -> str:
 
 def is_image_supported_ext(file_path: str) -> bool:
     return file_path.lower().endswith((".png", ".jpg", ".jpeg"))
+
+
+def is_video_supported_codec(file_path: str) -> bool:
+    return get_video_fourcc(file_path) in const.SUPPORTED_FOURCC
 
 
 def is_video_supported_ext(file_path: str) -> bool:
@@ -164,3 +169,11 @@ def is_clockwise(points: list) -> bool:
 def get_json_length(value) -> int:
     json_str = json.dumps(value)
     return len(json_str)
+
+
+def get_video_fourcc(video_path: str) -> str:
+    cap = cv2.VideoCapture(video_path)
+    fourcc_code = int(cap.get(cv2.CAP_PROP_FOURCC))
+    fourcc_str = "".join([chr((fourcc_code >> 8 * i) & 0xFF) for i in range(4)])
+    cap.release()
+    return fourcc_str

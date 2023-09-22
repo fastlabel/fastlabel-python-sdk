@@ -767,6 +767,8 @@ task_id = client.create_video_task(
 ##### Limitation
 
 - You can upload up to a size of 250 MB.
+- You can upload only videos with H.264 encoding.
+- You can upload only MP4 file format.
 
 #### Find Task
 
