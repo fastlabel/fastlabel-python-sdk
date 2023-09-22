@@ -20,7 +20,7 @@ def is_image_supported_ext(file_path: str) -> bool:
 
 
 def is_video_supported_codec(file_path: str) -> bool:
-    return get_video_codec(file_path) in const.SUPPORTED_CODECS
+    return get_video_fourcc(file_path) in const.SUPPORTED_FOURCC
 
 
 def is_video_supported_ext(file_path: str) -> bool:
@@ -171,7 +171,7 @@ def get_json_length(value) -> int:
     return len(json_str)
 
 
-def get_video_codec(video_path: str) -> str:
+def get_video_fourcc(video_path: str) -> str:
     cap = cv2.VideoCapture(video_path)
     fourcc_code = int(cap.get(cv2.CAP_PROP_FOURCC))
     fourcc_str = "".join([chr((fourcc_code >> 8 * i) & 0xFF) for i in range(4)])
