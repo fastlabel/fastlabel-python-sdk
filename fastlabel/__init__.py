@@ -1254,7 +1254,7 @@ class Client:
             )
         if not utils.is_video_supported_codec(file_path):
             raise FastLabelInvalidException(
-                "Supported codec is H.264.", 422
+                "Supported video encoding for registration through the SDK is only H.264.", 422
             )
 
         file = utils.base64_encode(file_path)
@@ -1322,7 +1322,7 @@ class Client:
             )
         if not utils.is_video_supported_codec(file_path):
             raise FastLabelInvalidException(
-                "Supported codec is H.264.", 422
+                "Supported video encoding for registration through the SDK is only H.264.", 422
             )
 
         file = utils.base64_encode(file_path)
