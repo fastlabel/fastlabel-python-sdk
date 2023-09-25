@@ -2615,7 +2615,7 @@ client.download_dataset_objects(
   path="YOUR_DOWNLOAD_PATH",
   version="latest", # default is "latest"
   tags=["cat"],
-  types=["train", "valid"],
+  types=["train", "valid"],  # choices are "train", "valid", "test" and "none" (Optional)
 )
 ```
 
