@@ -247,3 +247,10 @@ class Priority(Enum):
     low = 10
     medium = 20
     high = 30
+
+
+class DatasetObjectType(Enum):
+    none = "none"
+    train = "train"
+    valid = "valid"
+    test = "test"

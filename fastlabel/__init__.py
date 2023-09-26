@@ -1,11 +1,14 @@
+import asyncio
 import glob
 import json
 import logging
 import os
 import re
 from concurrent.futures import ThreadPoolExecutor
-from typing import List, Optional
+from pathlib import Path
+from typing import List, Optional, Union
 
+import aiohttp
 import cv2
 import numpy as np
 import xmltodict
@@ -20,6 +23,7 @@ from fastlabel.const import (
     POSE_ESTIMATION_MIN_STROKE_WIDTH,
     SEPARATOER,
     AnnotationType,
+    DatasetObjectType,
     Priority,
 )
 
@@ -3917,10 +3921,7 @@ class Client:
         return self.api.get_request(endpoint)
 
     def get_dataset_objects(
-        self,
-        dataset: str,
-        version: str = None,
-        tags: List[str] = [],
+        self, dataset: str, version: str = None, tags: List[str] = []
     ) -> list:
         """
         Returns a list of dataset objects.
@@ -3936,6 +3937,77 @@ class Client:
         if tags:
             params["tags"] = tags
         return self.api.get_request(endpoint, params=params)
+
+    def download_dataset_objects(
+        self,
+        dataset: str,
+        path: str,
+        version: str = "",
+        tags: Optional[List[str]] = None,
+        types: Optional[List[Union[str, DatasetObjectType]]] = None,
+    ):
+        endpoint = "dataset-objects/signed-urls"
+        params = {"dataset": dataset}
+        if version:
+            params["version"] = version
+        if tags:
+            params["tags"] = tags
+        if types:
+            try:
+                types = list(
+                    map(
+                        lambda t: t
+                        if isinstance(t, DatasetObjectType)
+                        else DatasetObjectType(t),
+                        types,
+                    )
+                )
+            except ValueError:
+                raise FastLabelInvalidException(
+                    f"types must be {[k for k in DatasetObjectType.__members__.keys()]}.",
+                    422,
+                )
+            params["types"] = [t.value for t in types]
+
+        response = self.api.get_request(endpoint, params=params)
+
+        download_path = Path(path)
+        download_path.mkdir(exist_ok=True)
+        object_map = {}
+        if types:
+            for type_ in types:
+                (download_path / type_.value).mkdir(exist_ok=True)
+                object_map[type_.value] = [
+                    obj for obj in response if obj["type"] == type_.value
+                ]
+        else:
+            object_map[""] = response
+
+        sem = asyncio.Semaphore(10)
+
+        async def __download(base_path: Path, _obj: dict):
+            async with sem:
+                await self.__download_dataset_object(base_path, _obj)
+
+        for _type, objects in object_map.items():
+            base_path = download_path / _type
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(
+                asyncio.gather(*[__download(base_path, obj) for obj in objects])
+            )
+            with Path(base_path / "annotations.json").open("w") as f:
+                annotations = [
+                    {"name": obj["name"], "annotations": obj["annotations"]}
+                    for obj in objects
+                ]
+                json.dump(annotations, fp=f, indent=4)
+
+    async def __download_dataset_object(self, download_path: Path, obj: dict):
+        obj_path = download_path / obj["name"]
+        async with aiohttp.ClientSession() as session:
+            async with session.get(obj["signedUrl"]) as response:
+                with obj_path.open("wb") as f:
+                    f.write(await response.read())
 
     def create_dataset_object(
         self,
