@@ -1694,7 +1694,7 @@ class Client:
         if not utils.is_pcd_supported_ext(file_path):
             raise FastLabelInvalidException("Supported extensions are pcd only", 422)
         if not utils.is_pcd_supported_size(file_path):
-            raise FastLabelInvalidException("Supported PCD size is under 30 MB.", 422)
+            raise FastLabelInvalidException("Supported PCD size is under 100 MB.", 422)
 
         file = utils.base64_encode(file_path)
         payload = {"project": project, "name": name, "file": file}

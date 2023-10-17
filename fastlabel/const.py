@@ -216,8 +216,8 @@ SUPPORTED_AUDIO_SIZE = 120 * math.pow(1024, 2)
 # API can accept under 2GB
 SUPPORTED_DICOM_SIZE = 2000 * math.pow(1024, 2)
 
-# API can accept under 30 MB
-SUPPORTED_PCD_SIZE = 30 * math.pow(1024, 2)
+# API can accept under 100 MB
+SUPPORTED_PCD_SIZE = 100 * math.pow(1024, 2)
 
 # API can accept under 250 MB
 SUPPORTED_OBJECT_SIZE = 250 * math.pow(1024, 2)
