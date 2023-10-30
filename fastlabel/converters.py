@@ -8,7 +8,7 @@ from decimal import Decimal
 from operator import itemgetter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List, Optional
+from typing import List, Dict, Optional
 
 import cv2
 import geojson
@@ -269,7 +269,7 @@ def __get_coco_annotation(
     category_id: int,
     image_id: str,
     annotation_type: str,
-    annotation_attributes: dict[str, AttributeValue],
+    annotation_attributes: Dict[str, AttributeValue],
 ) -> dict:
     annotation = {}
     annotation["num_keypoints"] = len(keypoints) if keypoints else 0
@@ -1128,7 +1128,7 @@ def _get_annotation_points_for_image_annotation(annotation: dict):
     return annotation.get("points")
 
 
-def _get_coco_annotation_attributes(annotation: dict) -> dict[str, AttributeValue]:
+def _get_coco_annotation_attributes(annotation: dict) -> Dict[str, AttributeValue]:
     coco_attributes = {}
     attributes = annotation.get("attributes")
     if not attributes:
