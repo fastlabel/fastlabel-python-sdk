@@ -4217,7 +4217,6 @@ class Client:
 
     def get_training_jobs(
         self,
-        keyword: str = None,
         offset: int = None,
         limit: int = 100,
     ) -> list:
@@ -4226,7 +4225,6 @@ class Client:
         Returns up to 1000 at a time, to get more, set offset as the starting position
         to fetch.
 
-        keyword are search terms in the tag name (Optional).
         offset is the starting position number to fetch (Optional).
         limit is the max number to fetch (Optional).
         """
@@ -4236,8 +4234,6 @@ class Client:
             )
         endpoint = "trainings"
         params = {}
-        if keyword:
-            params["keyword"] = keyword
         if offset:
             params["offset"] = offset
         if limit:
