@@ -32,6 +32,7 @@
   - [YOLO To FastLabel](#yolo-to-fastlabel)
   - [Pascal VOC To FastLabel](#pascal-voc-to-fastlabel)
   - [labelme To FastLabel](#labelme-to-fastlabel)
+- [Model](#model)
 - [API Docs](#api-docs)
 
 ## Installation
@@ -3048,7 +3049,7 @@ Example of two training jobs.
 ```
 
 
-## Execute endpoint
+### Execute endpoint
 
 Create the endpoint from the screen at first.
 
@@ -3086,9 +3087,7 @@ if __name__ == '__main__':
   cv2.imwrite(RESULT_IMAGE_FILE_PATH, img)
 ```
 
-## Model Monitoring
-
-### Create Request Results
+### Create Request Results for Monitoring
 
 You can integrate the results of model endpoint calls,
 which are targeted for aggregation in model monitoring, from an external source.
