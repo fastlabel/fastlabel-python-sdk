@@ -1258,7 +1258,8 @@ class Client:
             )
         if not utils.is_video_supported_codec(file_path):
             raise FastLabelInvalidException(
-                "Supported video encoding for registration through the SDK is only H.264.", 422
+                "Supported video encoding for registration through the SDK is only H.264.",
+                422,
             )
 
         file = utils.base64_encode(file_path)
@@ -1326,7 +1327,8 @@ class Client:
             )
         if not utils.is_video_supported_codec(file_path):
             raise FastLabelInvalidException(
-                "Supported video encoding for registration through the SDK is only H.264.", 422
+                "Supported video encoding for registration through the SDK is only H.264.",
+                422,
             )
 
         file = utils.base64_encode(file_path)
@@ -4143,6 +4145,31 @@ class Client:
         endpoint = "files"
         params = {"project": project, "fileName": file_name, "fileType": file_type}
         return self.api.get_request(endpoint, params)
+
+    def get_training_jobs(
+        self,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of training jobs.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "trainings"
+        params = {}
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+
+        return self.api.get_request(endpoint, params=params)
 
     def execute_endpoint(
         self,

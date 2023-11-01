@@ -2964,6 +2964,90 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
 
 > Please check const.COLOR_PALLETE for index colors.
 
+## Model
+
+### Get training jobs
+
+Get training jobs.
+
+```python
+def get_training_jobs() -> list[dict]:
+    all_training_jobs = []
+    offset = None
+    while True:
+        time.sleep(1)
+
+        training_jobs = client.get_training_jobs(offset=offset)
+        all_training_jobs.extend(training_jobs)
+
+        if len(training_jobs) > 0:
+            offset = len(all_training_jobs)
+        else:
+            break
+    return all_training_jobs
+
+```
+
+#### Response
+
+Example of two training jobs.
+
+```python
+[
+    {
+        "trainingJobId": "f40c5838-4c3a-482f-96b7-f77e16c96fed",
+        "status": "in_progress",
+        "baseModelName": "FastLabel Object Detection High Accuracy - 汎用",
+        "instanceType": "ml.p3.2xlarge",
+        "epoch": 300,
+        "projects": [
+            "image-bbox"
+        ],
+        "statuses": [],
+        "tags": [],
+        "contentCount": 23,
+        "userName": "Admin",
+        "createdAt": "2023-10-31T07:10:28.306Z",
+        "completedAt": null,
+        "customModel": {
+            "modelId": "",
+            "modelName": "",
+            "modelURL": "",
+            "classes": []
+        }
+    },
+    {
+        "trainingJobId": "1d2bc86a-c7f1-40a5-8e85-48246cc3c8d2",
+        "status": "completed",
+        "baseModelName": "custom-object-detection-image",
+        "instanceType": "ml.p3.2xlarge",
+        "epoch": 300,
+        "projects": [
+            "image-bbox"
+        ],
+        "statuses": [
+            "approved"
+        ],
+        "tags": [
+            "trainval"
+        ],
+        "contentCount": 20,
+        "userName": "Admin",
+        "createdAt": "2023-10-31T06:56:28.112Z",
+        "completedAt": "2023-10-31T07:08:26.000Z",
+        "customModel": {
+            "modelId": "a6728876-2eb7-49b5-9fd8-7dee1b8a81b3",
+            "modelName": "fastlabel_object_detection-2023-10-31-07-08-29",
+            "modelURL": "URL for download model file",
+            "classes": [
+                "person"
+            ]
+        }
+    }
+]
+```
+
+
 ## Execute endpoint
 
 Create the endpoint from the screen at first.
