@@ -3835,6 +3835,13 @@ class Client:
 
     # Dataset
 
+    def find_dataset_v2(self, dataset_id: str) -> dict:
+        """
+        Find a dataset with latest version.
+        """
+        endpoint = "datasets-v2/" + dataset_id
+        return self.api.get_request(endpoint)
+
     def find_dataset(self, dataset_id: str) -> dict:
         """
         Find a dataset with latest version.
