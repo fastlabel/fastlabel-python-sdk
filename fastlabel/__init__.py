@@ -3835,12 +3835,44 @@ class Client:
 
     # Dataset
 
+    def find_dataset_v2(self, dataset_id: str) -> dict:
+        """
+        Find a dataset with latest version.
+        """
+        endpoint = "datasets-v2/" + dataset_id
+        return self.api.get_request(endpoint)
+
     def find_dataset(self, dataset_id: str) -> dict:
         """
         Find a dataset with latest version.
         """
         endpoint = "datasets/" + dataset_id
         return self.api.get_request(endpoint)
+
+    def get_datasets_v2(
+        self,
+        keyword: str = None,
+        tags: List[str] = [],
+        license: Optional[str] = None,
+        visibility: str = None,
+    ) -> list:
+        """
+        Returns a list of datasets.
+
+        keyword are search terms in the dataset slug (Optional).
+        visibility are search terms in the dataset visibility.(Optional).
+        """
+        endpoint = "datasets-v2"
+        params = {}
+        if keyword:
+            params["keyword"] = keyword
+        if tags:
+            params["tags"] = tags
+        if license:
+            params["license"] = license
+        if visibility:
+            params["visibility"] = visibility
+        return self.api.get_request(endpoint, params=params)
 
     def get_datasets(
         self,
@@ -3868,6 +3900,25 @@ class Client:
             params["visibility"] = visibility
         return self.api.get_request(endpoint, params=params)
 
+    def create_dataset_v2(
+        self, name: str, tags: List[str] = [], visibility: str = None, license: str = ""
+    ) -> dict:
+        """
+        Create a dataset.
+
+        name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
+        tags is a list of tag (Optional).
+        visibility are search terms in the dataset visibility.(Optional).
+        license is a license name of your dataset. (Optional)
+        """
+        endpoint = "datasets-v2"
+        payload = {"name": name, "license": license}
+        if tags:
+            payload["tags"] = tags
+        if visibility:
+            payload["visibility"] = visibility
+        return self.api.post_request(endpoint, payload=payload)
+
     def create_dataset(
         self, name: str, tags: List[str] = [], visibility: str = None, license: str = ""
     ) -> dict:
@@ -3886,6 +3937,25 @@ class Client:
         if visibility:
             payload["visibility"] = visibility
         return self.api.post_request(endpoint, payload=payload)
+
+    def update_dataset_v2(
+        self,
+        dataset_id: str,
+        name: str = None,
+        tags: List[str] = None,
+    ) -> dict:
+        """
+        Update a dataset.
+
+        dataset_id is an id of the dataset (Required).
+        name is name of your dataset (Required).
+        tags is a list of tag (Optional).
+        """
+        endpoint = "datasets-v2/" + dataset_id
+        payload = {"name": name}
+        if tags is not None:
+            payload["tags"] = tags
+        return self.api.put_request(endpoint, payload=payload)
 
     def update_dataset(
         self,
@@ -3906,6 +3976,13 @@ class Client:
             payload["tags"] = tags
         return self.api.put_request(endpoint, payload=payload)
 
+    def delete_dataset_v2(self, dataset_id: str) -> None:
+        """
+        Delete a dataset.
+        """
+        endpoint = "datasets-v2/" + dataset_id
+        self.api.delete_request(endpoint)
+
     def delete_dataset(self, dataset_id: str) -> None:
         """
         Delete a dataset.
@@ -3915,12 +3992,37 @@ class Client:
 
     # Dataset Object
 
+    def find_dataset_object_v2(self, dataset_object_id: str) -> dict:
+        """
+        Find a dataset object.
+        """
+        endpoint = "dataset-objects-v2/" + dataset_object_id
+        return self.api.get_request(endpoint)
+
     def find_dataset_object(self, dataset_object_id: str) -> dict:
         """
         Find a dataset object.
         """
         endpoint = "dataset-objects/" + dataset_object_id
         return self.api.get_request(endpoint)
+
+    def get_dataset_objects_v2(
+        self, dataset: str, version: str = None, tags: List[str] = []
+    ) -> list:
+        """
+        Returns a list of dataset objects.
+
+        dataset is dataset name (Required).
+        version is dataset version (Optional).
+        tags is a list of tag (Optional).
+        """
+        endpoint = "dataset-objects-v2"
+        params = {"dataset": dataset}
+        if version:
+            params["version"] = version
+        if tags:
+            params["tags"] = tags
+        return self.api.get_request(endpoint, params=params)
 
     def get_dataset_objects(
         self, dataset: str, version: str = None, tags: List[str] = []
@@ -3939,6 +4041,70 @@ class Client:
         if tags:
             params["tags"] = tags
         return self.api.get_request(endpoint, params=params)
+
+    def download_dataset_objects_v2(
+        self,
+        dataset: str,
+        path: str,
+        version: str = "",
+        tags: Optional[List[str]] = None,
+        types: Optional[List[Union[str, DatasetObjectType]]] = None,
+    ):
+        endpoint = "dataset-objects-v2/signed-urls"
+        params = {"dataset": dataset}
+        if version:
+            params["version"] = version
+        if tags:
+            params["tags"] = tags
+        if types:
+            try:
+                types = list(
+                    map(
+                        lambda t: t
+                        if isinstance(t, DatasetObjectType)
+                        else DatasetObjectType(t),
+                        types,
+                    )
+                )
+            except ValueError:
+                raise FastLabelInvalidException(
+                    f"types must be {[k for k in DatasetObjectType.__members__.keys()]}.",
+                    422,
+                )
+            params["types"] = [t.value for t in types]
+
+        response = self.api.get_request(endpoint, params=params)
+
+        download_path = Path(path)
+        download_path.mkdir(exist_ok=True)
+        object_map = {}
+        if types:
+            for type_ in types:
+                (download_path / type_.value).mkdir(exist_ok=True)
+                object_map[type_.value] = [
+                    obj for obj in response if obj["type"] == type_.value
+                ]
+        else:
+            object_map[""] = response
+
+        sem = asyncio.Semaphore(10)
+
+        async def __download(base_path: Path, _obj: dict):
+            async with sem:
+                await self.__download_dataset_object(base_path, _obj)
+
+        for _type, objects in object_map.items():
+            base_path = download_path / _type
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(
+                asyncio.gather(*[__download(base_path, obj) for obj in objects])
+            )
+            with Path(base_path / "annotations.json").open("w") as f:
+                annotations = [
+                    {"name": obj["name"], "annotations": obj["annotations"]}
+                    for obj in objects
+                ]
+                json.dump(annotations, fp=f, indent=4)
 
     def download_dataset_objects(
         self,
@@ -4011,6 +4177,39 @@ class Client:
                 with obj_path.open("wb") as f:
                     f.write(await response.read())
 
+    def create_dataset_object_v2(
+        self,
+        dataset: str,
+        name: str,
+        file_path: str,
+        tags: List[str] = [],
+        annotations: List[dict] = [],
+    ) -> dict:
+        """
+        Create a dataset object.
+
+        dataset is dataset name (Required).
+        name is a unique identifier of dataset object in your dataset (Required).
+        file_path is a path to data. (Required).
+        tags is a list of tag (Optional).
+        annotations is a list of annotation (Optional).
+        """
+        endpoint = "dataset-objects-v2"
+        if not utils.is_object_supported_size(file_path):
+            raise FastLabelInvalidException(
+                "Supported object size is under 250 MB.", 422
+            )
+        payload = {
+            "dataset": dataset,
+            "name": name,
+            "filePath": utils.base64_encode(file_path),
+        }
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            payload["annotations"] = annotations
+        return self.api.post_request(endpoint, payload=payload)
+
     def create_dataset_object(
         self,
         dataset: str,
@@ -4043,6 +4242,13 @@ class Client:
         if annotations:
             payload["annotations"] = annotations
         return self.api.post_request(endpoint, payload=payload)
+
+    def delete_dataset_object_v2(self, dataset_object_id: str) -> None:
+        """
+        Delete a dataset object.
+        """
+        endpoint = "dataset-objects-v2/" + dataset_object_id
+        self.api.delete_request(endpoint)
 
     def delete_dataset_object(self, dataset_object_id: str) -> None:
         """
