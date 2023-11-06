@@ -3842,6 +3842,28 @@ class Client:
         endpoint = "datasets/" + dataset_id
         return self.api.get_request(endpoint)
 
+    def get_datasets_v2(
+        self,
+        keyword: str = None,
+        license: Optional[str] = None,
+        visibility: str = None,
+    ) -> list:
+        """
+        Returns a list of datasets.
+
+        keyword are search terms in the dataset slug (Optional).
+        visibility are search terms in the dataset visibility.(Optional).
+        """
+        endpoint = "datasets-v2"
+        params = {}
+        if keyword:
+            params["keyword"] = keyword
+        if license:
+            params["license"] = license
+        if visibility:
+            params["visibility"] = visibility
+        return self.api.get_request(endpoint, params=params)
+
     def get_datasets(
         self,
         keyword: str = None,
