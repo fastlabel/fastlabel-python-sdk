@@ -3970,6 +3970,22 @@ class Client:
         endpoint = "dataset-objects/" + dataset_object_id
         return self.api.get_request(endpoint)
 
+    def get_dataset_objects_v2(
+        self, dataset: str, tags: List[str] = []
+    ) -> list:
+        """
+        Returns a list of dataset objects.
+
+        dataset is dataset name (Required).
+        version is dataset version (Optional).
+        tags is a list of tag (Optional).
+        """
+        endpoint = "dataset-objects-v2"
+        params = {"dataset": dataset}
+        if tags:
+            params["tags"] = tags
+        return self.api.get_request(endpoint, params=params)
+
     def get_dataset_objects(
         self, dataset: str, version: str = None, tags: List[str] = []
     ) -> list:
