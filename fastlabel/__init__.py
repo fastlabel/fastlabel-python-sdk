@@ -3897,6 +3897,25 @@ class Client:
             params["visibility"] = visibility
         return self.api.get_request(endpoint, params=params)
 
+    def create_dataset_v2(
+        self, name: str, tags: List[str] = [], visibility: str = None, license: str = ""
+    ) -> dict:
+        """
+        Create a dataset.
+
+        name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
+        tags is a list of tag (Optional).
+        visibility are search terms in the dataset visibility.(Optional).
+        license is a license name of your dataset. (Optional)
+        """
+        endpoint = "datasets-v2"
+        payload = {"name": name, "license": license}
+        if tags:
+            payload["tags"] = tags
+        if visibility:
+            payload["visibility"] = visibility
+        return self.api.post_request(endpoint, payload=payload)
+
     def create_dataset(
         self, name: str, tags: List[str] = [], visibility: str = None, license: str = ""
     ) -> dict:
