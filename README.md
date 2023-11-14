@@ -2619,6 +2619,10 @@ client.download_dataset_objects(
   version="latest", # default is "latest"
   tags=["cat"],
   types=["train", "valid"],  # choices are "train", "valid", "test" and "none" (Optional)
+  annotations=["face", "tail"],
+  attributes=[
+    {"name": "breed", "value": "munchkin"},
+  ]
 )
 ```
 

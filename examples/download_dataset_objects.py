@@ -3,5 +3,11 @@ import fastlabel
 client = fastlabel.Client()
 
 client.download_dataset_objects(
-    dataset="object-detection", path="./downloads", types=["train", "valid"]
+    dataset="object-detection",
+    path="./downloads",
+    types=["train", "valid"],
+    annotations=["face", "tail"],
+    attributes=[
+        {"name": "breed", "value": "munchkin"},
+    ],
 )

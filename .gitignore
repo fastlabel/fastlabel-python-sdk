@@ -16,3 +16,4 @@ output/
 .venv/
 .env
 !tests/files/*
+.idea/

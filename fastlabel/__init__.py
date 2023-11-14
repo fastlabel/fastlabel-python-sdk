@@ -26,6 +26,7 @@ from fastlabel.const import (
     DatasetObjectType,
     Priority,
 )
+from fastlabel.types import DatasetObjectAttributeType
 
 from .api import Api
 from .exceptions import FastLabelInvalidException
@@ -3947,6 +3948,8 @@ class Client:
         version: str = "",
         tags: Optional[List[str]] = None,
         types: Optional[List[Union[str, DatasetObjectType]]] = None,
+        annotations: Optional[List[str]] = None,
+        attributes: Optional[List[DatasetObjectAttributeType]] = None,
     ):
         endpoint = "dataset-objects/signed-urls"
         params = {"dataset": dataset}
@@ -3970,6 +3973,10 @@ class Client:
                     422,
                 )
             params["types"] = [t.value for t in types]
+        if annotations:
+            params["annotations"] = annotations
+        if attributes:
+            params["attributes"] = json.dumps(attributes)
 
         response = self.api.get_request(endpoint, params=params)
 
