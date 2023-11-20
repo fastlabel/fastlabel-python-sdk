@@ -3914,11 +3914,11 @@ class Client:
 
     # Dataset Object
 
-    def find_dataset_object(self, dataset_object_id: str) -> dict:
+    def find_dataset_object(self, dataset_id: str, object_name: str) -> dict:
         """
         Find a dataset object.
         """
-        endpoint = "dataset-objects-v2/" + dataset_object_id
+        endpoint = "datasets-v2/" + dataset_id  + "/" + object_name
         return self.api.get_request(endpoint)
 
     def get_dataset_objects(
@@ -4043,11 +4043,11 @@ class Client:
             payload["annotations"] = annotations
         return self.api.post_request(endpoint, payload=payload)
 
-    def delete_dataset_object(self, dataset_object_id: str) -> None:
+    def delete_dataset_object(self, dataset_id: str, object_name: str) -> None:
         """
         Delete a dataset object.
         """
-        endpoint = "dataset-objects-v2/" + dataset_object_id
+        endpoint = "datasets-v2/" + dataset_id  + "/" + object_name
         self.api.delete_request(endpoint)
 
     def update_aws_s3_storage(
