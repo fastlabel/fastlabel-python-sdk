@@ -2524,7 +2524,6 @@ See API docs for details.
 
 ```python
 {
-    'id': 'YOUR_DATASET_OBJECT_ID',
     'name': 'brushwood_dog.jpg',
     'size': 6717,
     'height': 225,
@@ -2580,7 +2579,8 @@ Find a single dataset object.
 
 ```python
 dataset_object = client.find_dataset_object(
-    dataset_object_id="YOUR_DATASET_OBJECT_ID"
+    dataset_id="YOUR_DATASET_ID",
+    object_name="brushwood_dog.jpg"
 )
 ```
 
@@ -2627,7 +2627,10 @@ client.download_dataset_objects(
 Delete a single dataset object.
 
 ```python
-client.delete_dataset_object(dataset_object_id="YOUR_DATASET_OBJECT_ID")
+client.delete_dataset_object(
+    dataset_id="YOUR_DATASET_ID",
+    object_name="brushwood_dog.jpg"
+)
 ```
 
 ## Converter
