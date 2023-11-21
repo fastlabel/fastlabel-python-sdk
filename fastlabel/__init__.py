@@ -3918,7 +3918,7 @@ class Client:
         """
         Find a dataset object.
         """
-        endpoint = "datasets-v2/" + dataset_id  + "/" + object_name
+        endpoint = "datasets-v2/" + dataset_id  + "/objects/" + object_name
         return self.api.get_request(endpoint)
 
     def get_dataset_objects(
@@ -4047,7 +4047,7 @@ class Client:
         """
         Delete a dataset object.
         """
-        endpoint = "datasets-v2/" + dataset_id  + "/" + object_name
+        endpoint = "datasets-v2/" + dataset_id  + "/objects/" + object_name
         self.api.delete_request(endpoint)
 
     def update_aws_s3_storage(
