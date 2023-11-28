@@ -4015,8 +4015,8 @@ class Client:
         dataset: str,
         name: str,
         file_path: str,
-        tags: List[str] = [],
-        annotations: List[dict] = [],
+        tags: List[str] = None,
+        annotations: List[dict] = None,
     ) -> dict:
         """
         Create a dataset object.
@@ -4027,6 +4027,8 @@ class Client:
         tags is a list of tag (Optional).
         annotations is a list of annotation (Optional).
         """
+        tags = tags or []
+        annotations = annotations or []
         endpoint = "dataset-objects-v2"
         if not utils.is_object_supported_size(file_path):
             raise FastLabelInvalidException(
