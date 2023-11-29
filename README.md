@@ -21,6 +21,7 @@
   - [Common](#common)
 - [Annotation](#annotation)
 - [Project](#project)
+- [Dataset](#dataset)
 - [Converter](#converter)
   - [FastLabel To COCO](#fastlabel-to-coco)
   - [FastLabel To YOLO](#fastlabel-to-yolo)
@@ -2383,6 +2384,252 @@ client.delete_tags(
         "YOUR_TAG_ID_1",
         "YOUR_TAG_ID_2",
     ],
+)
+```
+
+## Dataset
+
+### Create Dataset
+
+Create a new dataset.
+
+```python
+dataset = client.create_dataset(
+    name="object-detection", # Only lowercase alphanumeric characters + hyphen is available
+    tags=["cat", "dog"], # max 5 tags per dataset.
+    visibility="workspace", # visibility can be 'workspace' or 'public' or 'organization'
+    license="The MIT License" # Optional
+)
+```
+
+#### Response Dataset
+
+See API docs for details.
+
+```python
+{
+    'id': 'YOUR_DATASET_ID',
+    'name': 'object-detection',
+    'tags': ['cat', 'dog'],
+    'visibility': 'workspace',
+    'license': 'The MIT License',
+    'createdAt': '2022-10-31T02:20:00.248Z',
+    'updatedAt': '2022-10-31T02:20:00.248Z'
+}
+```
+
+### Find Dataset
+
+Find a single dataset.
+
+```python
+dataset = client.find_dataset(dataset_id="YOUR_DATASET_ID")
+```
+
+Success response is the same as when created.
+
+### Get Dataset
+
+Get all datasets in the workspace. (Up to 1000 tasks)
+
+```python
+datasets = client.get_datasets()
+```
+
+The success response is the same as when created, but it is an array.
+
+You can filter by keywords and visibility, tags.
+
+```python
+datasets = client.get_datasets(
+    keyword="dog",
+    tags=["cat", "dog"], # max 5 tags per dataset.
+    license="mit",
+    visibility="workspace", # visibility can be 'workspace' or 'public' or 'organization'.
+)
+```
+
+If you wish to retrieve more than 1000 datasets, please refer to the Task [sample code](#get-tasks).
+
+### Update Dataset
+
+Update a single dataset.
+
+```python
+dataset = client.update_dataset(
+    dataset_id="YOUR_DATASET_ID", name="object-detection", tags=["cat", "dog"]
+)
+```
+
+Success response is the same as when created.
+
+### Delete Dataset
+
+Delete a single dataset.
+
+**⚠️ The dataset object and its associated tasks that dataset has will also be deleted, so check carefully before executing.**
+
+```python
+client.delete_dataset(dataset_id="YOUR_DATASET_ID")
+```
+
+### Create Dataset Object
+
+Create object in the dataset.
+
+The types of objects that can be created are "image", "video", and "audio".
+There are type-specific methods. but they can be used in the same way.
+
+Created object are automatically assigned to the "latest" dataset version.
+
+```python
+dataset_object = client.create_dataset_object(
+    dataset="YOUR_DATASET_NAME",
+    name="brushwood_dog.jpg",
+    file_path="./brushwood_dog.jpg",
+    tags=["dog"], # max 5 tags per dataset object.
+    annotations=[
+        {
+            "keypoints": [
+                {
+                    "value": [
+                        102.59,
+                        23.04,
+                        1
+                    ],
+                    "key": "head"
+                }
+            ],
+            "attributes": [
+                {
+                    "value": "Scottish field",
+                    "key": "kind"
+                }
+            ],
+            "confidenceScore": 0,
+            "rotation": 0,
+            "points": [
+                0
+            ],
+            "value": "dog",
+            "type": "bbox" # type can be 'bbox', 'segmentation'.
+        }
+    ]
+)
+```
+
+#### Response Dataset Object
+
+See API docs for details.
+
+```python
+{
+    'name': 'brushwood_dog.jpg',
+    'size': 6717,
+    'height': 225,
+    'width': 225,
+    'tags': [
+        'dog'
+    ],
+    "annotations": [
+        {
+            "id": "YOUR_DATASET_OBJECT_ANNOTATION_ID",
+            "type": "bbox",
+            "title": "dog",
+            "value": "dog",
+            "points": [
+                0
+            ],
+            "attributes": [
+                {
+                    "value": "Scottish field",
+                    "key": "kind",
+                    "name": "Kind",
+                    "type": "text"
+                }
+            ],
+            "keypoints": [
+                {
+                    "edges": [
+                        "right_shoulder",
+                        "left_shoulder"
+                    ],
+                    "value": [
+                        102.59,
+                        23.04,
+                        1
+                    ],
+                    "key": "head",
+                    "name": "頭"
+                }
+            ],
+            "rotation": 0,
+            "color": "#FF0000",
+            "confidenceScore": -1
+        }
+    ],
+    'createdAt': '2022-10-30T08:32:20.748Z',
+    'updatedAt': '2022-10-30T08:32:20.748Z'
+}
+```
+
+### Find Dataset Object
+
+Find a single dataset object.
+
+```python
+dataset_object = client.find_dataset_object(
+    dataset_id="YOUR_DATASET_ID",
+    object_name="brushwood_dog.jpg"
+)
+```
+
+Success response is the same as when created.
+
+### Get Dataset Object
+
+Get all dataset object in the dataset. (Up to 1000 tasks)
+
+```python
+dataset_objects = client.get_dataset_objects(dataset="YOUR_DATASET_NAME")
+```
+
+The success response is the same as when created, but it is an array.
+
+You can filter by version and tags.
+
+```python
+dataset_objects = client.get_dataset_objects(
+    dataset="YOUR_DATASET_NAME",
+    version="latest", # default is "latest"
+    tags=["cat"],
+)
+```
+
+### Download Dataset Objects
+
+Download dataset objects in the dataset to specific directories.
+
+You can filter by version, tags and types.
+
+```python
+client.download_dataset_objects(
+  dataset="YOUR_DATASET_NAME",
+  path="YOUR_DOWNLOAD_PATH",
+  version="latest", # default is "latest"
+  tags=["cat"],
+  types=["train", "valid"],  # choices are "train", "valid", "test" and "none" (Optional)
+)
+```
+
+### Delete Dataset Object
+
+Delete a single dataset object.
+
+```python
+client.delete_dataset_object(
+    dataset_id="YOUR_DATASET_ID",
+    object_name="brushwood_dog.jpg"
 )
 ```
 
