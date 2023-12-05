@@ -3914,12 +3914,23 @@ class Client:
 
     # Dataset Object
 
-    def find_dataset_object(self, dataset_id: str, object_name: str) -> dict:
+    def find_dataset_object(
+        self,
+        dataset_id: str,
+        object_name: str,
+        version: str = None,
+        revision_id: str = None,
+    ) -> dict:
         """
         Find a dataset object.
         """
-        endpoint = "datasets-v2/" + dataset_id  + "/objects/" + object_name
-        return self.api.get_request(endpoint)
+        endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
+        params = {}
+        if revision_id:
+            params["revisionId"] = revision_id
+        elif version:
+            params["version"] = version
+        return self.api.get_request(endpoint, params=params)
 
     def get_dataset_objects(
         self,
@@ -3942,7 +3953,7 @@ class Client:
             params["revisionId"] = revision_id
         elif version:
             params["version"] = version
-        
+
         if tags:
             params["tags"] = tags
         return self.api.get_request(endpoint, params=params)
