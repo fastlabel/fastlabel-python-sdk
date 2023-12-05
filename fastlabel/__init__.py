@@ -3918,7 +3918,7 @@ class Client:
         """
         Find a dataset object.
         """
-        endpoint = "datasets-v2/" + dataset_id  + "/objects/" + object_name
+        endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
         return self.api.get_request(endpoint)
 
     def get_dataset_objects(
@@ -4049,7 +4049,7 @@ class Client:
         """
         Delete a dataset object.
         """
-        endpoint = "datasets-v2/" + dataset_id  + "/objects/" + object_name
+        endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
         self.api.delete_request(endpoint)
 
     def update_aws_s3_storage(
@@ -4171,6 +4171,41 @@ class Client:
             params["limit"] = limit
 
         return self.api.get_request(endpoint, params=params)
+
+    def execute_training_job(
+        self,
+        dataset_name: str,
+        base_model_name: str,
+        epoch: int,
+        dataset_revision_id: str = None,
+        use_dataset_train_val: bool = False,
+        instance_type: str = "ml.p3.2xlarge",
+        batch_size: int = None,
+        learning_rate: float = None,
+    ) -> list:
+        """
+        Returns a list of training jobs.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        endpoint = "trainings"
+        payload = {
+            "datasetName": dataset_name,
+            "baseModelName": base_model_name,
+            "epoch": epoch,
+            "useDatasetTrainVal": use_dataset_train_val,
+            "datasetRevisionId": dataset_revision_id,
+            "instanceType": instance_type,
+            "batchSize": batch_size,
+            "learningRate": learning_rate,
+        }
+
+        return self.api.post_request(
+            endpoint,
+            payload={key: value for key, value in payload.items() if value is not None},
+        )
 
     def execute_endpoint(
         self,

@@ -3051,6 +3051,48 @@ Example of two training jobs.
 ]
 ```
 
+### Execute training job
+
+Get training jobs.
+
+```python
+training_job = client.execute_training_job(
+    dataset_name="dataset_name",
+    base_model_name="fastlabel_object_detection_light",  // "fastlabel_object_detection_light" or "fastlabel_object_detection_high_accuracy"
+    epoch=300,
+    use_dataset_train_val=True
+)
+
+```
+
+#### Response
+
+Example of two training jobs.
+
+```python
+{
+    "trainingJobId": "f40c5838-4c3a-482f-96b7-f77e16c96fed",
+    "status": "in_progress",
+    "baseModelName": "FastLabel Object Detection High Accuracy - 汎用",
+    "instanceType": "ml.p3.2xlarge",
+    "epoch": 300,
+    "projects": [
+        "image-bbox"
+    ],
+    "statuses": [],
+    "tags": [],
+    "contentCount": 23,
+    "userName": "Admin",
+    "createdAt": "2023-10-31T07:10:28.306Z",
+    "completedAt": null,
+    "customModel": {
+        "modelId": "",
+        "modelName": "",
+        "modelURL": "",
+        "classes": []
+    }
+}
+```
 
 ### Execute endpoint
 
