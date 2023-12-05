@@ -3922,7 +3922,11 @@ class Client:
         return self.api.get_request(endpoint)
 
     def get_dataset_objects(
-        self, dataset: str, version: str = None, tags: List[str] = []
+        self,
+        dataset: str,
+        version: str = None,
+        tags: List[str] = [],
+        revision_id: str = None,
     ) -> list:
         """
         Returns a list of dataset objects.
@@ -3930,11 +3934,15 @@ class Client:
         dataset is dataset name (Required).
         version is dataset version (Optional).
         tags is a list of tag (Optional).
+        revision_id is dataset rebision (Optional).
         """
         endpoint = "dataset-objects-v2"
         params = {"dataset": dataset}
-        if version:
+        if revision_id:
+            params["revisionId"] = revision_id
+        elif version:
             params["version"] = version
+        
         if tags:
             params["tags"] = tags
         return self.api.get_request(endpoint, params=params)
@@ -4049,7 +4057,7 @@ class Client:
         """
         Delete a dataset object.
         """
-        endpoint = "datasets-v2/" + dataset_id  + "/objects/" + object_name
+        endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
         self.api.delete_request(endpoint)
 
     def update_aws_s3_storage(
