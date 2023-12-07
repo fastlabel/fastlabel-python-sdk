@@ -3923,7 +3923,16 @@ class Client:
     ) -> dict:
         """
         Find a dataset object.
+
+        dataset_id is dataset id (Required).
+        object_name is dataset object name (Required).
+        version is dataset version (Optional).
+        revision_id is dataset rebision (Optional).
+        Only use specify one of revision_id or version.
         """
+        if version and revision_id:
+            raise FastLabelInvalidException(
+                "only use specify one of revisionId or version.", 400)
         endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
         params = {}
         if revision_id:
