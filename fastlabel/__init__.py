@@ -3945,7 +3945,7 @@ class Client:
         self,
         dataset: str,
         version: str = None,
-        tags: List[str] = [],
+        tags: List[str] = None,
         revision_id: str = None,
     ) -> list:
         """
@@ -3967,6 +3967,7 @@ class Client:
         if version:
             params["version"] = version
 
+        tags = tags or []
         if tags:
             params["tags"] = tags
         return self.api.get_request(endpoint, params=params)
