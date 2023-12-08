@@ -3914,15 +3914,39 @@ class Client:
 
     # Dataset Object
 
-    def find_dataset_object(self, dataset_id: str, object_name: str) -> dict:
+    def find_dataset_object(
+        self,
+        dataset_id: str,
+        object_name: str,
+        version: str = None,
+        revision_id: str = None,
+    ) -> dict:
         """
         Find a dataset object.
+
+        dataset_id is dataset id (Required).
+        object_name is dataset object name (Required).
+        version is dataset version (Optional).
+        revision_id is dataset rebision (Optional).
+        Only use specify one of revision_id or version.
         """
-        endpoint = "datasets-v2/" + dataset_id  + "/objects/" + object_name
-        return self.api.get_request(endpoint)
+        if version and revision_id:
+            raise FastLabelInvalidException(
+                "only use specify one of revisionId or version.", 400)
+        endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
+        params = {}
+        if revision_id:
+            params["revisionId"] = revision_id
+        elif version:
+            params["version"] = version
+        return self.api.get_request(endpoint, params=params)
 
     def get_dataset_objects(
-        self, dataset: str, version: str = None, tags: List[str] = []
+        self,
+        dataset: str,
+        version: str = None,
+        tags: List[str] = None,
+        revision_id: str = None,
     ) -> list:
         """
         Returns a list of dataset objects.
@@ -3930,11 +3954,20 @@ class Client:
         dataset is dataset name (Required).
         version is dataset version (Optional).
         tags is a list of tag (Optional).
+        revision_id is dataset rebision (Optional).
+        Only use specify one of revision_id or version.
         """
+        if version and revision_id:
+            raise FastLabelInvalidException(
+                "only use specify one of revisionId or version.", 400)
         endpoint = "dataset-objects-v2"
         params = {"dataset": dataset}
+        if revision_id:
+            params["revisionId"] = revision_id
         if version:
             params["version"] = version
+
+        tags = tags or []
         if tags:
             params["tags"] = tags
         return self.api.get_request(endpoint, params=params)
@@ -4049,7 +4082,7 @@ class Client:
         """
         Delete a dataset object.
         """
-        endpoint = "datasets-v2/" + dataset_id  + "/objects/" + object_name
+        endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
         self.api.delete_request(endpoint)
 
     def update_aws_s3_storage(
