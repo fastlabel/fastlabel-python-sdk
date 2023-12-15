@@ -844,8 +844,8 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
     coco_categories = {}
     coco_categories_keypoints = {}
     for c in coco["categories"]:
-        coco_categories[c["id"]] = c["supercategory"]
-        coco_categories_keypoints[c["id"]] = c["keypoints"]
+        coco_categories[c["id"]] = c["name"] if c.get("name") else c["supercategory"]
+        coco_categories_keypoints[c["id"]] = c["keypoints"] if c.get("keypoints") else []
 
     coco_annotations = coco["annotations"]
 
