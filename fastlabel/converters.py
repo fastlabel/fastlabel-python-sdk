@@ -845,7 +845,9 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
     coco_categories_keypoints = {}
     for c in coco["categories"]:
         coco_categories[c["id"]] = c["name"] if c.get("name") else c["supercategory"]
-        coco_categories_keypoints[c["id"]] = c["keypoints"] if c.get("keypoints") else []
+        coco_categories_keypoints[c["id"]] = (
+            c["keypoints"] if c.get("keypoints") else []
+        )
 
     coco_annotations = coco["annotations"]
 
@@ -1136,3 +1138,55 @@ def _get_coco_annotation_attributes(annotation: dict) -> Dict[str, AttributeValu
     for attribute in attributes:
         coco_attributes[attribute["key"]] = attribute["value"]
     return coco_attributes
+
+
+def get_image_annotation_parameters(annotation: dict) -> dict:
+    annotation_parameters = {
+        "type": annotation.get("type"),
+        "content": annotation.get("content"),
+        "value": annotation.get("value"),
+        "points": annotation.get("points", None),
+        "rotation": annotation.get("rotation", None),
+        "confidenceScore": annotation.get("confidenceScore", None),
+        "attributes": [
+            _get_attribute_parameters(attribute)
+            for attribute in annotation.get("attributes", [])
+        ],
+        "keypoints": [
+            _get_keypoint_parameters(keypoint)
+            for keypoint in annotation.get("keypoints", [])
+        ],
+    }
+    annotation_parameters = {
+        annotation_key: annotation_value
+        for annotation_key, annotation_value in annotation_parameters.items()
+        if annotation_value is not None
+    }
+    return annotation_parameters
+
+
+def get_pcd_annotation_parameters(annotation: dict) -> dict:
+    annotation_parameters = {
+        "type": annotation.get("type"),
+        "content": annotation.get("content"),
+        "value": annotation.get("value"),
+        "points": annotation.get("points", None),
+        "attributes": [
+            _get_attribute_parameters(attribute)
+            for attribute in annotation.get("attributes", [])
+        ],
+    }
+    annotation_parameters = {
+        annotation_key: annotation_value
+        for annotation_key, annotation_value in annotation_parameters.items()
+        if annotation_value is not None
+    }
+    return annotation_parameters
+
+
+def _get_attribute_parameters(attribute: dict) -> dict:
+    return {"key": attribute.get("key"), "value": attribute.get("value")}
+
+
+def _get_keypoint_parameters(keypoint: dict) -> dict:
+    return {"key": keypoint.get("key"), "value": keypoint.get("value")}

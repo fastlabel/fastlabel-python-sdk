@@ -934,8 +934,9 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if annotations:
-            for annotation in annotations:
+            for i, annotation in enumerate(annotations):
                 annotation["content"] = name
+                annotations[i] = converters.get_image_annotation_parameters(annotation)
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
@@ -1054,7 +1055,10 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = [
+            converters._get_attribute_parameters(attribute)
+            for attribute in attributes
+        ]
         if tags:
             payload["tags"] = tags
 
@@ -1204,7 +1208,9 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if annotations:
-            payload["annotations"] = annotations
+            payload["annotations"] = [
+                converters.get_image_annotation_parameters(annotation) for annotation in annotations
+            ]
         if tags:
             payload["tags"] = tags
 
@@ -1705,8 +1711,9 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if annotations:
-            for annotation in annotations:
+            for i, annotation in enumerate(annotations):
                 annotation["content"] = name
+                annotations[i] = converters.get_pcd_annotation_parameters(annotation)
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
@@ -1797,6 +1804,8 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if annotations:
+            for i, annotation in enumerate(annotations):
+                annotations[i] = converters.get_pcd_annotation_parameters(annotation)
             payload["annotations"] = annotations
         if tags:
             payload["tags"] = tags
@@ -1897,10 +1906,11 @@ class Client:
         if tags:
             payload["tags"] = tags
         if annotations:
-            for annotation in annotations:
+            for i, annotation in enumerate(annotations):
                 # Since the content name is not passed in the sdk update api,
                 # the content will be filled on the server side.
                 annotation["content"] = ""
+                annotations[i] = converters.get_image_annotation_parameters(annotation)
             payload["annotations"] = annotations
 
         self.__fill_assign_users(payload, **kwargs)
@@ -1949,7 +1959,10 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = [
+            converters._get_attribute_parameters(attribute)
+            for attribute in attributes
+        ]
         if tags:
             payload["tags"] = tags
 
@@ -2001,7 +2014,9 @@ class Client:
         if tags:
             payload["tags"] = tags
         if annotations:
-            payload["annotations"] = annotations
+            payload["annotations"] = [
+                converters.get_image_annotation_parameters(annotation) for annotation in annotations
+            ]
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2357,10 +2372,11 @@ class Client:
         if tags:
             payload["tags"] = tags
         if annotations:
-            for annotation in annotations:
+            for i, annotation in enumerate(annotations):
                 # Since the content name is not passed in the sdk update api,
                 # the content will be filled on the server side.
                 annotation["content"] = ""
+                annotations[i] = converters.get_pcd_annotation_parameters(annotation)
             payload["annotations"] = annotations
 
         self.__fill_assign_users(payload, **kwargs)
@@ -2411,10 +2427,11 @@ class Client:
         if tags:
             payload["tags"] = tags
         if annotations:
-            for annotation in annotations:
+            for i, annotation in enumerate(annotations):
                 # Since the content name is not passed in the sdk update api,
                 # the content will be filled on the server side.
                 annotation["content"] = ""
+                annotations[i] = converters.get_pcd_annotation_parameters(annotation)
             payload["annotations"] = annotations
 
         self.__fill_assign_users(payload, **kwargs)
