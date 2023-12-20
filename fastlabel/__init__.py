@@ -3932,7 +3932,8 @@ class Client:
         """
         if version and revision_id:
             raise FastLabelInvalidException(
-                "only use specify one of revisionId or version.", 400)
+                "only use specify one of revisionId or version.", 400
+            )
         endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
         params = {}
         if revision_id:
@@ -3947,6 +3948,8 @@ class Client:
         version: str = None,
         tags: List[str] = None,
         revision_id: str = None,
+        offset: int = 0,
+        limit: int = 1000,
     ) -> list:
         """
         Returns a list of dataset objects.
@@ -3959,9 +3962,14 @@ class Client:
         """
         if version and revision_id:
             raise FastLabelInvalidException(
-                "only use specify one of revisionId or version.", 400)
+                "only use specify one of revisionId or version.", 400
+            )
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
         endpoint = "dataset-objects-v2"
-        params = {"dataset": dataset}
+        params = {"dataset": dataset, "offset": offset, "limit": limit}
         if revision_id:
             params["revisionId"] = revision_id
         if version:
@@ -3979,9 +3987,15 @@ class Client:
         version: str = "",
         tags: Optional[List[str]] = None,
         types: Optional[List[Union[str, DatasetObjectType]]] = None,
+        offset: int = 0,
+        limit: int = 1000,
     ):
         endpoint = "dataset-objects-v2/signed-urls"
-        params = {"dataset": dataset}
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        params = {"dataset": dataset, "offset": offset, "limit": limit}
         if version:
             params["version"] = version
         if tags:
@@ -4017,7 +4031,7 @@ class Client:
         else:
             object_map[""] = response
 
-        sem = asyncio.Semaphore(10)
+        sem = asyncio.Semaphore(4)
 
         async def __download(base_path: Path, _obj: dict):
             async with sem:
@@ -4029,15 +4043,27 @@ class Client:
             loop.run_until_complete(
                 asyncio.gather(*[__download(base_path, obj) for obj in objects])
             )
+            # check specification
+            output_path = base_path / "annotations.json"
+            exist_dataset_objects = []
+            if os.path.exists(output_path):
+                exist_dataset_objects = json.load(open(output_path))
             with Path(base_path / "annotations.json").open("w") as f:
                 annotations = [
                     {"name": obj["name"], "annotations": obj["annotations"]}
                     for obj in objects
                 ]
-                json.dump(annotations, fp=f, indent=4)
+                json.dump(
+                    exist_dataset_objects + annotations,
+                    fp=f,
+                    ensure_ascii=False,
+                    indent=4,
+                )
+        return [obj for objects in object_map.values() for obj in objects]
 
     async def __download_dataset_object(self, download_path: Path, obj: dict):
         obj_path = download_path / obj["name"]
+        os.makedirs(obj_path.parent, exist_ok=True)
         async with aiohttp.ClientSession() as session:
             async with session.get(obj["signedUrl"]) as response:
                 with obj_path.open("wb") as f:
