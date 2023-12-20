@@ -1139,24 +1139,3 @@ def _get_coco_annotation_attributes(annotation: dict) -> Dict[str, AttributeValu
         coco_attributes[attribute["key"]] = attribute["value"]
     return coco_attributes
 
-
-def delete_extra_annotations_parameter(annotations: list) -> list:
-    for annotation in annotations:
-        annotation.pop("id", None)
-        annotation.pop("title", None)
-        annotation.pop("color", None)
-        for keypoint in annotation.get("keypoints", []):
-            keypoint.pop("edges", None)
-            keypoint.pop("name", None)
-        annotation["attributes"] = _delete_extra_attributes_parameter(
-            annotation.get("attributes", [])
-        )
-    return annotations
-
-
-def _delete_extra_attributes_parameter(attributes: list) -> list:
-    for attribute in attributes:
-        attribute.pop("title", None)
-        attribute.pop("name", None)
-        attribute.pop("type", None)
-    return attributes
