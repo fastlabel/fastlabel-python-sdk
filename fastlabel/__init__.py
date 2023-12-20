@@ -4053,7 +4053,12 @@ class Client:
                     {"name": obj["name"], "annotations": obj["annotations"]}
                     for obj in objects
                 ]
-                json.dump(exist_dataset_objects + annotations, fp=f, indent=4)
+                json.dump(
+                    exist_dataset_objects + annotations,
+                    fp=f,
+                    ensure_ascii=False,
+                    indent=4,
+                )
         return [obj for objects in object_map.values() for obj in objects]
 
     async def __download_dataset_object(self, download_path: Path, obj: dict):
