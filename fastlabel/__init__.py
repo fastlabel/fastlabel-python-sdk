@@ -936,7 +936,7 @@ class Client:
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
 
@@ -992,7 +992,7 @@ class Client:
         if annotations:
             for annotation in annotations:
                 annotation["content"] = file_path
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
 
@@ -1054,7 +1054,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
 
@@ -1114,7 +1114,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
 
@@ -1204,7 +1204,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if annotations:
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
 
@@ -1273,7 +1273,7 @@ class Client:
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
 
@@ -1340,7 +1340,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
 
@@ -1402,7 +1402,7 @@ class Client:
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
 
@@ -1462,7 +1462,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
 
@@ -1528,7 +1528,7 @@ class Client:
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
 
@@ -1592,7 +1592,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
 
@@ -1707,7 +1707,7 @@ class Client:
         if annotations:
             for annotation in annotations:
                 annotation["content"] = name
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
 
@@ -1797,7 +1797,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if annotations:
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
 
@@ -1901,7 +1901,7 @@ class Client:
                 # Since the content name is not passed in the sdk update api,
                 # the content will be filled on the server side.
                 annotation["content"] = ""
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1949,7 +1949,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
 
@@ -2001,7 +2001,7 @@ class Client:
         if tags:
             payload["tags"] = tags
         if annotations:
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2053,7 +2053,7 @@ class Client:
         if annotations:
             for annotation in annotations:
                 annotation["content"] = ""
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2101,7 +2101,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
 
@@ -2155,7 +2155,7 @@ class Client:
         if annotations:
             for annotation in annotations:
                 annotation["content"] = ""
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2203,7 +2203,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
 
@@ -2257,7 +2257,7 @@ class Client:
         if annotations:
             for annotation in annotations:
                 annotation["content"] = ""
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2305,7 +2305,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if attributes:
-            payload["attributes"] = attributes
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
 
@@ -2361,7 +2361,7 @@ class Client:
                 # Since the content name is not passed in the sdk update api,
                 # the content will be filled on the server side.
                 annotation["content"] = ""
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2415,7 +2415,7 @@ class Client:
                 # Since the content name is not passed in the sdk update api,
                 # the content will be filled on the server side.
                 annotation["content"] = ""
-            payload["annotations"] = annotations
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -4299,3 +4299,24 @@ class Client:
             params["limit"] = limit
 
         return self.api.get_request(endpoint, params=params)
+
+def delete_extra_annotations_parameter(annotations: list) -> list:
+    for annotation in annotations:
+        annotation.pop("id", None)
+        annotation.pop("title", None)
+        annotation.pop("color", None)
+        for keypoint in annotation.get("keypoints", []):
+            keypoint.pop("edges", None)
+            keypoint.pop("name", None)
+        annotation["attributes"] = delete_extra_attributes_parameter(
+            annotation.get("attributes", [])
+        )
+    return annotations
+
+
+def delete_extra_attributes_parameter(attributes: list) -> list:
+    for attribute in attributes:
+        attribute.pop("title", None)
+        attribute.pop("name", None)
+        attribute.pop("type", None)
+    return attributes
