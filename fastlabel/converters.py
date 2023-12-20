@@ -1148,8 +1148,11 @@ def delete_extra_annotations_parameter(annotations: list) -> list:
         for keypoint in annotation.get("keypoints", []):
             keypoint.pop("edges", None)
             keypoint.pop("name", None)
-        annotation["attributes"] = _delete_extra_attributes_parameter(annotation.get("attributes", []))
+        annotation["attributes"] = _delete_extra_attributes_parameter(
+            annotation.get("attributes", [])
+        )
     return annotations
+
 
 def _delete_extra_attributes_parameter(attributes: list) -> list:
     for attribute in attributes:
