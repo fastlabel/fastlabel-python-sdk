@@ -4043,16 +4043,17 @@ class Client:
             loop.run_until_complete(
                 asyncio.gather(*[__download(base_path, obj) for obj in objects])
             )
-            
-            output_path=base_path / "annotations.json"
+            # check specification
+            output_path = base_path / "annotations.json"
+            exist_dataset_objects = []
             if os.path.exists(output_path):
-                exist_dataset_objects=json.load(open(output_path))
+                exist_dataset_objects = json.load(open(output_path))
             with Path(base_path / "annotations.json").open("w") as f:
                 annotations = [
                     {"name": obj["name"], "annotations": obj["annotations"]}
                     for obj in objects
                 ]
-                json.dump(exist_dataset_objects+annotations, fp=f, indent=4)
+                json.dump(exist_dataset_objects + annotations, fp=f, indent=4)
         return [obj for objects in object_map.values() for obj in objects]
 
     async def __download_dataset_object(self, download_path: Path, obj: dict):
