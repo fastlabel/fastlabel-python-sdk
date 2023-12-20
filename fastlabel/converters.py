@@ -1140,53 +1140,20 @@ def _get_coco_annotation_attributes(annotation: dict) -> Dict[str, AttributeValu
     return coco_attributes
 
 
-def get_image_annotation_parameters(annotation: dict) -> dict:
-    annotation_parameters = {
-        "type": annotation.get("type"),
-        "content": annotation.get("content"),
-        "value": annotation.get("value"),
-        "points": annotation.get("points", None),
-        "rotation": annotation.get("rotation", None),
-        "confidenceScore": annotation.get("confidenceScore", None),
-        "attributes": [
-            _get_attribute_parameters(attribute)
-            for attribute in annotation.get("attributes", [])
-        ],
-        "keypoints": [
-            _get_keypoint_parameters(keypoint)
-            for keypoint in annotation.get("keypoints", [])
-        ],
-    }
-    annotation_parameters = {
-        annotation_key: annotation_value
-        for annotation_key, annotation_value in annotation_parameters.items()
-        if annotation_value is not None
-    }
-    return annotation_parameters
+def delete_extra_annotations_parameter(annotations: list) -> list:
+    for annotation in annotations:
+        annotation.pop("id", None)
+        annotation.pop("title", None)
+        annotation.pop("color", None)
+        for keypoint in annotation.get("keypoints", []):
+            keypoint.pop("edges", None)
+            keypoint.pop("name", None)
+        annotation["attributes"] = _delete_extra_attributes_parameter(annotation.get("attributes", []))
+    return annotations
 
-
-def get_pcd_annotation_parameters(annotation: dict) -> dict:
-    annotation_parameters = {
-        "type": annotation.get("type"),
-        "content": annotation.get("content"),
-        "value": annotation.get("value"),
-        "points": annotation.get("points", None),
-        "attributes": [
-            _get_attribute_parameters(attribute)
-            for attribute in annotation.get("attributes", [])
-        ],
-    }
-    annotation_parameters = {
-        annotation_key: annotation_value
-        for annotation_key, annotation_value in annotation_parameters.items()
-        if annotation_value is not None
-    }
-    return annotation_parameters
-
-
-def _get_attribute_parameters(attribute: dict) -> dict:
-    return {"key": attribute.get("key"), "value": attribute.get("value")}
-
-
-def _get_keypoint_parameters(keypoint: dict) -> dict:
-    return {"key": keypoint.get("key"), "value": keypoint.get("value")}
+def _delete_extra_attributes_parameter(attributes: list) -> list:
+    for attribute in attributes:
+        attribute.pop("title", None)
+        attribute.pop("name", None)
+        attribute.pop("type", None)
+    return attributes
