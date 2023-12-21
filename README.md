@@ -2992,6 +2992,14 @@ def get_training_jobs() -> list[dict]:
 
 ```
 
+#### Find Training job
+
+Find a single training job.
+
+```python
+task = client.find_training_job(id="YOUR_TRAINING_ID")
+```
+
 #### Response
 
 Example of two training jobs.
@@ -3065,33 +3073,94 @@ training_job = client.execute_training_job(
 
 ```
 
-#### Response
+### Get evaluation jobs
 
-Example of two training jobs.
+Get evaluation jobs.
 
 ```python
+def get_evaluation_jobs() -> list[dict]:
+    all_evaluation_jobs = []
+    offset = None
+    while True:
+        time.sleep(1)
+
+        evaluation_jobs = client.get_evaluation_jobs(offset=offset)
+        all_evaluation_jobs.extend(evaluation_jobs)
+
+        if len(evaluation_jobs) > 0:
+            offset = len(all_evaluation_jobs)
+        else:
+            break
+    return all_evaluation_jobs
+
+```
+
+#### Find Evaluation job
+
+Find a single evaluation job.
+
+```python
+evaluation_job = client.find_evaluation_job(id="YOUR_EVALUATION_ID")
+```
+
+#### Response
+
+Example of two evaluation jobs.
+
+```python
+
 {
-    "trainingJobId": "f40c5838-4c3a-482f-96b7-f77e16c96fed",
-    "status": "in_progress",
-    "baseModelName": "FastLabel Object Detection High Accuracy - 汎用",
-    "instanceType": "ml.p3.2xlarge",
-    "epoch": 300,
-    "projects": [
-        "image-bbox"
-    ],
-    "statuses": [],
-    "tags": [],
-    "contentCount": 23,
-    "userName": "Admin",
-    "createdAt": "2023-10-31T07:10:28.306Z",
-    "completedAt": null,
-    "customModel": {
-        "modelId": "",
-        "modelName": "",
-        "modelURL": "",
-        "classes": []
-    }
-}
+  id: "50873ea1-e008-48db-a368-241ca88d6f67",
+  version: 59,
+  status: "in_progress",
+  modelType: "builtin",
+  modelName: "FastLabel Object Detection Light - 汎用",
+  customModelId: None,
+  iouThreshold: 0.8,
+  confidenceThreshold: 0.4,
+  contentCount: 0,
+  gtCount: 0,
+  predCount: 0,
+  mAP: 0,
+  recall: 0,
+  precision: 0,
+  f1: 0,
+  confusionMatrix: None,
+  duration: 0,
+  evaluationSource: "dataset",
+  projects: [],
+  statuses: [],
+  tags: [],
+  datasetId: "deacbe6d-406f-4086-bd87-80ffb1c1a393",
+  dataset: {
+    id: "deacbe6d-406f-4086-bd87-80ffb1c1a393",
+    workspaceId: "df201d3c-af00-423a-aa7f-827376fd96de",
+    name: "sample-dataset",
+    createdAt: "2023-12-20T10:44:12.198Z",
+    updatedAt: "2023-12-20T10:44:12.198Z",
+  },
+  datasetRevisionId: "2d26ab64-dfc0-482d-9211-ce8feb3d480b",
+  useDatasetTest: True,
+  userName: "",
+  completedAt: None,
+  createdAt: "2023-12-21T09:08:16.111Z",
+  updatedAt: "2023-12-21T09:08:18.414Z",
+};
+
+```
+
+### Execute evaluation job
+
+Execute evaluation jobs.
+
+```python
+training_job = client.execute_evaluation_job(
+    dataset_name="dataset_name",
+    base_model_name="fastlabel_object_detection_light",  // "fastlabel_object_detection_light" or "fastlabel_object_detection_high_accuracy"
+    epoch=300,
+    use_dataset_train_val=True
+)
+
 ```
 
 ### Execute endpoint
