@@ -3155,10 +3155,11 @@ Execute evaluation jobs.
 
 ```python
 training_job = client.execute_evaluation_job(
-    dataset_name="dataset_name",
-    base_model_name="fastlabel_object_detection_light",  // "fastlabel_object_detection_light" or "fastlabel_object_detection_high_accuracy"
-    epoch=300,
-    use_dataset_train_val=True
+    dataset_name="DATASET_NAME",
+    model_name="fastlabel_object_detection_light",
+    // If you want to use the built-in model, select the following. "fastlabel_object_detection_light" or "fastlabel_object_detection_high_accuracy"
+    // If you want to use the custom model, please fill　out model name.
+    use_dataset_test=True,
 )
 
 ```
