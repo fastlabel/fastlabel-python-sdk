@@ -2583,7 +2583,21 @@ dataset_object = client.find_dataset_object(
     object_name="brushwood_dog.jpg"
 )
 ```
-
+You can find a object of specified revision by version or revision_id.  
+```python
+dataset_object = client.find_dataset_object(
+    dataset_id="YOUR_DATASET_ID",
+    object_name="brushwood_dog.jpg",
+    version="YOUR_VERSION_NAME" # default is "latest"
+)   
+```
+```python
+dataset_object = client.find_dataset_object(
+    dataset_id="YOUR_DATASET_ID",
+    object_name="brushwood_dog.jpg",
+    revision_id="YOUR_REVISION_ID" # 8 characters or more
+)   
+```
 Success response is the same as when created.
 
 ### Get Dataset Object
@@ -2596,7 +2610,7 @@ dataset_objects = client.get_dataset_objects(dataset="YOUR_DATASET_NAME")
 
 The success response is the same as when created, but it is an array.
 
-You can filter by version and tags.
+You can filter by version or revision_id and tags.
 
 ```python
 dataset_objects = client.get_dataset_objects(
@@ -2605,7 +2619,12 @@ dataset_objects = client.get_dataset_objects(
     tags=["cat"],
 )
 ```
-
+```python
+dataset_objects = client.get_dataset_objects(
+    dataset="YOUR_DATASET_NAME",
+    revision_id="YOUR_REVISION_ID" # 8 characters or more
+)
+```
 ### Download Dataset Objects
 
 Download dataset objects in the dataset to specific directories.
