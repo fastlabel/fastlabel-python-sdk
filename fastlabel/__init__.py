@@ -4231,6 +4231,124 @@ class Client:
 
         return self.api.get_request(endpoint, params=params)
 
+    def execute_training_job(
+        self,
+        dataset_name: str,
+        base_model_name: str,
+        epoch: int,
+        dataset_revision_id: str = None,
+        use_dataset_train_val: bool = False,
+        instance_type: str = "ml.p3.2xlarge",
+        batch_size: int = None,
+        learning_rate: float = None,
+    ) -> list:
+        """
+        Returns a list of training jobs.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        endpoint = "trainings"
+        payload = {
+            "datasetName": dataset_name,
+            "baseModelName": base_model_name,
+            "epoch": epoch,
+            "useDatasetTrainVal": use_dataset_train_val,
+            "datasetRevisionId": dataset_revision_id,
+            "instanceType": instance_type,
+            "batchSize": batch_size,
+            "learningRate": learning_rate,
+        }
+
+        return self.api.post_request(
+            endpoint,
+            payload={key: value for key, value in payload.items() if value is not None},
+        )
+
+    def find_training_job(self, id: str) -> list:
+        """
+        Returns training job.
+        id is id of training job (Required).
+        """
+
+        endpoint = f"trainings/{id}"
+
+        return self.api.get_request(
+            endpoint,
+        )
+
+    def get_evaluation_jobs(
+        self,
+        offset: int = None,
+        limit: int = 1000,
+    ) -> list:
+        """
+        Returns a list of training jobs.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "evaluations"
+        params = {}
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+
+        return self.api.get_request(endpoint, params=params)
+
+    def find_evaluation_job(self, id: str) -> list:
+        """
+        Returns evaluation job.
+        id is id of evaluation job (Required).
+        """
+
+        endpoint = f"evaluations/{id}"
+
+        return self.api.get_request(
+            endpoint,
+        )
+
+    def execute_evaluation_job(
+        self,
+        dataset_name: str,
+        model_name: str,
+        iou_threshold: float = 0.5,
+        confidence_threshold: float = 0.4,
+        dataset_revision_id: str = None,
+        use_dataset_test: bool = False,
+        instance_type: str = "ml.p3.2xlarge",
+        batch_size: int = None,
+        learning_rate: float = None,
+    ) -> list:
+        """
+        Returns a list of training jobs.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        endpoint = "evaluations"
+        payload = {
+            "modelName": model_name,
+            "datasetName": dataset_name,
+            "iouThreshold": iou_threshold,
+            "confidenceThreshold": confidence_threshold,
+            "datasetRevisionId": dataset_revision_id,
+            "useDatasetTest": use_dataset_test,
+        }
+
+        return self.api.post_request(
+            endpoint,
+            payload={key: value for key, value in payload.items() if value is not None},
+        )
+
     def execute_endpoint(
         self,
         endpoint_name: str,
