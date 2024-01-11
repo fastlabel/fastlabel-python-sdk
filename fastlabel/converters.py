@@ -233,7 +233,7 @@ def __to_coco_annotation(data: dict) -> dict:
         annotation_id,
         points,
         keypoints,
-        category["id"],
+        category,
         image_id,
         annotation_type,
         annotation_attributes,
@@ -249,13 +249,11 @@ def __get_coco_category_by_name(categories: list, name: str) -> Optional[dict]:
     return None
 
 
-def __get_coco_annotation_keypoints(keypoints: list) -> list:
+def __get_coco_annotation_keypoints(keypoints: list, category_keypoints: list) -> list:
     coco_annotation_keypoints = []
-    for keypoint in keypoints:
-        value = keypoint["value"]
-        if not value:
-            coco_annotation_keypoints.extend([0, 0, 0])
-            continue
+    keypoint_values = {keypoint["key"]: keypoint["value"] for keypoint in keypoints if keypoint["value"]}
+    for category_key in category_keypoints:
+        value = keypoint_values.get(category_key, [0, 0, 0])
         # Adjust fastlabel data definition to coco format
         visibility = 2 if value[2] == 1 else 1
         coco_annotation_keypoints.extend([value[0], value[1], visibility])
@@ -266,7 +264,7 @@ def __get_coco_annotation(
     id_: int,
     points: list,
     keypoints: list,
-    category_id: int,
+    category: dict,
     image_id: str,
     annotation_type: str,
     annotation_attributes: Dict[str, AttributeValue],
@@ -274,14 +272,14 @@ def __get_coco_annotation(
     annotation = {}
     annotation["num_keypoints"] = len(keypoints) if keypoints else 0
     annotation["keypoints"] = (
-        __get_coco_annotation_keypoints(keypoints) if keypoints else []
+        __get_coco_annotation_keypoints(keypoints, category["keypoints"]) if keypoints else []
     )
     annotation["segmentation"] = __to_coco_segmentation(annotation_type, points)
     annotation["iscrowd"] = 0
     annotation["area"] = __to_area(annotation_type, points)
     annotation["image_id"] = image_id
     annotation["bbox"] = __to_bbox(annotation_type, points)
-    annotation["category_id"] = category_id
+    annotation["category_id"] = category["id"]
     annotation["id"] = id_
     annotation["attributes"] = annotation_attributes
     return annotation
