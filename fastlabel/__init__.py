@@ -4050,7 +4050,11 @@ class Client:
                 exist_dataset_objects = json.load(open(output_path))
             with Path(base_path / "annotations.json").open("w") as f:
                 annotations = [
-                    {"name": obj["name"], "annotations": obj["annotations"]}
+                    {
+                        "name": obj["name"],
+                        "annotations": obj["annotations"],
+                        "customMetadata": obj["customMetadata"],
+                    }
                     for obj in objects
                 ]
                 json.dump(
@@ -4076,6 +4080,7 @@ class Client:
         file_path: str,
         tags: List[str] = None,
         annotations: List[dict] = None,
+        custom_metadata: Optional[dict[str, str]] = None,
     ) -> dict:
         """
         Create a dataset object.
@@ -4102,6 +4107,8 @@ class Client:
             payload["tags"] = tags
         if annotations:
             payload["annotations"] = annotations
+        if custom_metadata:
+            payload["customMetadata"] = custom_metadata
         return self.api.post_request(endpoint, payload=payload)
 
     def delete_dataset_object(self, dataset_id: str, object_name: str) -> None:
@@ -4417,6 +4424,7 @@ class Client:
             params["limit"] = limit
 
         return self.api.get_request(endpoint, params=params)
+
 
 def delete_extra_annotations_parameter(annotations: list) -> list:
     for annotation in annotations:
