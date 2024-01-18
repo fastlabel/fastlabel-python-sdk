@@ -2514,7 +2514,11 @@ dataset_object = client.create_dataset_object(
             "value": "dog",
             "type": "bbox" # type can be 'bbox', 'segmentation'.
         }
-    ]
+    ],
+    custom_metadata={
+      "key": "value",
+      "metadata": "metadata-value"
+    }
 )
 ```
 
@@ -2568,6 +2572,10 @@ See API docs for details.
             "confidenceScore": -1
         }
     ],
+  "customMetadata": {
+    "key": "value",
+    "metadata": "metadata-value"
+  },
     'createdAt': '2022-10-30T08:32:20.748Z',
     'updatedAt': '2022-10-30T08:32:20.748Z'
 }
