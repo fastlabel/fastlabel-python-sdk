@@ -2591,21 +2591,25 @@ dataset_object = client.find_dataset_object(
     object_name="brushwood_dog.jpg"
 )
 ```
-You can find a object of specified revision by version or revision_id.  
+
+You can find a object of specified revision by version or revision_id.
+
 ```python
 dataset_object = client.find_dataset_object(
     dataset_id="YOUR_DATASET_ID",
     object_name="brushwood_dog.jpg",
     version="YOUR_VERSION_NAME" # default is "latest"
-)   
+)
 ```
+
 ```python
 dataset_object = client.find_dataset_object(
     dataset_id="YOUR_DATASET_ID",
     object_name="brushwood_dog.jpg",
     revision_id="YOUR_REVISION_ID" # 8 characters or more
-)   
+)
 ```
+
 Success response is the same as when created.
 
 ### Get Dataset Object
@@ -2627,12 +2631,14 @@ dataset_objects = client.get_dataset_objects(
     tags=["cat"],
 )
 ```
+
 ```python
 dataset_objects = client.get_dataset_objects(
     dataset="YOUR_DATASET_NAME",
     revision_id="YOUR_REVISION_ID" # 8 characters or more
 )
 ```
+
 ### Download Dataset Objects
 
 Download dataset objects in the dataset to specific directories.
@@ -3184,7 +3190,10 @@ Execute evaluation jobs.
 training_job = client.execute_evaluation_job(
     dataset_name="DATASET_NAME",
     model_name="fastlabel_object_detection_light",
-    // If you want to use the built-in model, select the following. "fastlabel_object_detection_light" or "fastlabel_object_detection_high_accuracy"
+    // If you want to use the built-in model, select the following.
+    - "fastlabel_object_detection_light"
+    - "fastlabel_object_detection_high_accuracy"
+    - "fastlabel_fcn_resnet"
     // If you want to use the custom model, please fill　out model name.
     use_dataset_test=True,
 )
