@@ -6,7 +6,7 @@ import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 import aiohttp
 import cv2
@@ -4248,6 +4248,9 @@ class Client:
         instance_type: str = "ml.p3.2xlarge",
         batch_size: int = None,
         learning_rate: float = None,
+        resize_option: str = Literal["fixed", "none"],
+        resize_height: Optional[int] = None,
+        resize_width: Optional[int] = None,
     ) -> list:
         """
         Returns a list of training jobs.
@@ -4266,6 +4269,9 @@ class Client:
             "instanceType": instance_type,
             "batchSize": batch_size,
             "learningRate": learning_rate,
+            "resizeOption": resize_option,
+            "resizeHeight": resize_height,
+            "resizeWidth": resize_width,
         }
 
         return self.api.post_request(
