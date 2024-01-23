@@ -4248,7 +4248,7 @@ class Client:
         instance_type: str = "ml.p3.2xlarge",
         batch_size: int = None,
         learning_rate: float = None,
-        resize_option: str = Literal["fixed", "none"],
+        resize_option: Optional[Literal["fixed", "none"]] = None,
         resize_dimension: Optional[int] = None,
     ) -> list:
         """
