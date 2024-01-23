@@ -3196,6 +3196,7 @@ training_job = client.execute_evaluation_job(
     - "fastlabel_object_detection_light"
     - "fastlabel_object_detection_high_accuracy"
     - "fastlabel_fcn_resnet"
+    - "fastlabel_keypoint_rcnn"
     // If you want to use the custom model, please fill　out model name.
     use_dataset_test=True,
 )
