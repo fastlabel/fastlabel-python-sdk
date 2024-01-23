@@ -3096,9 +3096,8 @@ training_job = client.execute_training_job(
     base_model_name="fastlabel_object_detection_light",  // "fastlabel_object_detection_light" or "fastlabel_object_detection_high_accuracy" or "fastlabel_u_net_general"
     epoch=300,
     use_dataset_train_val=True,
-    resize_option="fixed",  // "fixed" or "none"
-    resize_width=1024,
-    resize_height=1024,
+    resize_option="fixed",  // optional, "fixed" or "none"
+    resize_dimension=1024, // optional, 512 or 1024
 )
 
 ```

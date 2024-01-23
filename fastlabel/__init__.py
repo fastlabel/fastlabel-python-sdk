@@ -4249,8 +4249,7 @@ class Client:
         batch_size: int = None,
         learning_rate: float = None,
         resize_option: str = Literal["fixed", "none"],
-        resize_height: Optional[int] = None,
-        resize_width: Optional[int] = None,
+        resize_dimension: Optional[int] = None,
     ) -> list:
         """
         Returns a list of training jobs.
@@ -4270,8 +4269,7 @@ class Client:
             "batchSize": batch_size,
             "learningRate": learning_rate,
             "resizeOption": resize_option,
-            "resizeHeight": resize_height,
-            "resizeWidth": resize_width,
+            "resizeDimension": resize_dimension,
         }
 
         return self.api.post_request(
