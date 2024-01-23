@@ -3099,9 +3099,11 @@ Get training jobs.
 ```python
 training_job = client.execute_training_job(
     dataset_name="dataset_name",
-    base_model_name="fastlabel_object_detection_light",  // "fastlabel_object_detection_light" or "fastlabel_object_detection_high_accuracy"
+    base_model_name="fastlabel_object_detection_light",  // "fastlabel_object_detection_light" or "fastlabel_object_detection_high_accuracy" or "fastlabel_u_net_general"
     epoch=300,
-    use_dataset_train_val=True
+    use_dataset_train_val=True,
+    resize_option="fixed",  // optional, "fixed" or "none"
+    resize_dimension=1024, // optional, 512 or 1024
 )
 
 ```
