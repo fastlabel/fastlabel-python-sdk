@@ -890,6 +890,7 @@ class Client:
         priority: Priority = None,
         annotations: list = [],
         tags: list = [],
+        is_delete_exif: bool = False,
         **kwargs,
     ) -> str:
         """
@@ -939,6 +940,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
+        if is_delete_exif:
+            payload["isDeleteExif"] = is_delete_exif
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1010,6 +1013,7 @@ class Client:
         priority: Priority = None,
         attributes: list = [],
         tags: list = [],
+        is_delete_exif: bool = False,
         **kwargs,
     ) -> str:
         """
@@ -1057,6 +1061,9 @@ class Client:
             payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
+
+        if is_delete_exif:
+            payload["isDeleteExif"] = is_delete_exif
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1132,6 +1139,7 @@ class Client:
         priority: Priority = None,
         annotations: list = [],
         tags: list = [],
+        is_delete_exif: bool = False,
         **kwargs,
     ) -> str:
         """
@@ -1207,6 +1215,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
+        if is_delete_exif:
+            payload["isDeleteExif"] = is_delete_exif
 
         self.__fill_assign_users(payload, **kwargs)
 
