@@ -4260,6 +4260,7 @@ class Client:
         learning_rate: float = None,
         resize_option: Optional[Literal["fixed", "none"]] = None,
         resize_dimension: Optional[int] = None,
+        annotation_value: str = "",
     ) -> list:
         """
         Returns a list of training jobs.
@@ -4281,6 +4282,8 @@ class Client:
             "resizeOption": resize_option,
             "resizeDimension": resize_dimension,
         }
+        if annotation_value:
+            payload["annotationValue"] = annotation_value
 
         return self.api.post_request(
             endpoint,
