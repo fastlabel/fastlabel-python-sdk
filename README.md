@@ -3104,7 +3104,8 @@ training_job = client.execute_training_job(
     use_dataset_train_val=True,
     resize_option="fixed",  // optional, "fixed" or "none"
     resize_dimension=1024, // optional, 512 or 1024
-    annotation_value="person" // Annotation value is required if choose "fastlabel_keypoint_rcnn"
+    annotation_value="person", // Annotation value is required if choose "fastlabel_keypoint_rcnn"
+    config_file_path="config.yaml", // optional, YAML file path for training config file.
 )
 
 ```

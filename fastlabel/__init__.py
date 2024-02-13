@@ -11,7 +11,6 @@ from typing import List, Literal, Optional, Union
 import aiohttp
 import cv2
 import numpy as np
-import requests
 import xmltodict
 from PIL import Image, ImageColor, ImageDraw
 
@@ -4271,21 +4270,8 @@ class Client:
         offset is the starting position number to fetch (Optional).
         limit is the max number to fetch (Optional).
         """
-        job_id = utils.get_uuid()
-        if config_file_path is not None:
-            config_file_path = (
-                Path(config_file_path)
-                if isinstance(config_file_path, str)
-                else config_file_path
-            )
-            self._upload_training_config_file(
-                job_id=job_id,
-                config_file_path=config_file_path,
-                base_model_name=base_model_name,
-            )
         endpoint = "trainings"
         payload = {
-            "jobId": job_id,
             "datasetName": dataset_name,
             "baseModelName": base_model_name,
             "epoch": epoch,
@@ -4296,7 +4282,9 @@ class Client:
             "learningRate": learning_rate,
             "resizeOption": resize_option,
             "resizeDimension": resize_dimension,
-            "hasCustomTrainingConfig": config_file_path is not None,
+            "configFile": utils.base64_encode(str(config_file_path))
+            if config_file_path is not None
+            else None,
         }
         if annotation_value:
             payload["annotationValue"] = annotation_value
@@ -4305,33 +4293,6 @@ class Client:
             endpoint,
             payload={key: value for key, value in payload.items() if value is not None},
         )
-
-    def _upload_training_config_file(
-        self, job_id: str, config_file_path: Path, base_model_name: str
-    ) -> None:
-        if not config_file_path.exists():
-            raise ValueError(f"config_file_path {config_file_path} does not exist.")
-
-        if config_file_path.suffix not in [".yaml", ".yml"]:
-            raise ValueError(f"config_file_path {config_file_path} must be yaml file.")
-
-        endpoint = "trainings/configs/upload/file"
-        params = {
-            "jobId": job_id,
-            "baseModelName": base_model_name,
-        }
-        signed_url = self.api.get_request(endpoint, params=params)
-        file_name = "training-config.yaml"
-        with config_file_path.open("rb") as f:
-            res = requests.put(
-                signed_url,
-                data=f,
-                headers={
-                    "Content-Type": "application/x-yaml",
-                    "X-FILE-NAME": file_name,
-                },
-            )
-        res.raise_for_status()
 
     def find_training_job(self, id: str) -> list:
         """
