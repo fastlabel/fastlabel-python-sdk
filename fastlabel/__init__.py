@@ -4261,6 +4261,7 @@ class Client:
         resize_option: Optional[Literal["fixed", "none"]] = None,
         resize_dimension: Optional[int] = None,
         annotation_value: str = "",
+        config_file_path: Optional[Union[Path, str]] = None,
     ) -> list:
         """
         Returns a list of training jobs.
@@ -4281,6 +4282,9 @@ class Client:
             "learningRate": learning_rate,
             "resizeOption": resize_option,
             "resizeDimension": resize_dimension,
+            "configFile": utils.base64_encode(str(config_file_path))
+            if config_file_path is not None
+            else None,
         }
         if annotation_value:
             payload["annotationValue"] = annotation_value

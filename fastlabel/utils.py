@@ -2,10 +2,11 @@ import base64
 import json
 import os
 from typing import List
+from uuid import uuid4
 
+import cv2
 import geojson
 import numpy as np
-import cv2
 
 from fastlabel import const
 
@@ -177,3 +178,7 @@ def get_video_fourcc(video_path: str) -> str:
     fourcc_str = "".join([chr((fourcc_code >> 8 * i) & 0xFF) for i in range(4)])
     cap.release()
     return fourcc_str
+
+
+def get_uuid() -> str:
+    return str(uuid4())
