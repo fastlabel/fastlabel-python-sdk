@@ -6,7 +6,7 @@ import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import List, Literal, Optional, Union
+from typing import List, Literal, Optional, Union, Dict
 
 import aiohttp
 import cv2
@@ -4090,7 +4090,7 @@ class Client:
         file_path: str,
         tags: List[str] = None,
         annotations: List[dict] = None,
-        custom_metadata: Optional[dict[str, str]] = None,
+        custom_metadata: Optional[Dict[str, str]] = None,
     ) -> dict:
         """
         Create a dataset object.
