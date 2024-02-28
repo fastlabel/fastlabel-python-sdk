@@ -1,16 +1,15 @@
-import asyncio
 import glob
 import json
 import logging
 import os
 import re
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
-from typing import List, Literal, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 
-import aiohttp
 import cv2
 import numpy as np
+import requests
 import xmltodict
 from PIL import Image, ImageColor, ImageDraw
 
@@ -4041,18 +4040,12 @@ class Client:
         else:
             object_map[""] = response
 
-        sem = asyncio.Semaphore(4)
-
-        async def __download(base_path: Path, _obj: dict):
-            async with sem:
-                await self.__download_dataset_object(base_path, _obj)
-
         for _type, objects in object_map.items():
             base_path = download_path / _type
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(
-                asyncio.gather(*[__download(base_path, obj) for obj in objects])
-            )
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                futures = [executor.submit(self.__download_dataset_object, base_path, obj) for obj in objects]
+                wait(futures)
+
             # check specification
             output_path = base_path / "annotations.json"
             exist_dataset_objects = []
@@ -4075,13 +4068,12 @@ class Client:
                 )
         return [obj for objects in object_map.values() for obj in objects]
 
-    async def __download_dataset_object(self, download_path: Path, obj: dict):
+    def __download_dataset_object(self, download_path: Path, obj: dict):
         obj_path = download_path / obj["name"]
         os.makedirs(obj_path.parent, exist_ok=True)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(obj["signedUrl"]) as response:
-                with obj_path.open("wb") as f:
-                    f.write(await response.read())
+        response = requests.get(obj["signedUrl"])
+        with obj_path.open("wb") as f:
+            f.write(response.content)
 
     def create_dataset_object(
         self,
@@ -4090,7 +4082,7 @@ class Client:
         file_path: str,
         tags: List[str] = None,
         annotations: List[dict] = None,
-        custom_metadata: Optional[dict[str, str]] = None,
+        custom_metadata: Optional[Dict[str, str]] = None,
     ) -> dict:
         """
         Create a dataset object.
