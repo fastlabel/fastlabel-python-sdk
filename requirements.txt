@@ -1,7 +1,0 @@
-requests==2.25.1
-numpy>=1.21.2
-geojson==2.5.0
-xmltodict==0.12.0
-Pillow>=10.0.0,<11.0.0
-opencv-python==4.7.0.72
-aiohttp>=3.8.5
