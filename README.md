@@ -2655,6 +2655,46 @@ client.download_dataset_objects(
 )
 ```
 
+### Update Dataset Object
+```python
+dataset_object = client.update_dataset_object(
+    dataset_id="YOUR_DATASET_ID",
+    object_name="brushwood_dog.jpg",
+    tags=["dog"], # max 5 tags per dataset object.
+    annotations=[
+        {
+            "keypoints": [
+                {
+                    "value": [
+                        102.59,
+                        23.04,
+                        1
+                    ],
+                    "key": "head"
+                }
+            ],
+            "attributes": [
+                {
+                    "value": "Scottish field",
+                    "key": "kind"
+                }
+            ],
+            "confidenceScore": 0,
+            "rotation": 0,
+            "points": [
+                0
+            ],
+            "value": "dog",
+            "type": "bbox" # type can be 'bbox', 'segmentation'.
+        }
+    ],
+    custom_metadata={
+      "key": "value",
+      "metadata": "metadata-value"
+    }
+)
+```
+
 ### Delete Dataset Object
 
 Delete a single dataset object.

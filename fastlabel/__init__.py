@@ -4043,7 +4043,10 @@ class Client:
         for _type, objects in object_map.items():
             base_path = download_path / _type
             with ThreadPoolExecutor(max_workers=4) as executor:
-                futures = [executor.submit(self.__download_dataset_object, base_path, obj) for obj in objects]
+                futures = [
+                    executor.submit(self.__download_dataset_object, base_path, obj)
+                    for obj in objects
+                ]
                 wait(futures)
 
             # check specification
@@ -4112,6 +4115,24 @@ class Client:
         if custom_metadata:
             payload["customMetadata"] = custom_metadata
         return self.api.post_request(endpoint, payload=payload)
+
+    def update_dataset_object(
+        self,
+        dataset_id: str,
+        object_name: str,
+        tags: Optional[List[str]] = None,
+        annotations: Optional[List[dict]] = None,
+        custom_metadata: Optional[dict] = None,
+    ) -> dict:
+        endpoint = "dataset-objects-v2"
+        payload = {"datasetId": dataset_id, "objectName": object_name}
+        if tags is not None:
+            payload["tags"] = tags
+        if annotations is not None:
+            payload["annotations"] = annotations
+        if custom_metadata is not None:
+            payload["customMetadata"] = custom_metadata
+        return self.api.put_request(endpoint, payload=payload)
 
     def delete_dataset_object(self, dataset_id: str, object_name: str) -> None:
         """
