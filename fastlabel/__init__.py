@@ -1870,6 +1870,7 @@ class Client:
         priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
+        relations: Optional[List[dict]] = None,
         **kwargs,
     ) -> str:
         """
@@ -1888,6 +1889,7 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
+        relations is a list of annotation relations to be set (Optional).
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -1911,6 +1913,8 @@ class Client:
                 # the content will be filled on the server side.
                 annotation["content"] = ""
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
+        if relations:
+            payload["relations"] = relations
 
         self.__fill_assign_users(payload, **kwargs)
 

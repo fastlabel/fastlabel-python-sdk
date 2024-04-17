@@ -244,6 +244,17 @@ task_id = client.update_image_task(
             ]
         }
     ],
+    # pass annotation indexes to update
+    relations=[
+      {
+        "startIndex": 1,
+        "endIndex": 0,
+      },
+      {
+        "startIndex": 2,
+        "endIndex": 0
+      }
+    ]
 )
 ```
 
