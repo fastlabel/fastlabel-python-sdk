@@ -3881,7 +3881,7 @@ class Client:
         return self.api.get_request(endpoint, params=params)
 
     def create_dataset(
-        self, name: str, tags: List[str] = [], visibility: str = None, license: str = ""
+        self, name: str, tags: List[str] = [], visibility: str = None
     ) -> dict:
         """
         Create a dataset.
@@ -3889,10 +3889,9 @@ class Client:
         name is name of your dataset. Only lowercase alphanumeric characters + hyphen is available (Required).
         tags is a list of tag (Optional).
         visibility are search terms in the dataset visibility.(Optional).
-        license is a license name of your dataset. (Optional)
         """
         endpoint = "datasets-v2"
-        payload = {"name": name, "license": license}
+        payload = {"name": name}
         if tags:
             payload["tags"] = tags
         if visibility:
@@ -3959,7 +3958,8 @@ class Client:
         self,
         dataset: str,
         version: str = None,
-        tags: List[str] = None,
+        tags: Optional[List[str]] = None,
+        licenses: Optional[List[str]] = None,
         revision_id: str = None,
         offset: int = 0,
         limit: int = 1000,
@@ -3991,6 +3991,8 @@ class Client:
         tags = tags or []
         if tags:
             params["tags"] = tags
+        if licenses:
+            params["licenses"] = licenses
         return self.api.get_request(endpoint, params=params)
 
     def download_dataset_objects(
@@ -4088,6 +4090,7 @@ class Client:
         name: str,
         file_path: str,
         tags: List[str] = None,
+        licenses: List[str] = None,
         annotations: List[dict] = None,
         custom_metadata: Optional[Dict[str, str]] = None,
     ) -> dict:
@@ -4114,6 +4117,8 @@ class Client:
         }
         if tags:
             payload["tags"] = tags
+        if licenses:
+            payload["licenses"] = licenses
         if annotations:
             payload["annotations"] = annotations
         if custom_metadata:
@@ -4125,6 +4130,7 @@ class Client:
         dataset_id: str,
         object_name: str,
         tags: Optional[List[str]] = None,
+        licenses: Optional[List[str]] = None,
         annotations: Optional[List[dict]] = None,
         custom_metadata: Optional[dict] = None,
     ) -> dict:
@@ -4132,6 +4138,8 @@ class Client:
         payload = {"datasetId": dataset_id, "objectName": object_name}
         if tags is not None:
             payload["tags"] = tags
+        if licenses is not None:
+            payload["licenses"] = licenses
         if annotations is not None:
             payload["annotations"] = annotations
         if custom_metadata is not None:

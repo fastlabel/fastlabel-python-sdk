@@ -2409,7 +2409,6 @@ dataset = client.create_dataset(
     name="object-detection", # Only lowercase alphanumeric characters + hyphen is available
     tags=["cat", "dog"], # max 5 tags per dataset.
     visibility="workspace", # visibility can be 'workspace' or 'public' or 'organization'
-    license="The MIT License" # Optional
 )
 ```
 
@@ -2455,7 +2454,6 @@ You can filter by keywords and visibility, tags.
 datasets = client.get_datasets(
     keyword="dog",
     tags=["cat", "dog"], # max 5 tags per dataset.
-    license="mit",
     visibility="workspace", # visibility can be 'workspace' or 'public' or 'organization'.
 )
 ```
@@ -2499,6 +2497,7 @@ dataset_object = client.create_dataset_object(
     name="brushwood_dog.jpg",
     file_path="./brushwood_dog.jpg",
     tags=["dog"], # max 5 tags per dataset object.
+    licenses=["MIT", "my-license"],  # max 10 licenses per dataset object
     annotations=[
         {
             "keypoints": [
@@ -2633,13 +2632,14 @@ dataset_objects = client.get_dataset_objects(dataset="YOUR_DATASET_NAME")
 
 The success response is the same as when created, but it is an array.
 
-You can filter by version or revision_id and tags.
+You can filter by version or revision_id, licenses and tags.
 
 ```python
 dataset_objects = client.get_dataset_objects(
     dataset="YOUR_DATASET_NAME",
     version="latest", # default is "latest"
     tags=["cat"],
+    licenses=["MIT"]
 )
 ```
 
@@ -2672,6 +2672,7 @@ dataset_object = client.update_dataset_object(
     dataset_id="YOUR_DATASET_ID",
     object_name="brushwood_dog.jpg",
     tags=["dog"], # max 5 tags per dataset object.
+    licenses=["MIT", "my-license"],  # max 10 licenses per dataset object
     annotations=[
         {
             "keypoints": [
