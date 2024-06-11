@@ -2639,7 +2639,10 @@ dataset_objects = client.get_dataset_objects(
     dataset="YOUR_DATASET_NAME",
     version="latest", # default is "latest"
     tags=["cat"],
-    licenses=["MIT"]
+    licenses=["fastlabel"],
+    types=["train", "valid"],  # choices are "train", "valid", "test" and "none" (Optional)
+    offset=0,  # default is 0 (Optional)
+    limit=1000,  # default is 1000, and must be less than 1000 (Optional)
 )
 ```
 
@@ -2663,6 +2666,9 @@ client.download_dataset_objects(
   version="latest", # default is "latest"
   tags=["cat"],
   types=["train", "valid"],  # choices are "train", "valid", "test" and "none" (Optional)
+  licenses=["fastlabel"],
+  offset=0,  # default is 0 (Optional)
+  limit=1000,  # default is 1000, and must be less than 1000 (Optional)
 )
 ```
 
