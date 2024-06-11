@@ -1267,7 +1267,7 @@ class Client:
             )
         if not utils.is_video_supported_codec(file_path):
             raise FastLabelInvalidException(
-                "Supported video encoding for registration through the SDK is only H.264.",
+                "Supported video encoding for registration through the SDK is only AVC/H.264",
                 422,
             )
 
@@ -1336,7 +1336,7 @@ class Client:
             )
         if not utils.is_video_supported_codec(file_path):
             raise FastLabelInvalidException(
-                "Supported video encoding for registration through the SDK is only H.264.",
+                "Supported video encoding for registration through the SDK is only AVC/H.264",
                 422,
             )
 
