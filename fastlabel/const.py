@@ -254,3 +254,15 @@ class DatasetObjectType(Enum):
     train = "train"
     valid = "valid"
     test = "test"
+
+    @classmethod
+    def create(cls, value: "str | DatasetObjectType") -> "DatasetObjectType":
+        if isinstance(value, cls):
+            return value
+        try:
+            return cls(value)
+        except ValueError:
+            raise ValueError(
+                f"Invalid DatasetObjectType: {value}. "
+                f"types must be {[k for k in DatasetObjectType.__members__.keys()]}"
+            )

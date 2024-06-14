@@ -28,6 +28,7 @@ from fastlabel.const import (
 
 from .api import Api
 from .exceptions import FastLabelInvalidException
+from .query import DatasetObjectGetQuery
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -3961,6 +3962,7 @@ class Client:
         tags: Optional[List[str]] = None,
         licenses: Optional[List[str]] = None,
         revision_id: str = None,
+        types: Optional[List[Union[str, DatasetObjectType]]] = None,
         offset: int = 0,
         limit: int = 1000,
     ) -> list:
@@ -3973,6 +3975,31 @@ class Client:
         revision_id is dataset rebision (Optional).
         Only use specify one of revision_id or version.
         """
+        endpoint = "dataset-objects-v2"
+        types = [DatasetObjectType.create(type_) for type_ in types or []]
+        params = self._prepare_params(
+            dataset=dataset,
+            version=version,
+            tags=tags,
+            licenses=licenses,
+            revision_id=revision_id,
+            types=types,
+            offset=offset,
+            limit=limit,
+        )
+        return self.api.get_request(endpoint, params=params)
+
+    def _prepare_params(
+        self,
+        dataset: str,
+        offset: int,
+        limit: int,
+        version: str,
+        revision_id: str,
+        tags: Optional[List[str]],
+        licenses: Optional[List[str]],
+        types: Optional[List[DatasetObjectType]],
+    ) -> DatasetObjectGetQuery:
         if version and revision_id:
             raise FastLabelInvalidException(
                 "only use specify one of revisionId or version.", 400
@@ -3981,56 +4008,47 @@ class Client:
             raise FastLabelInvalidException(
                 "Limit must be less than or equal to 1000.", 422
             )
-        endpoint = "dataset-objects-v2"
-        params = {"dataset": dataset, "offset": offset, "limit": limit}
+        params: DatasetObjectGetQuery = {
+            "dataset": dataset,
+            "offset": offset,
+            "limit": limit,
+        }
         if revision_id:
             params["revisionId"] = revision_id
         if version:
             params["version"] = version
-
-        tags = tags or []
         if tags:
             params["tags"] = tags
         if licenses:
             params["licenses"] = licenses
-        return self.api.get_request(endpoint, params=params)
+        if types:
+            params["types"] = [t.value for t in types]
+        return params
 
     def download_dataset_objects(
         self,
         dataset: str,
         path: str,
         version: str = "",
+        revision_id: str = "",
         tags: Optional[List[str]] = None,
+        licenses: Optional[List[str]] = None,
         types: Optional[List[Union[str, DatasetObjectType]]] = None,
         offset: int = 0,
         limit: int = 1000,
     ):
         endpoint = "dataset-objects-v2/signed-urls"
-        if limit > 1000:
-            raise FastLabelInvalidException(
-                "Limit must be less than or equal to 1000.", 422
-            )
-        params = {"dataset": dataset, "offset": offset, "limit": limit}
-        if version:
-            params["version"] = version
-        if tags:
-            params["tags"] = tags
-        if types:
-            try:
-                types = list(
-                    map(
-                        lambda t: t
-                        if isinstance(t, DatasetObjectType)
-                        else DatasetObjectType(t),
-                        types,
-                    )
-                )
-            except ValueError:
-                raise FastLabelInvalidException(
-                    f"types must be {[k for k in DatasetObjectType.__members__.keys()]}.",
-                    422,
-                )
-            params["types"] = [t.value for t in types]
+        types = [DatasetObjectType.create(type_) for type_ in types or []]
+        params = self._prepare_params(
+            dataset=dataset,
+            offset=offset,
+            limit=limit,
+            version=version,
+            revision_id=revision_id,
+            tags=tags,
+            types=types,
+            licenses=licenses,
+        )
 
         response = self.api.get_request(endpoint, params=params)
 
