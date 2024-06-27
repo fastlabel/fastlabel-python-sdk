@@ -21,6 +21,7 @@ from fastlabel.utils import is_video_project_type
 
 # COCO
 
+
 def to_coco(
     project_type: str, tasks: list, output_dir: str, annotations: list = []
 ) -> dict:
