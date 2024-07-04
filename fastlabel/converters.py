@@ -282,7 +282,11 @@ def __get_coco_annotation(
     annotation["iscrowd"] = 0
     annotation["area"] = __to_area(annotation_type, points)
     annotation["image_id"] = image_id
-    annotation["bbox"] = __get_coco_bbox(annotation_type, points, rotation)
+    annotation["bbox"] = (
+        __get_coco_bbox(points, rotation) 
+        if annotation_type == AnnotationType.bbox 
+        else __to_bbox(annotation_type, points)
+    )
     annotation["rotation"] = rotation
     annotation["category_id"] = category["id"]
     annotation["id"] = id_
@@ -326,21 +330,12 @@ def __get_rotated_rectangle_coordinates(
     return rotated_corners
 
 def __get_coco_bbox(
-    annotation_type: AnnotationType,
     points: list,
     rotation: int,
 ) -> list[float]:
     if not points:
         return []
-    if annotation_type == AnnotationType.segmentation.value:
-        base_points = sum(
-            __get_without_hollowed_points(points), []
-        )
-    else:
-        base_points = points
-    points_splitted = [
-        base_points[idx : idx + 2] for idx in range(0, len(base_points), 2)
-    ]
+    points_splitted = [points[idx : idx + 2] for idx in range(0, len(points), 2)]
     polygon_geo = geojson.Polygon(points_splitted)
     coords = np.array(list(geojson.utils.coords(polygon_geo)))
     rotated_coords = __get_rotated_rectangle_coordinates(coords, rotation)
