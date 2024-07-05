@@ -73,6 +73,7 @@ def to_coco(
                     "annotation_value": annotation["value"],
                     "annotation_type": annotation["type"],
                     "annotation_points": get_annotation_points(annotation, index),
+                    "annotation_rotation": annotation.get("rotation", 0),
                     "annotation_keypoints": annotation.get("keypoints"),
                     "annotation_attributes": _get_coco_annotation_attributes(
                         annotation
@@ -204,6 +205,7 @@ def __to_coco_annotation(data: dict) -> dict:
     image_id = data["image_id"]
     points = data["annotation_points"]
     keypoints = data["annotation_keypoints"]
+    rotation = data["annotation_rotation"]
     annotation_type = data["annotation_type"]
     annotation_value = data["annotation_value"]
     annotation_id = 0
@@ -237,6 +239,7 @@ def __to_coco_annotation(data: dict) -> dict:
         image_id,
         annotation_type,
         annotation_attributes,
+        rotation
     )
 
 
@@ -268,6 +271,7 @@ def __get_coco_annotation(
     image_id: str,
     annotation_type: str,
     annotation_attributes: Dict[str, AttributeValue],
+    rotation: int
 ) -> dict:
     annotation = {}
     annotation["num_keypoints"] = len(keypoints) if keypoints else 0
@@ -278,11 +282,73 @@ def __get_coco_annotation(
     annotation["iscrowd"] = 0
     annotation["area"] = __to_area(annotation_type, points)
     annotation["image_id"] = image_id
-    annotation["bbox"] = __to_bbox(annotation_type, points)
+    annotation["bbox"] = (
+        __get_coco_bbox(points, rotation) 
+        if annotation_type == AnnotationType.bbox 
+        else __to_bbox(annotation_type, points)
+    )
+    annotation["rotation"] = rotation
     annotation["category_id"] = category["id"]
     annotation["id"] = id_
     annotation["attributes"] = annotation_attributes
     return annotation
+
+
+def __rotate_point(
+    cx: float, cy: float, angle: float, px: float, py: float
+) -> np.ndarray:
+    px -= cx
+    py -= cy
+
+    x_new = px * math.cos(angle) - py * math.sin(angle)
+    y_new = px * math.sin(angle) + py * math.cos(angle)
+
+    px = x_new + cx
+    py = y_new + cy
+    return np.array([px, py])
+
+
+def __get_rotated_rectangle_coordinates(
+    coords: np.ndarray, rotation: int
+) -> np.ndarray:
+    top_left = coords[0]
+    bottom_right = coords[1]
+
+    cx = (top_left[0] + bottom_right[0]) / 2
+    cy = (top_left[1] + bottom_right[1]) / 2
+
+    top_right = np.array([bottom_right[0], top_left[1]])
+    bottom_left = np.array([top_left[0], bottom_right[1]])
+
+    corners = np.array([top_left, top_right, bottom_right, bottom_left])
+
+    angle_rad = math.radians(rotation)
+    rotated_corners = np.array(
+        [__rotate_point(cx, cy, angle_rad, x, y) for x, y in corners]
+    )
+
+    return rotated_corners
+
+def __get_coco_bbox(
+    points: list,
+    rotation: int,
+) -> list[float]:
+    if not points:
+        return []
+    points_splitted = [points[idx : idx + 2] for idx in range(0, len(points), 2)]
+    polygon_geo = geojson.Polygon(points_splitted)
+    coords = np.array(list(geojson.utils.coords(polygon_geo)))
+    rotated_coords = __get_rotated_rectangle_coordinates(coords, rotation)
+    x_min = rotated_coords[:, 0].min()
+    y_min = rotated_coords[:, 1].min()
+    x_max = rotated_coords[:, 0].max()
+    y_max = rotated_coords[:, 1].max()
+    return [
+        x_min,  # x
+        y_min,  # y
+        x_max - x_min,  # width
+        y_max - y_min,  # height
+    ]
 
 
 def __get_without_hollowed_points(points: list) -> list:
@@ -295,6 +361,10 @@ def __to_coco_segmentation(annotation_type: str, points: list) -> list:
     if annotation_type == AnnotationType.segmentation.value:
         # Remove hollowed points
         return __get_without_hollowed_points(points)
+    if annotation_type == AnnotationType.bbox.value:
+        x1, y1, x2, y2 = points
+        rectangle_points = [x1, y1, x2, y1, x2, y2, x1, y2, x1, y1]
+        return [rectangle_points]
     return [points]
 
 
