@@ -405,7 +405,10 @@ def __to_area(annotation_type: str, points: list) -> float:
 def __calc_area(annotation_type: str, points: list) -> float:
     if not points:
         return 0
-    if annotation_type == AnnotationType.bbox.value:
+    if annotation_type in [
+        AnnotationType.bbox.value,
+        AnnotationType.pose_estimation.value,
+    ]:
         width = points[0] - points[2]
         height = points[1] - points[3]
         return width * height
