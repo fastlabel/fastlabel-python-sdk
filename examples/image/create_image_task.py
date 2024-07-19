@@ -12,7 +12,6 @@ annotations = [
     {
         "type": "bbox",
         "value": "cat",
-        "attributes": [{"key": "kind", "value": "Scottish field"}],
         "points": [
             100,  # top-left x
             100,  # top-left y
@@ -22,6 +21,9 @@ annotations = [
     }
 ]
 
+annotation_id = client.create_annotation(
+    project="sample3", type="bbox", value="cat", title="Cat"
+)
 task_id = client.create_image_task(
     project=project, name=name, file_path=file_path, annotations=annotations
 )
