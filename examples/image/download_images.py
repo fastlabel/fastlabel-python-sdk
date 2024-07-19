@@ -17,7 +17,7 @@ def get_all_tasks() -> list:
     while True:
         time.sleep(1)
 
-        tasks = client.get_image_classification_tasks(
+        tasks = client.get_image_tasks(
             project=PROJECT_SLUG, limit=1000, offset=offset
         )
         all_tasks.extend(tasks)
