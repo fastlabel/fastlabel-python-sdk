@@ -2533,6 +2533,32 @@ dataset_object = client.create_dataset_object(
 )
 ```
 
+If you would like to create a new dataset object with classification type annotations, please pass empty points and value of the annotation named 'classification'.
+
+```python
+dataset_object = client.create_dataset_object(
+    dataset="YOUR_DATASET_NAME",
+    name="brushwood_dog.jpg",
+    file_path="./brushwood_dog.jpg",
+    tags=["dog"], # max 5 tags per dataset object.
+    licenses=["MIT", "my-license"],  # max 10 licenses per dataset object
+    annotations=[
+        { 
+            "type": "classification",
+            "value": "classification",
+            "points": [],
+            "attributes": [
+                {
+                    "type": "text",
+                    "value": "Scottish field",
+                    "key": "kind"
+                }
+            ]
+        }
+    ]
+)
+```
+
 #### Response Dataset Object
 
 See API docs for details.
@@ -2590,32 +2616,6 @@ See API docs for details.
     'createdAt': '2022-10-30T08:32:20.748Z',
     'updatedAt': '2022-10-30T08:32:20.748Z'
 }
-```
-
-If you would like to create with classification type annotations, please pass empty points and value of the annotation named 'classification'.
-
-```python
-dataset_object = client.create_dataset_object(
-    dataset="YOUR_DATASET_NAME",
-    name="brushwood_dog.jpg",
-    file_path="./brushwood_dog.jpg",
-    tags=["dog"], # max 5 tags per dataset object.
-    licenses=["MIT", "my-license"],  # max 10 licenses per dataset object
-    annotations=[
-        { 
-            "type": "classification",
-            "value": "classification",
-            "points": [],
-            "attributes": [
-                {
-                    "type": "text",
-                    "value": "Scottish field",
-                    "key": "kind"
-                }
-            ]
-        }
-    ]
-)
 ```
 
 ### Find Dataset Object
