@@ -887,6 +887,7 @@ class Client:
         file_path: str,
         status: str = None,
         external_status: str = None,
+        custom_task_status: str = "",
         priority: Priority = None,
         annotations: list = [],
         tags: list = [],
@@ -902,6 +903,8 @@ class Client:
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        custom_task_status is the initial value of the status.
+        it can be set to 'registered', 'pending', 'workflow_{1..6}_completed', 'workflow_{1..6}_declined' (Optional).
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
@@ -917,6 +920,7 @@ class Client:
         external_assignee is slug of external assigned user (Optional).
         external_reviewer is slug of external review user (Optional).
         external_approver is slug of external approve user (Optional).
+        workflow_{1..6}_user is slug of custom workflow assignee user for each step (Optional).
         """
         endpoint = "tasks/image"
         if not utils.is_image_supported_ext(file_path):
@@ -942,6 +946,8 @@ class Client:
             payload["tags"] = tags
         if is_delete_exif:
             payload["isDeleteExif"] = is_delete_exif
+        if custom_task_status:
+            payload["customTaskStatus"] = custom_task_status
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1868,6 +1874,7 @@ class Client:
         task_id: str,
         status: str = None,
         external_status: str = None,
+        custom_task_status: str = "",
         priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
@@ -1881,6 +1888,8 @@ class Client:
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        custom_task_status is the initial value of the status.
+        it can be set to 'registered', 'pending', 'workflow_{1..6}_completed', 'workflow_{1..6}_declined' (Optional).
         priority is the priority of the task (default: none) (Optional).
         Set one of the numbers corresponding to:
             none = 0,
@@ -1897,6 +1906,7 @@ class Client:
         external_assignee is slug of external assigned user (Optional).
         external_reviewer is slug of external review user (Optional).
         external_approver is slug of external approve user (Optional).
+        workflow_{1..6}_user is slug of custom workflow assignee user for each step (Optional).
         """
         endpoint = "tasks/image/" + task_id
         payload = {}
@@ -1916,6 +1926,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if relations:
             payload["relations"] = relations
+        if custom_task_status:
+            payload["customTaskStatus"] = custom_task_status
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -4255,6 +4267,18 @@ class Client:
             payload["externalReviewer"] = kwargs.get("external_reviewer")
         if "external_approver" in kwargs:
             payload["externalApprover"] = kwargs.get("external_approver")
+        if "workflow_1_user" in kwargs:
+            payload["workflow1User"] = kwargs.get("workflow_1_user")
+        if "workflow_2_user" in kwargs:
+            payload["workflow2User"] = kwargs.get("workflow_2_user")
+        if "workflow_3_user" in kwargs:
+            payload["workflow3User"] = kwargs.get("workflow_3_user")
+        if "workflow_4_user" in kwargs:
+            payload["workflow4User"] = kwargs.get("workflow_4_user")
+        if "workflow_5_user" in kwargs:
+            payload["workflow5User"] = kwargs.get("workflow_5_user")
+        if "workflow_6_user" in kwargs:
+            payload["workflow6User"] = kwargs.get("workflow_6_user")
 
     def __get_signed_path(
         self,
