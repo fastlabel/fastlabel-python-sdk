@@ -70,6 +70,29 @@ class Client:
         """
         endpoint = "tasks/image/classification/" + task_id
         return self.api.get_request(endpoint)
+    
+    def find_multi_image_classification_task(self, task_id: str) -> dict:
+        """
+        Find a single multi image classification task.
+        """
+        endpoint = "tasks/multi-image/classification/" + task_id
+        return self.api.get_request(endpoint)
+    
+    def find_multi_image_classification_task_by_name(
+        self, project: str, task_name: str
+    ) -> dict:
+        """
+        Find a single multi image classification task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_multi_image_classification_tasks(
+            project=project, task_name=task_name
+        )
+        if not tasks:
+            return None
+        return tasks[0]
 
     def find_image_classification_task_by_name(
         self, project: str, task_name: str
@@ -395,6 +418,46 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/image/classification"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+    
+    def get_multi_image_classification_tasks(
+            self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of multi image classification tasks.
+        Returns up to 1000 at a time, to get more,
+        set offset as the starting position to fetch.
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        endpoint = "tasks/multi-image/classification"
         params = {"project": project}
         if status:
             params["status"] = status
@@ -1130,6 +1193,96 @@ class Client:
             payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+    
+    def create_multi_image_classification_task(
+        self,
+        project: str,
+        name: str,
+        folder_path: str,
+        status: str = None,
+        external_status: str = None,
+        priority: Priority = None,
+        attributes: list = [],
+        tags: list = [],
+        is_delete_exif: bool = False,
+        **kwargs,
+    ) -> str:
+        """
+        Create a single multi image classification task.
+
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        folder_path is a path to data folder. Files should be under the folder.
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/multi-image/classification"
+        if not os.path.isdir(folder_path):
+            raise FastLabelInvalidException("Folder does not exist.", 422)
+        file_paths = glob.glob(os.path.join(folder_path, "*"))
+        if not file_paths:
+            raise FastLabelInvalidException("Folder does not have any file.", 422)
+        contents = []
+        contents_size = 0
+        for file_path in file_paths:
+            if not utils.is_image_supported_ext(file_path):
+                raise FastLabelInvalidException(
+                    "Supported extensions are png, jpg, jpeg.", 422
+                )
+
+            if not utils.is_image_supported_size(file_path):
+                raise FastLabelInvalidException(
+                    "Supported image size is under 20 MB.", 422
+                )
+
+            if len(contents) == 6:
+                raise FastLabelInvalidException(
+                    "The count of files should be under 6", 422
+                )
+
+            file = utils.base64_encode(file_path)
+            contents.append({"name": os.path.basename(file_path), "file": file})
+            contents_size += utils.get_json_length(contents[-1])
+            if contents_size > const.SUPPORTED_CONTENTS_SIZE:
+                raise FastLabelInvalidException(
+                    "Supported contents size is under"
+                    f" {const.SUPPORTED_CONTENTS_SIZE}.",
+                    422,
+                )
+
+        payload = {"project": project, "name": name, "contents": contents}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
+        if attributes:
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
+        if tags:
+            payload["tags"] = tags
+        if is_delete_exif:
+            payload["isDeleteExif"] = is_delete_exif
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1967,6 +2120,56 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/image/classification/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
+        if attributes:
+            payload["attributes"] = delete_extra_attributes_parameter(attributes)
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+    
+    def update_multi_image_classification_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        priority: Priority = None,
+        attributes: list = [],
+        tags: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single multi image classification task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        attributes is a list of attribute to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/multi-image/classification/" + task_id
         payload = {}
         if status:
             payload["status"] = status
