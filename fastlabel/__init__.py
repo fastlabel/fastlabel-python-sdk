@@ -4096,6 +4096,8 @@ class Client:
                         "name": obj["name"],
                         "annotations": obj["annotations"],
                         "customMetadata": obj["customMetadata"],
+                        "tags": obj["tags"],
+                        "object_type": obj["type"]
                     }
                     for obj in objects
                 ]
