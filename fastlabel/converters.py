@@ -83,6 +83,7 @@ def to_coco(
                 }
                 for annotation in task["annotations"]
             ]
+            print(params)
 
             with ThreadPoolExecutor(max_workers=8) as executor:
                 image_annotations = executor.map(__to_coco_annotation, params)

@@ -1,0 +1,80 @@
+[
+    {
+        "id": "6827b0d7-8fe1-4bc5-ab28-7c15fa5554ba",
+        "name": "sample1.jpg",
+        "status": "registered",
+        "externalStatus": "registered",
+        "url": "https://prod-fastlabel-app-annotations.s3.amazonaws.com/workspaces/7a38045c-71a9-4422-8184-f3c723af7e52/ed0d0062-8584-47cb-a9a1-80d4818f75ec/tasks/sample1.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYVHKCFVVKRTC7MV7%2F20240808%2Fap-northeast-1%2Fs3%2Faws4_request&X-Amz-Date=20240808T060839Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEC0aDmFwLW5vcnRoZWFzdC0xIkcwRQIgf%2BblkmEB4FEl479V3zrHdWYEAqAXOdqa%2FDVzVqe7seECIQCLzq74h5lwvHW4mC7R%2Ftv40M8e%2BsePo1OZs81CgUNyrCqABAgmEAEaDDU5NTM0Mzg0Njc2MiIM9a2pSeZdcgAlEqPaKt0D0FBErS7nk%2BdouREHqO579%2BB%2FAnQG3wCUtbHSvl%2FYNNjxykU%2BUp5H9nxCdSHgxyeYXJyNyYKr1PqAj32z4bx3hZHD4KZAipXMM4Z%2BbMTQ3PGHeS8vyeIfXuyRS2oZSsyGmjurjw4VkdEkm9nGozCk0ngDsfSMZBg2g7Q0yd%2Bdl4PcydMBHjITMjfaM5K1IiEsZPYjc14SxOSKIIwJloTj08PfBMrvhFN1uLMP%2FkT7JBg2g0OmnyuZrhbPdE9Q2hPwkvcoNPEMFa2pIRJEEeSARdfNQEEA0KijWsluMsMau%2B8NV1r%2BTtMAUFZVpw9ie%2BHNhimOsRPDbHQsNIfsj3xd4cxo08mbnTO5COCBamGdELSDHem8trWOUwKra2FVnhDqor5WChsccKzujThRE627TKva1yKeW8gTE5HRVfDU%2FPw%2FVaK0mIuuvTV0%2BgVLj4jhItxybhbXzXYl7buBNTK2riYyUrgeAmFaM0TlKaNm%2FgGNdhTGLq73N0LES5dCaX29ZsDMEM7M1SNm4pt2APtZSmXs2SEw5icW5tnxQIc9HSnambBJTpo4G0h1zruf9nMAomMq9T8EeHdMCeFJmgKlioEfYqhDVC7%2B9SB5DRf192e8yfdp9xGrTZUYZRxlMO%2Bn0bUGOqUBy0lFB53RAbvKlBjFqXkv4g7s1tV0Ar1GS6FtlMsGvn%2Be8s5CGThzjWZSakaKxbD62GXC3Ee4b7NVA%2BrxIPAr9y0fN%2BNh6fSFqPi9IAmkwYZPiwcxHd8IUsfFdpXLiNathG3Ot21HOSzLZBKC51mWZKKjuagr6pkJaIYEOj3jQrB%2B%2FNif4b6fzgmUnJRjG6avNz5QHK1ebSuxnecHJFq1P8mcrBrH&X-Amz-Signature=36b93692e9be08ebe23148f49b3bd49ea99a6628601d2e0a6f0387d885a74e3b",
+        "width": 5184,
+        "height": 3888,
+        "secondsToAnnotate": 0,
+        "annotations": [
+            {
+                "id": "fb0e74b1-fd6d-4d82-8dad-7bf531c7ffdc",
+                "type": "bbox",
+                "title": "animal",
+                "value": "animal",
+                "color": "#A8D695",
+                "attributes": [],
+                "points": [
+                    1387.3,
+                    944.91,
+                    2661.5,
+                    3018.38
+                ],
+                "rotation": 0,
+                "keypoints": [],
+                "confidenceScore": -1
+            }
+        ],
+        "relations": [],
+        "tags": [],
+        "assignee": "",
+        "reviewer": "",
+        "approver": "",
+        "externalAssignee": "",
+        "externalReviewer": "",
+        "externalApprover": "",
+        "createdAt": "2024-08-08T14:55:13.154085",
+        "updatedAt": "2024-08-08T14:55:13.154085"
+    },
+    {
+        "id": "4c785bb9-febd-4f6c-b1fa-d485cf22e889",
+        "name": "sample2.jpg",
+        "status": "registered",
+        "externalStatus": "registered",
+        "url": "https://prod-fastlabel-app-annotations.s3.amazonaws.com/workspaces/7a38045c-71a9-4422-8184-f3c723af7e52/ed0d0062-8584-47cb-a9a1-80d4818f75ec/tasks/sample2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYVHKCFVVKRTC7MV7%2F20240808%2Fap-northeast-1%2Fs3%2Faws4_request&X-Amz-Date=20240808T060839Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEC0aDmFwLW5vcnRoZWFzdC0xIkcwRQIgf%2BblkmEB4FEl479V3zrHdWYEAqAXOdqa%2FDVzVqe7seECIQCLzq74h5lwvHW4mC7R%2Ftv40M8e%2BsePo1OZs81CgUNyrCqABAgmEAEaDDU5NTM0Mzg0Njc2MiIM9a2pSeZdcgAlEqPaKt0D0FBErS7nk%2BdouREHqO579%2BB%2FAnQG3wCUtbHSvl%2FYNNjxykU%2BUp5H9nxCdSHgxyeYXJyNyYKr1PqAj32z4bx3hZHD4KZAipXMM4Z%2BbMTQ3PGHeS8vyeIfXuyRS2oZSsyGmjurjw4VkdEkm9nGozCk0ngDsfSMZBg2g7Q0yd%2Bdl4PcydMBHjITMjfaM5K1IiEsZPYjc14SxOSKIIwJloTj08PfBMrvhFN1uLMP%2FkT7JBg2g0OmnyuZrhbPdE9Q2hPwkvcoNPEMFa2pIRJEEeSARdfNQEEA0KijWsluMsMau%2B8NV1r%2BTtMAUFZVpw9ie%2BHNhimOsRPDbHQsNIfsj3xd4cxo08mbnTO5COCBamGdELSDHem8trWOUwKra2FVnhDqor5WChsccKzujThRE627TKva1yKeW8gTE5HRVfDU%2FPw%2FVaK0mIuuvTV0%2BgVLj4jhItxybhbXzXYl7buBNTK2riYyUrgeAmFaM0TlKaNm%2FgGNdhTGLq73N0LES5dCaX29ZsDMEM7M1SNm4pt2APtZSmXs2SEw5icW5tnxQIc9HSnambBJTpo4G0h1zruf9nMAomMq9T8EeHdMCeFJmgKlioEfYqhDVC7%2B9SB5DRf192e8yfdp9xGrTZUYZRxlMO%2Bn0bUGOqUBy0lFB53RAbvKlBjFqXkv4g7s1tV0Ar1GS6FtlMsGvn%2Be8s5CGThzjWZSakaKxbD62GXC3Ee4b7NVA%2BrxIPAr9y0fN%2BNh6fSFqPi9IAmkwYZPiwcxHd8IUsfFdpXLiNathG3Ot21HOSzLZBKC51mWZKKjuagr6pkJaIYEOj3jQrB%2B%2FNif4b6fzgmUnJRjG6avNz5QHK1ebSuxnecHJFq1P8mcrBrH&X-Amz-Signature=31733efcc1769b6cc5a00285d655efdde977403d0cf5fd27ba607435cd3d99f1",
+        "width": 2878,
+        "height": 1871,
+        "secondsToAnnotate": 0,
+        "annotations": [
+            {
+                "id": "2e1e54b0-92c7-4aa4-8c92-08a4934f0561",
+                "type": "bbox",
+                "title": "animal",
+                "value": "animal",
+                "color": "#A8D695",
+                "attributes": [],
+                "points": [
+                    1349.85,
+                    167.97,
+                    2394.59,
+                    1750.39
+                ],
+                "rotation": 0,
+                "keypoints": [],
+                "confidenceScore": -1
+            }
+        ],
+        "relations": [],
+        "tags": [],
+        "assignee": "",
+        "reviewer": "",
+        "approver": "",
+        "externalAssignee": "",
+        "externalReviewer": "",
+        "externalApprover": "",
+        "createdAt": "2024-08-08T14:55:13.540003",
+        "updatedAt": "2024-08-08T14:55:13.540003"
+    }
+]
