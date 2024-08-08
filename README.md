@@ -116,7 +116,7 @@ task_id = client.create_image_task(
 )
 ```
 
-> Check [examples/create_image_task.py](/examples/create_image_task.py).
+> Check [examples/image/create_image_task.py](/examples/image/create_image_task.py).
 
 ##### Limitation
 
