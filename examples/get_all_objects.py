@@ -18,7 +18,7 @@ import os
 os.environ['FASTLABEL_ACCESS_TOKEN'] = FASTLABEL_ACCESS_TOKEN
 client = fastlabel.Client()
 
-def get_all_dataset_objects(dataset_name: str, tags: list[str] = None):
+def get_all_dataset_objects(dataset_name: str, tags: list[str] | None= None):
     # Iterate pages until new tasks are empty.
     result = []
     offset = None
