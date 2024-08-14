@@ -8,7 +8,7 @@ from decimal import Decimal
 from operator import itemgetter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 import cv2
 import geojson
@@ -83,7 +83,6 @@ def to_coco(
                 }
                 for annotation in task["annotations"]
             ]
-            print(params)
 
             with ThreadPoolExecutor(max_workers=8) as executor:
                 image_annotations = executor.map(__to_coco_annotation, params)
@@ -240,7 +239,7 @@ def __to_coco_annotation(data: dict) -> dict:
         image_id,
         annotation_type,
         annotation_attributes,
-        rotation
+        rotation,
     )
 
 
@@ -255,7 +254,11 @@ def __get_coco_category_by_name(categories: list, name: str) -> Optional[dict]:
 
 def __get_coco_annotation_keypoints(keypoints: list, category_keypoints: list) -> list:
     coco_annotation_keypoints = []
-    keypoint_values = {keypoint["key"]: keypoint["value"] for keypoint in keypoints if keypoint["value"]}
+    keypoint_values = {
+        keypoint["key"]: keypoint["value"]
+        for keypoint in keypoints
+        if keypoint["value"]
+    }
     for category_key in category_keypoints:
         value = keypoint_values.get(category_key, [0, 0, 0])
         # Adjust fastlabel data definition to coco format
@@ -272,20 +275,22 @@ def __get_coco_annotation(
     image_id: str,
     annotation_type: str,
     annotation_attributes: Dict[str, AttributeValue],
-    rotation: int
+    rotation: int,
 ) -> dict:
     annotation = {}
     annotation["num_keypoints"] = len(keypoints) if keypoints else 0
     annotation["keypoints"] = (
-        __get_coco_annotation_keypoints(keypoints, category["keypoints"]) if keypoints else []
+        __get_coco_annotation_keypoints(keypoints, category["keypoints"])
+        if keypoints
+        else []
     )
     annotation["segmentation"] = __to_coco_segmentation(annotation_type, points)
     annotation["iscrowd"] = 0
     annotation["area"] = __to_area(annotation_type, points)
     annotation["image_id"] = image_id
     annotation["bbox"] = (
-        __get_coco_bbox(points, rotation) 
-        if annotation_type == AnnotationType.bbox 
+        __get_coco_bbox(points, rotation)
+        if annotation_type == AnnotationType.bbox
         else __to_bbox(annotation_type, points)
     )
     annotation["rotation"] = rotation
@@ -329,6 +334,7 @@ def __get_rotated_rectangle_coordinates(
     )
 
     return rotated_corners
+
 
 def __get_coco_bbox(
     points: list,
@@ -1210,4 +1216,3 @@ def _get_coco_annotation_attributes(annotation: dict) -> Dict[str, AttributeValu
     for attribute in attributes:
         coco_attributes[attribute["key"]] = attribute["value"]
     return coco_attributes
-
