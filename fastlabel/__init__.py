@@ -1,3 +1,5 @@
+# type: ignore
+
 import glob
 import json
 import logging
@@ -70,14 +72,14 @@ class Client:
         """
         endpoint = "tasks/image/classification/" + task_id
         return self.api.get_request(endpoint)
-    
+
     def find_multi_image_classification_task(self, task_id: str) -> dict:
         """
         Find a single multi image classification task.
         """
         endpoint = "tasks/multi-image/classification/" + task_id
         return self.api.get_request(endpoint)
-    
+
     def find_multi_image_classification_task_by_name(
         self, project: str, task_name: str
     ) -> dict:
@@ -432,9 +434,9 @@ class Client:
         if limit:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
-    
+
     def get_multi_image_classification_tasks(
-            self,
+        self,
         project: str,
         status: str = None,
         external_status: str = None,
@@ -1197,7 +1199,7 @@ class Client:
         self.__fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
-    
+
     def create_multi_image_classification_task(
         self,
         project: str,
@@ -2135,7 +2137,7 @@ class Client:
         self.__fill_assign_users(payload, **kwargs)
 
         return self.api.put_request(endpoint, payload=payload)
-    
+
     def update_multi_image_classification_task(
         self,
         task_id: str,
@@ -4300,7 +4302,7 @@ class Client:
                         "annotations": obj["annotations"],
                         "customMetadata": obj["customMetadata"],
                         "tags": obj["tags"],
-                        "object_type": obj["type"]
+                        "object_type": obj["type"],
                     }
                     for obj in objects
                 ]
