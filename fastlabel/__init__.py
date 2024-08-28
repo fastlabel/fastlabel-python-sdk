@@ -1,5 +1,3 @@
-# type: ignore
-
 import glob
 import json
 import logging
@@ -7,7 +5,7 @@ import os
 import re
 from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import cv2
 import numpy as np
@@ -40,8 +38,6 @@ logging.basicConfig(
 
 
 class Client:
-    api = None
-
     def __init__(self):
         self.api = Api()
 
@@ -54,7 +50,7 @@ class Client:
         endpoint = "tasks/image/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_image_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_image_task_by_name(self, project: str, task_name: str) -> dict | None:
         """
         Find a single image task by name.
 
@@ -82,7 +78,7 @@ class Client:
 
     def find_multi_image_classification_task_by_name(
         self, project: str, task_name: str
-    ) -> dict:
+    ) -> dict | None:
         """
         Find a single multi image classification task by name.
 
@@ -98,7 +94,7 @@ class Client:
 
     def find_image_classification_task_by_name(
         self, project: str, task_name: str
-    ) -> dict:
+    ) -> dict | None:
         """
         Find a single image classification task by name.
 
@@ -119,7 +115,9 @@ class Client:
         endpoint = "tasks/sequential-image/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_sequential_image_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_sequential_image_task_by_name(
+        self, project: str, task_name: str
+    ) -> dict | None:
         """
         Find a single sequential image task by name.
 
@@ -145,7 +143,7 @@ class Client:
         endpoint = "tasks/video/classification/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_video_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_video_task_by_name(self, project: str, task_name: str) -> dict | None:
         """
         Find a single video task by name.
 
@@ -159,7 +157,7 @@ class Client:
 
     def find_video_classification_task_by_name(
         self, project: str, task_name: str
-    ) -> dict:
+    ) -> dict | None:
         """
         Find a single video classification task by name.
 
@@ -187,7 +185,7 @@ class Client:
         endpoint = "tasks/text/classification/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_text_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_text_task_by_name(self, project: str, task_name: str) -> dict | None:
         """
         Find a single text task by name.
 
@@ -201,7 +199,7 @@ class Client:
 
     def find_text_classification_task_by_name(
         self, project: str, task_name: str
-    ) -> dict:
+    ) -> dict | None:
         """
         Find a single text classification task by name.
 
@@ -227,7 +225,7 @@ class Client:
         endpoint = "tasks/audio/classification/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_audio_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_audio_task_by_name(self, project: str, task_name: str) -> dict | None:
         """
         Find a single audio task by name.
 
@@ -241,7 +239,7 @@ class Client:
 
     def find_audio_classification_task_by_name(
         self, project: str, task_name: str
-    ) -> dict:
+    ) -> dict | None:
         """
         Find a single audio classification task by name.
 
@@ -262,7 +260,7 @@ class Client:
         endpoint = "tasks/dicom/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_dicom_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_dicom_task_by_name(self, project: str, task_name: str) -> dict | None:
         """
         Find a single DICOM task by name.
 
@@ -281,7 +279,7 @@ class Client:
         endpoint = "tasks/pcd/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_pcd_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_pcd_task_by_name(self, project: str, task_name: str) -> dict | None:
         """
         Find a single PCD task by name.
 
@@ -300,7 +298,9 @@ class Client:
         endpoint = "tasks/sequential-pcd/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_sequential_pcd_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_sequential_pcd_task_by_name(
+        self, project: str, task_name: str
+    ) -> dict | None:
         """
         Find a single Sequential PCD task by name.
 
@@ -324,9 +324,9 @@ class Client:
     def count_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
-        tags: list = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        tags: Optional[list] = None,
     ) -> int:
         """
         Returns task count.
@@ -340,7 +340,7 @@ class Client:
         tags is a list of tag (Optional).
         """
         endpoint = "tasks/count"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -352,11 +352,11 @@ class Client:
     def get_image_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -380,7 +380,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tasks/image"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -398,12 +398,12 @@ class Client:
     def get_image_classification_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
-        limit: int = 100,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
+        limit: Optional[int] = 100,
     ) -> list:
         """
         Returns a list of image classification tasks.
@@ -420,7 +420,7 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/image/classification"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -438,11 +438,11 @@ class Client:
     def get_multi_image_classification_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -460,7 +460,7 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/multi-image/classification"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -478,11 +478,11 @@ class Client:
     def get_sequential_image_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 10,
     ) -> list:
         """
@@ -504,7 +504,7 @@ class Client:
                 "Limit must be less than or equal to 10.", 422
             )
         endpoint = "tasks/sequential-image"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -522,11 +522,11 @@ class Client:
     def get_video_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 10,
     ) -> list:
         """
@@ -549,7 +549,7 @@ class Client:
                 "Limit must be less than or equal to 10.", 422
             )
         endpoint = "tasks/video"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -567,11 +567,11 @@ class Client:
     def get_video_classification_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -589,7 +589,7 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/video/classification"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -607,11 +607,11 @@ class Client:
     def get_text_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -634,7 +634,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tasks/text"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -652,11 +652,11 @@ class Client:
     def get_text_classification_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -674,7 +674,7 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/text/classification"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -692,11 +692,11 @@ class Client:
     def get_audio_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -719,7 +719,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tasks/audio"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -737,11 +737,11 @@ class Client:
     def get_audio_classification_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -759,7 +759,7 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/audio/classification"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -777,11 +777,11 @@ class Client:
     def get_pcd_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -805,7 +805,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tasks/pcd"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -823,11 +823,11 @@ class Client:
     def get_sequential_pcd_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
-        tags: list = None,
-        task_name: str = None,
-        offset: int = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        tags: Optional[list] = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 10,
     ) -> list:
         """
@@ -851,7 +851,7 @@ class Client:
                 "Limit must be less than or equal to 10.", 422
             )
         endpoint = "tasks/sequential-pcd"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -869,7 +869,7 @@ class Client:
     def get_task_id_name_map(
         self,
         project: str,
-        offset: int = None,
+        offset: Optional[int] = None,
         limit: int = 1000,
     ) -> dict:
         """
@@ -890,7 +890,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tasks/map/id-name"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if offset:
             params["offset"] = offset
         if limit:
@@ -900,11 +900,11 @@ class Client:
     def get_dicom_tasks(
         self,
         project: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
-        task_name: str = None,
-        offset: int = None,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -928,7 +928,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tasks/dicom"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if status:
             params["status"] = status
         if external_status:
@@ -950,10 +950,10 @@ class Client:
         project: str,
         name: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         custom_task_status: str = "",
-        priority: Priority = None,
+        priority: Optional[Priority] = None,
         annotations: list = [],
         tags: list = [],
         is_delete_exif: bool = False,
@@ -996,7 +996,7 @@ class Client:
             raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
 
         file = utils.base64_encode(file_path)
-        payload = {"project": project, "name": name, "file": file}
+        payload: dict[str, Any] = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
         if external_status:
@@ -1023,10 +1023,10 @@ class Client:
         project: str,
         storage_type: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
-        annotations: list = None,
-        tags: list = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        annotations: Optional[list] = None,
+        tags: Optional[list] = None,
         **kwargs,
     ) -> str:
         """
@@ -1054,7 +1054,7 @@ class Client:
                 "Supported extensions are png, jpg, jpeg.", 422
             )
 
-        payload = {
+        payload: dict[str, Any] = {
             "project": project,
             "filePath": file_path,
             "storageType": storage_type,
@@ -1079,9 +1079,9 @@ class Client:
         project: str,
         name: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         attributes: list = [],
         tags: list = [],
         is_delete_exif: bool = False,
@@ -1121,7 +1121,7 @@ class Client:
             raise FastLabelInvalidException("Supported image size is under 20 MB.", 422)
 
         file = utils.base64_encode(file_path)
-        payload = {"project": project, "name": name, "file": file}
+        payload: dict[str, Any] = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
         if external_status:
@@ -1145,11 +1145,11 @@ class Client:
         project: str,
         file_path: str,
         storage_type: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
-        attributes: list = None,
-        tags: list = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
+        attributes: Optional[list] = None,
+        tags: Optional[list] = None,
         **kwargs,
     ) -> str:
         """
@@ -1178,7 +1178,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/integrated-image/classification"
-        payload = {
+        payload: dict[str, Any] = {
             "project": project,
             "filePath": file_path,
             "storageType": storage_type,
@@ -1205,9 +1205,9 @@ class Client:
         project: str,
         name: str,
         folder_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         attributes: list = [],
         tags: list = [],
         is_delete_exif: bool = False,
@@ -1244,7 +1244,7 @@ class Client:
         file_paths = glob.glob(os.path.join(folder_path, "*"))
         if not file_paths:
             raise FastLabelInvalidException("Folder does not have any file.", 422)
-        contents = []
+        contents: list[dict[str, Any]] = []
         contents_size = 0
         for file_path in file_paths:
             if not utils.is_image_supported_ext(file_path):
@@ -1272,7 +1272,11 @@ class Client:
                     422,
                 )
 
-        payload = {"project": project, "name": name, "contents": contents}
+        payload: dict[str, Any] = {
+            "project": project,
+            "name": name,
+            "contents": contents,
+        }
         if status:
             payload["status"] = status
         if external_status:
@@ -1295,9 +1299,9 @@ class Client:
         project: str,
         name: str,
         folder_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         annotations: list = [],
         tags: list = [],
         is_delete_exif: bool = False,
@@ -1337,7 +1341,7 @@ class Client:
         file_paths = glob.glob(os.path.join(folder_path, "*"))
         if not file_paths:
             raise FastLabelInvalidException("Folder does not have any file.", 422)
-        contents = []
+        contents: list[dict[str, Any]] = []
         contents_size = 0
         for file_path in file_paths:
             if not utils.is_image_supported_ext(file_path):
@@ -1365,7 +1369,11 @@ class Client:
                     422,
                 )
 
-        payload = {"project": project, "name": name, "contents": contents}
+        payload: dict[str, Any] = {
+            "project": project,
+            "name": name,
+            "contents": contents,
+        }
         if status:
             payload["status"] = status
         if external_status:
@@ -1388,9 +1396,9 @@ class Client:
         project: str,
         name: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -1434,7 +1442,7 @@ class Client:
             )
 
         file = utils.base64_encode(file_path)
-        payload = {"project": project, "name": name, "file": file}
+        payload: dict[str, Any] = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
         if external_status:
@@ -1457,9 +1465,9 @@ class Client:
         project: str,
         name: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -1503,7 +1511,7 @@ class Client:
             )
 
         file = utils.base64_encode(file_path)
-        payload = {"project": project, "name": name, "file": file}
+        payload: dict[str, Any] = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
         if external_status:
@@ -1524,9 +1532,9 @@ class Client:
         project: str,
         name: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -1563,7 +1571,7 @@ class Client:
             raise FastLabelInvalidException("Supported text size is under 2 MB.", 422)
 
         file = utils.base64_encode(file_path)
-        payload = {"project": project, "name": name, "file": file}
+        payload: dict[str, Any] = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
         if external_status:
@@ -1586,9 +1594,9 @@ class Client:
         project: str,
         name: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -1625,7 +1633,7 @@ class Client:
             raise FastLabelInvalidException("Supported text size is under 2 MB.", 422)
 
         file = utils.base64_encode(file_path)
-        payload = {"project": project, "name": name, "file": file}
+        payload: dict[str, Any] = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
         if external_status:
@@ -1646,9 +1654,9 @@ class Client:
         project: str,
         name: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -1689,7 +1697,7 @@ class Client:
             )
 
         file = utils.base64_encode(file_path)
-        payload = {"project": project, "name": name, "file": file}
+        payload: dict[str, Any] = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
         if external_status:
@@ -1712,9 +1720,9 @@ class Client:
         project: str,
         name: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -1755,7 +1763,7 @@ class Client:
             )
 
         file = utils.base64_encode(file_path)
-        payload = {"project": project, "name": name, "file": file}
+        payload: dict[str, Any] = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
         if external_status:
@@ -1775,8 +1783,8 @@ class Client:
         self,
         project: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
         **kwargs,
     ) -> str:
@@ -1804,7 +1812,7 @@ class Client:
         if not utils.is_dicom_supported_size(file_path):
             raise FastLabelInvalidException("Supported image size is under 2 GB.", 422)
 
-        payload = {"project": project}
+        payload: dict[str, Any] = {"project": project}
         if status:
             payload["status"] = status
         if external_status:
@@ -1829,9 +1837,9 @@ class Client:
         project: str,
         name: str,
         file_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -1868,7 +1876,7 @@ class Client:
             raise FastLabelInvalidException("Supported PCD size is under 100 MB.", 422)
 
         file = utils.base64_encode(file_path)
-        payload = {"project": project, "name": name, "file": file}
+        payload: dict[str, Any] = {"project": project, "name": name, "file": file}
         if status:
             payload["status"] = status
         if external_status:
@@ -1891,9 +1899,9 @@ class Client:
         project: str,
         name: str,
         folder_path: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         annotations: list = [],
         tags: list = [],
         **kwargs,
@@ -1932,7 +1940,7 @@ class Client:
         file_paths = glob.glob(os.path.join(folder_path, "*"))
         if not file_paths:
             raise FastLabelInvalidException("Folder does not have any file.", 422)
-        contents = []
+        contents: list[dict[str, Any]] = []
         contents_size = 0
         for file_path in file_paths:
             if not utils.is_pcd_supported_ext(file_path):
@@ -1960,7 +1968,11 @@ class Client:
                     422,
                 )
 
-        payload = {"project": project, "name": name, "contents": contents}
+        payload: dict[str, Any] = {
+            "project": project,
+            "name": name,
+            "contents": contents,
+        }
         if status:
             payload["status"] = status
         if external_status:
@@ -1981,9 +1993,9 @@ class Client:
     def update_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         tags: list = [],
         **kwargs,
     ) -> str:
@@ -2010,7 +2022,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2027,10 +2039,10 @@ class Client:
     def update_image_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         custom_task_status: str = "",
-        priority: Priority = None,
+        priority: Optional[Priority] = None,
         tags: list = [],
         annotations: List[dict] = [],
         relations: Optional[List[dict]] = None,
@@ -2064,7 +2076,7 @@ class Client:
         workflow_{1..6}_user is slug of custom workflow assignee user for each step (Optional).
         """
         endpoint = "tasks/image/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2091,9 +2103,9 @@ class Client:
     def update_image_classification_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -2122,7 +2134,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/image/classification/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2141,9 +2153,9 @@ class Client:
     def update_multi_image_classification_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -2172,7 +2184,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/multi-image/classification/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2191,9 +2203,9 @@ class Client:
     def update_sequential_image_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -2222,7 +2234,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/sequential-image/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2241,9 +2253,9 @@ class Client:
     def update_video_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -2272,7 +2284,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/video/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2293,9 +2305,9 @@ class Client:
     def update_video_classification_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -2324,7 +2336,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/video/classification/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2343,9 +2355,9 @@ class Client:
     def update_text_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -2374,7 +2386,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/text/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2395,9 +2407,9 @@ class Client:
     def update_text_classification_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -2426,7 +2438,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/text/classification/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2445,9 +2457,9 @@ class Client:
     def update_audio_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -2476,7 +2488,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/audio/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2497,9 +2509,9 @@ class Client:
     def update_audio_classification_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         attributes: list = [],
         tags: list = [],
         **kwargs,
@@ -2528,7 +2540,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/audio/classification/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2547,9 +2559,9 @@ class Client:
     def update_pcd_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -2578,7 +2590,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/pcd/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2601,9 +2613,9 @@ class Client:
     def update_sequential_pcd_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
-        priority: Priority = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
         tags: list = [],
         annotations: List[dict] = [],
         **kwargs,
@@ -2632,7 +2644,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/sequential-pcd/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -2683,7 +2695,7 @@ class Client:
         prefix is a prefix of task name (Required).
         """
         endpoint = "tasks/integrate/images"
-        params = {"project": project, "prefix": prefix}
+        params: dict[str, Any] = {"project": project, "prefix": prefix}
 
         return self.api.get_request(endpoint, params=params)
 
@@ -2699,7 +2711,7 @@ class Client:
         prefix is a prefix of task name (Required).
         """
         endpoint = "tasks/integrate/videos"
-        params = {"project": project, "prefix": prefix}
+        params: dict[str, Any] = {"project": project, "prefix": prefix}
 
         return self.api.get_request(endpoint, params=params)
 
@@ -2715,13 +2727,15 @@ class Client:
         prefix is a prefix of task name (Required).
         """
         endpoint = "tasks/integrate/audios"
-        params = {"project": project, "prefix": prefix}
+        params: dict[str, Any] = {"project": project, "prefix": prefix}
 
         return self.api.get_request(endpoint, params=params)
 
     # Convert to Fastlabel
 
-    def convert_coco_to_fastlabel(self, file_path: str, annotation_type: str) -> dict:
+    def convert_coco_to_fastlabel(
+        self, file_path: str, annotation_type: str
+    ) -> dict | None:
         """
         Convert COCO format to FastLabel format as annotation file.
 
@@ -2823,6 +2837,10 @@ class Client:
                     json.load(f),
                     file_path.replace(os.path.join(*[folder_path, ""]), ""),
                 )
+                if not c:
+                    raise ValueError(
+                        "Cannot convert labelme format to FastLabel format."
+                    )
                 results[c[0]] = c[1]
         return results
 
@@ -2888,6 +2906,10 @@ class Client:
                     xmltodict.parse(file),
                     file_path.replace(os.path.join(*[folder_path, ""]), ""),
                 )
+                if not c:
+                    raise ValueError(
+                        "Cannot convert PascalVOC format to FastLabel format."
+                    )
                 results[c[0]] = c[1]
         return results
 
@@ -3018,7 +3040,7 @@ class Client:
             ...
         }
         """
-        yolo_annotations = {}
+        yolo_annotations: dict[str, list[list[str]]] = {}
         annotation_file_paths = [
             p
             for p in glob.glob(
@@ -3062,15 +3084,15 @@ class Client:
                 "Output file name must have a json extension", 422
             )
 
-        project = self.find_project_by_slug(project)
-        if project is None:
+        target_project = self.find_project_by_slug(project)
+        if target_project is None:
             raise FastLabelInvalidException(
                 "Project not found. Check the project slag.", 422
             )
 
         os.makedirs(output_dir, exist_ok=True)
         coco = converters.to_coco(
-            project_type=project["type"],
+            project_type=target_project["type"],
             tasks=tasks,
             annotations=annotations,
             output_dir=output_dir,
@@ -3098,15 +3120,15 @@ class Client:
         output_dir is output directory(default: output/yolo) (Optional).
         """
 
-        project = self.find_project_by_slug(project)
-        if project is None:
+        target_project = self.find_project_by_slug(project)
+        if target_project is None:
             raise FastLabelInvalidException(
                 "Project not found. Check the project slag.", 422
             )
 
         os.makedirs(output_dir, exist_ok=True)
         annos, categories = converters.to_yolo(
-            project_type=project["type"],
+            project_type=target_project["type"],
             tasks=tasks,
             classes=classes,
             output_dir=output_dir,
@@ -3143,15 +3165,15 @@ class Client:
         output_dir is output directory(default: output/pascalvoc) (Optional).
         """
 
-        project = self.find_project_by_slug(project)
-        if project is None:
+        target_project = self.find_project_by_slug(project)
+        if target_project is None:
             raise FastLabelInvalidException(
                 "Project not found. Check the project slag.", 422
             )
 
         os.makedirs(output_dir, exist_ok=True)
         pascalvoc = converters.to_pascalvoc(
-            project_type=project["type"], tasks=tasks, output_dir=output_dir
+            project_type=target_project["type"], tasks=tasks, output_dir=output_dir
         )
         for voc in pascalvoc:
             file_name = voc["annotation"]["filename"]
@@ -3262,7 +3284,7 @@ class Client:
 
     def __export_index_color_image(
         self,
-        task: list,
+        task: dict,
         output_dir: str,
         pallete: List[int],
         is_instance_segmentation: bool = True,
@@ -3404,7 +3426,7 @@ class Client:
         e.g.)
         [4, 5, 4, 9, 8, 9, 8, 5, 4, 5] => [4, 5, 8, 5, 8, 9, 4, 9, 4, 5]
         """
-        reversed_points = []
+        reversed_points: list[int] = []
         for index, _ in enumerate(points):
             if index % 2 == 0:
                 reversed_points.insert(0, points[index + 1])
@@ -3680,7 +3702,7 @@ class Client:
         endpoint = "annotations/" + annotation_id
         return self.api.get_request(endpoint)
 
-    def find_annotation_by_value(self, project: str, value: str) -> dict:
+    def find_annotation_by_value(self, project: str, value: str) -> dict | None:
         """
         Find an annotation by value.
         """
@@ -3692,8 +3714,8 @@ class Client:
     def get_annotations(
         self,
         project: str,
-        value: str = None,
-        offset: int = None,
+        value: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 10,
     ) -> list:
         """
@@ -3711,7 +3733,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "annotations"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if value:
             params["value"] = value
         if offset:
@@ -3726,8 +3748,8 @@ class Client:
         type: str,
         value: str,
         title: str,
-        color: str = None,
-        order: int = None,
+        color: Optional[str] = None,
+        order: Optional[int] = None,
         attributes: list = [],
     ) -> str:
         """
@@ -3742,7 +3764,7 @@ class Client:
         attributes is a list of attribute (Optional).
         """
         endpoint = "annotations"
-        payload = {
+        payload: dict[str, Any] = {
             "project": project,
             "type": type,
             "value": value,
@@ -3764,16 +3786,16 @@ class Client:
         attributes is a list of attribute (Required).
         """
         endpoint = "annotations/classification"
-        payload = {"project": project, "attributes": attributes}
+        payload: dict[str, Any] = {"project": project, "attributes": attributes}
         return self.api.post_request(endpoint, payload=payload)
 
     def update_annotation(
         self,
         annotation_id: str,
-        value: str = None,
-        title: str = None,
-        color: str = None,
-        order: int = None,
+        value: Optional[str] = None,
+        title: Optional[str] = None,
+        color: Optional[str] = None,
+        order: Optional[int] = None,
         attributes: list = [],
     ) -> str:
         """
@@ -3786,7 +3808,7 @@ class Client:
         attributes is a list of attribute (Optional).
         """
         endpoint = "annotations/" + annotation_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if value:
             payload["value"] = value
         if title:
@@ -3809,7 +3831,7 @@ class Client:
         attributes is a list of attribute (Required).
         """
         endpoint = "annotations/classification/" + annotation_id
-        payload = {"attributes": attributes}
+        payload: dict[str, Any] = {"attributes": attributes}
         return self.api.put_request(endpoint, payload=payload)
 
     def delete_annotation(self, annotation_id: str) -> None:
@@ -3828,7 +3850,7 @@ class Client:
         endpoint = "projects/" + project_id
         return self.api.get_request(endpoint)
 
-    def find_project_by_slug(self, slug: str) -> dict:
+    def find_project_by_slug(self, slug: str) -> dict | None:
         """
         Find a project by slug.
 
@@ -3842,8 +3864,8 @@ class Client:
     def update_dicom_task(
         self,
         task_id: str,
-        status: str = None,
-        external_status: str = None,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
         tags: list = [],
         **kwargs,
     ) -> str:
@@ -3864,7 +3886,7 @@ class Client:
         external_approver is slug of external approve user (Optional).
         """
         endpoint = "tasks/dicom/" + task_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if status:
             payload["status"] = status
         if external_status:
@@ -3878,8 +3900,8 @@ class Client:
 
     def get_projects(
         self,
-        slug: str = None,
-        offset: int = None,
+        slug: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -3896,7 +3918,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "projects"
-        params = {}
+        params: dict[str, Any] = {}
         if slug:
             params["slug"] = slug
         if offset:
@@ -3907,7 +3929,7 @@ class Client:
 
     def get_project_id_slug_map(
         self,
-        offset: int = None,
+        offset: Optional[int] = None,
         limit: int = 1000,
     ) -> dict:
         """
@@ -3927,7 +3949,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "projects/map/id-slug"
-        params = {}
+        params: dict[str, Any] = {}
         if offset:
             params["offset"] = offset
         if limit:
@@ -3962,7 +3984,7 @@ class Client:
         can be 'two_step' or 'three_step' (Optional).
         """
         endpoint = "projects"
-        payload = {
+        payload: dict[str, Any] = {
             "type": type,
             "name": name,
             "slug": slug,
@@ -3978,11 +4000,11 @@ class Client:
     def update_project(
         self,
         project_id: str,
-        name: str = None,
-        slug: str = None,
-        job_size: int = None,
-        workflow: str = None,
-        external_workflow: str = None,
+        name: Optional[str] = None,
+        slug: Optional[str] = None,
+        job_size: Optional[int] = None,
+        workflow: Optional[str] = None,
+        external_workflow: Optional[str] = None,
     ) -> str:
         """
         Update a project.
@@ -3997,7 +4019,7 @@ class Client:
         can be 'two_step' or 'three_step' (Optional).
         """
         endpoint = "projects/" + project_id
-        payload = {}
+        payload: dict[str, Any] = {}
         if name:
             payload["name"] = name
         if slug:
@@ -4021,7 +4043,7 @@ class Client:
         """
         Copy a project.
         """
-        payload = {"id": project_id}
+        payload: dict[str, Any] = {"id": project_id}
         endpoint = "projects/copy"
         return self.api.post_request(endpoint, payload=payload)
 
@@ -4030,8 +4052,8 @@ class Client:
     def get_tags(
         self,
         project: str,
-        keyword: str = None,
-        offset: int = None,
+        keyword: Optional[str] = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -4047,7 +4069,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tags"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if keyword:
             params["keyword"] = keyword
         if offset:
@@ -4061,7 +4083,7 @@ class Client:
         Delete a tags.
         """
         endpoint = "tags/delete/multi"
-        payload = {"tagIds": tag_ids}
+        payload: dict[str, Any] = {"tagIds": tag_ids}
         self.api.post_request(endpoint, payload=payload)
 
     # Dataset
@@ -4075,10 +4097,10 @@ class Client:
 
     def get_datasets(
         self,
-        keyword: str = None,
+        keyword: Optional[str] = None,
         tags: List[str] = [],
         license: Optional[str] = None,
-        visibility: str = None,
+        visibility: Optional[str] = None,
     ) -> list:
         """
         Returns a list of datasets.
@@ -4087,7 +4109,7 @@ class Client:
         visibility are search terms in the dataset visibility.(Optional).
         """
         endpoint = "datasets-v2"
-        params = {}
+        params: dict[str, Any] = {}
         if keyword:
             params["keyword"] = keyword
         if tags:
@@ -4099,7 +4121,7 @@ class Client:
         return self.api.get_request(endpoint, params=params)
 
     def create_dataset(
-        self, name: str, tags: List[str] = [], visibility: str = None
+        self, name: str, tags: List[str] = [], visibility: Optional[str] = None
     ) -> dict:
         """
         Create a dataset.
@@ -4109,7 +4131,7 @@ class Client:
         visibility are search terms in the dataset visibility.(Optional).
         """
         endpoint = "datasets-v2"
-        payload = {"name": name}
+        payload: dict[str, Any] = {"name": name}
         if tags:
             payload["tags"] = tags
         if visibility:
@@ -4119,8 +4141,8 @@ class Client:
     def update_dataset(
         self,
         dataset_id: str,
-        name: str = None,
-        tags: List[str] = None,
+        name: Optional[str] = None,
+        tags: Optional[List[str]] = None,
     ) -> dict:
         """
         Update a dataset.
@@ -4130,7 +4152,7 @@ class Client:
         tags is a list of tag (Optional).
         """
         endpoint = "datasets-v2/" + dataset_id
-        payload = {"name": name}
+        payload: dict[str, Any] = {"name": name}
         if tags is not None:
             payload["tags"] = tags
         return self.api.put_request(endpoint, payload=payload)
@@ -4148,8 +4170,8 @@ class Client:
         self,
         dataset_id: str,
         object_name: str,
-        version: str = None,
-        revision_id: str = None,
+        version: Optional[str] = None,
+        revision_id: Optional[str] = None,
     ) -> dict:
         """
         Find a dataset object.
@@ -4165,7 +4187,7 @@ class Client:
                 "only use specify one of revisionId or version.", 400
             )
         endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
-        params = {}
+        params: dict[str, Any] = {}
         if revision_id:
             params["revisionId"] = revision_id
         elif version:
@@ -4175,10 +4197,10 @@ class Client:
     def get_dataset_objects(
         self,
         dataset: str,
-        version: str = None,
+        version: Optional[str] = None,
         tags: Optional[List[str]] = None,
         licenses: Optional[List[str]] = None,
-        revision_id: str = None,
+        revision_id: Optional[str] = None,
         types: Optional[List[Union[str, DatasetObjectType]]] = None,
         offset: int = 0,
         limit: int = 1000,
@@ -4193,14 +4215,16 @@ class Client:
         Only use specify one of revision_id or version.
         """
         endpoint = "dataset-objects-v2"
-        types = [DatasetObjectType.create(type_) for type_ in types or []]
-        params = self._prepare_params(
+        dataset_object_types = [
+            DatasetObjectType.create(type_) for type_ in types or []
+        ]
+        params: DatasetObjectGetQuery = self._prepare_params(
             dataset=dataset,
             version=version,
             tags=tags,
             licenses=licenses,
             revision_id=revision_id,
-            types=types,
+            types=dataset_object_types,
             offset=offset,
             limit=limit,
         )
@@ -4211,8 +4235,8 @@ class Client:
         dataset: str,
         offset: int,
         limit: int,
-        version: str,
-        revision_id: str,
+        version: Optional[str],
+        revision_id: Optional[str],
         tags: Optional[List[str]],
         licenses: Optional[List[str]],
         types: Optional[List[DatasetObjectType]],
@@ -4255,15 +4279,17 @@ class Client:
         limit: int = 1000,
     ):
         endpoint = "dataset-objects-v2/signed-urls"
-        types = [DatasetObjectType.create(type_) for type_ in types or []]
-        params = self._prepare_params(
+        dataset_object_types = [
+            DatasetObjectType.create(type_) for type_ in types or []
+        ]
+        params: DatasetObjectGetQuery = self._prepare_params(
             dataset=dataset,
             offset=offset,
             limit=limit,
             version=version,
             revision_id=revision_id,
             tags=tags,
-            types=types,
+            types=dataset_object_types,
             licenses=licenses,
         )
 
@@ -4272,8 +4298,8 @@ class Client:
         download_path = Path(path)
         download_path.mkdir(exist_ok=True)
         object_map = {}
-        if types:
-            for type_ in types:
+        if dataset_object_types:
+            for type_ in dataset_object_types:
                 (download_path / type_.value).mkdir(exist_ok=True)
                 object_map[type_.value] = [
                     obj for obj in response if obj["type"] == type_.value
@@ -4326,9 +4352,9 @@ class Client:
         dataset: str,
         name: str,
         file_path: str,
-        tags: List[str] = None,
-        licenses: List[str] = None,
-        annotations: List[dict] = None,
+        tags: Optional[List[str]] = None,
+        licenses: Optional[List[str]] = None,
+        annotations: Optional[List[dict]] = None,
         custom_metadata: Optional[Dict[str, str]] = None,
     ) -> dict:
         """
@@ -4347,7 +4373,7 @@ class Client:
             raise FastLabelInvalidException(
                 "Supported object size is under 250 MB.", 422
             )
-        payload = {
+        payload: dict[str, Any] = {
             "dataset": dataset,
             "name": name,
             "filePath": utils.base64_encode(file_path),
@@ -4372,7 +4398,7 @@ class Client:
         custom_metadata: Optional[dict] = None,
     ) -> dict:
         endpoint = "dataset-objects-v2"
-        payload = {"datasetId": dataset_id, "objectName": object_name}
+        payload: dict[str, Any] = {"datasetId": dataset_id, "objectName": object_name}
         if tags is not None:
             payload["tags"] = tags
         if licenses is not None:
@@ -4391,7 +4417,11 @@ class Client:
         self.api.delete_request(endpoint)
 
     def update_aws_s3_storage(
-        self, project: str, bucket_name: str, bucket_region: str, prefix: str = None
+        self,
+        project: str,
+        bucket_name: str,
+        bucket_region: str,
+        prefix: Optional[str] = None,
     ) -> str:
         """
         Insert or update AWS S3 storage settings.
@@ -4412,7 +4442,7 @@ class Client:
 
         """
         endpoint = "storages/aws-s3/" + project
-        payload = {
+        payload: dict[str, Any] = {
             "bucketName": bucket_name,
             "bucketRegion": bucket_region,
         }
@@ -4442,7 +4472,7 @@ class Client:
             high = 30,
         """
         endpoint = "tasks/aws-s3"
-        payload = {
+        payload: dict[str, Any] = {
             "project": project,
             "status": status,
             "tags": tags,
@@ -4461,7 +4491,7 @@ class Client:
         return self.api.get_request(endpoint)
 
     @staticmethod
-    def __fill_assign_users(payload: dict, **kwargs):
+    def __fill_assign_users(payload: dict[str, Any], **kwargs):
         if "assignee" in kwargs:
             payload["assignee"] = kwargs.get("assignee")
         if "reviewer" in kwargs:
@@ -4494,12 +4524,16 @@ class Client:
         file_type: str,
     ):
         endpoint = "files"
-        params = {"project": project, "fileName": file_name, "fileType": file_type}
+        params: dict[str, Any] = {
+            "project": project,
+            "fileName": file_name,
+            "fileType": file_type,
+        }
         return self.api.get_request(endpoint, params)
 
     def get_training_jobs(
         self,
-        offset: int = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -4514,7 +4548,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "trainings"
-        params = {}
+        params: dict[str, Any] = {}
         if offset:
             params["offset"] = offset
         if limit:
@@ -4527,11 +4561,11 @@ class Client:
         dataset_name: str,
         base_model_name: str,
         epoch: int,
-        dataset_revision_id: str = None,
+        dataset_revision_id: Optional[str] = None,
         use_dataset_train_val: bool = False,
         instance_type: str = "ml.p3.2xlarge",
-        batch_size: int = None,
-        learning_rate: float = None,
+        batch_size: Optional[int] = None,
+        learning_rate: Optional[float] = None,
         resize_option: Optional[Literal["fixed", "none"]] = None,
         resize_dimension: Optional[int] = None,
         annotation_value: str = "",
@@ -4545,7 +4579,7 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "trainings"
-        payload = {
+        payload: dict[str, Any] = {
             "datasetName": dataset_name,
             "baseModelName": base_model_name,
             "epoch": epoch,
@@ -4582,7 +4616,7 @@ class Client:
 
     def get_evaluation_jobs(
         self,
-        offset: int = None,
+        offset: Optional[int] = None,
         limit: int = 1000,
     ) -> list:
         """
@@ -4597,7 +4631,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "evaluations"
-        params = {}
+        params: dict[str, Any] = {}
         if offset:
             params["offset"] = offset
         if limit:
@@ -4623,11 +4657,11 @@ class Client:
         model_name: str,
         iou_threshold: float = 0.5,
         confidence_threshold: float = 0.4,
-        dataset_revision_id: str = None,
+        dataset_revision_id: Optional[str] = None,
         use_dataset_test: bool = False,
         instance_type: str = "ml.p3.2xlarge",
-        batch_size: int = None,
-        learning_rate: float = None,
+        batch_size: Optional[int] = None,
+        learning_rate: Optional[float] = None,
     ) -> list:
         """
         Returns a list of training jobs.
@@ -4637,7 +4671,7 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "evaluations"
-        payload = {
+        payload: dict[str, Any] = {
             "modelName": model_name,
             "datasetName": dataset_name,
             "iouThreshold": iou_threshold,
@@ -4670,7 +4704,7 @@ class Client:
         if not utils.is_image_supported_size_for_inference(file_path):
             raise FastLabelInvalidException("Supported image size is under 6 MB.", 422)
 
-        payload = {
+        payload: dict[str, Any] = {
             "modelEndpointName": endpoint_name,
             "file": utils.base64_encode(file_path),
         }
@@ -4688,14 +4722,14 @@ class Client:
         """
         endpoint = "model-monitorings/create"
 
-        payload = {"name": name, "results": results}
+        payload: dict[str, Any] = {"name": name, "results": results}
 
         return self.api.post_request(endpoint, payload=payload)
 
     def get_histories(
         self,
         project: str,
-        offset: int = None,
+        offset: Optional[int] = None,
         limit: int = 100,
     ) -> list:
         """
@@ -4712,7 +4746,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "tasks/import/histories"
-        params = {"project": project}
+        params: dict[str, Any] = {"project": project}
         if offset:
             params["offset"] = offset
         if limit:
