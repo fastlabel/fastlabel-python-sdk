@@ -7,7 +7,6 @@ dist
 build
 fastlabel.egg-info
 annotation.json
-*.jpg
 *.jpeg
 *.png
 *.mp4
