@@ -1222,6 +1222,3 @@ def _get_coco_annotation_attributes(annotation: dict) -> Dict[str, AttributeValu
     for attribute in attributes:
         coco_attributes[attribute["key"]] = attribute["value"]
     return coco_attributes
-
-
-print()
