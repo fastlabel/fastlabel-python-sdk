@@ -1,7 +1,7 @@
 import base64
 import json
 import os
-from typing import List
+from typing import List, Tuple
 from uuid import uuid4
 
 import cv2
@@ -103,7 +103,7 @@ def reverse_points(points: List[int]) -> List[int]:
     e.g.)
     [4, 5, 4, 9, 8, 9, 8, 5, 4, 5] => [4, 5, 8, 5, 8, 9, 4, 9, 4, 5]
     """
-    reversed_points = []
+    reversed_points: List[int] = []
     for index, _ in enumerate(points):
         if index % 2 == 0:
             reversed_points.insert(0, points[index + 1])
@@ -150,8 +150,11 @@ def is_clockwise(points: list) -> bool:
     """
     points_splitted = [points[idx : idx + 2] for idx in range(0, len(points), 2)]
     polygon_geo = geojson.Polygon(points_splitted)
-    coords = np.array(list(geojson.utils.coords(polygon_geo)))
-    xs, ys = map(list, zip(*coords))
+    coords: List[Tuple[float, float]] = np.array(
+        list(geojson.utils.coords(polygon_geo))
+    )
+    xs: List[float] = [float(x) for x, _ in coords]
+    ys: List[float] = [float(y) for _, y in coords]
     xs.append(xs[0])
     ys.append(ys[0])
     sum_edges = (

@@ -56,7 +56,7 @@ class Api:
         r = requests.delete(self.base_url + endpoint, headers=headers, params=params)
 
         if r.status_code == 200 or r.status_code == 204:
-            return
+            return {}
 
         try:
             error = r.json()["message"]

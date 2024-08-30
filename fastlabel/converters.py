@@ -8,7 +8,7 @@ from decimal import Decimal
 from operator import itemgetter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import cv2
 import geojson
@@ -200,7 +200,7 @@ def __get_coco_categories(tasks: list, annotations: list) -> list:
     return categories
 
 
-def __to_coco_annotation(data: dict) -> dict:
+def __to_coco_annotation(data: dict) -> dict | None:
     categories = data["categories"]
     image_id = data["image_id"]
     points = data["annotation_points"]
@@ -239,7 +239,7 @@ def __to_coco_annotation(data: dict) -> dict:
         image_id,
         annotation_type,
         annotation_attributes,
-        rotation
+        rotation,
     )
 
 
@@ -254,7 +254,11 @@ def __get_coco_category_by_name(categories: list, name: str) -> Optional[dict]:
 
 def __get_coco_annotation_keypoints(keypoints: list, category_keypoints: list) -> list:
     coco_annotation_keypoints = []
-    keypoint_values = {keypoint["key"]: keypoint["value"] for keypoint in keypoints if keypoint["value"]}
+    keypoint_values = {
+        keypoint["key"]: keypoint["value"]
+        for keypoint in keypoints
+        if keypoint["value"]
+    }
     for category_key in category_keypoints:
         value = keypoint_values.get(category_key, [0, 0, 0])
         # Adjust fastlabel data definition to coco format
@@ -271,20 +275,24 @@ def __get_coco_annotation(
     image_id: str,
     annotation_type: str,
     annotation_attributes: Dict[str, AttributeValue],
-    rotation: int
-) -> dict:
-    annotation = {}
+    rotation: int,
+) -> dict[str, Any]:
+    annotation: Dict[
+        str, Union[int, float, str, Dict[str, AttributeValue], List[Any]]
+    ] = {}
     annotation["num_keypoints"] = len(keypoints) if keypoints else 0
     annotation["keypoints"] = (
-        __get_coco_annotation_keypoints(keypoints, category["keypoints"]) if keypoints else []
+        __get_coco_annotation_keypoints(keypoints, category["keypoints"])
+        if keypoints
+        else []
     )
     annotation["segmentation"] = __to_coco_segmentation(annotation_type, points)
     annotation["iscrowd"] = 0
     annotation["area"] = __to_area(annotation_type, points)
     annotation["image_id"] = image_id
     annotation["bbox"] = (
-        __get_coco_bbox(points, rotation) 
-        if annotation_type == AnnotationType.bbox 
+        __get_coco_bbox(points, rotation)
+        if annotation_type == AnnotationType.bbox
         else __to_bbox(annotation_type, points)
     )
     annotation["rotation"] = rotation
@@ -329,6 +337,7 @@ def __get_rotated_rectangle_coordinates(
 
     return rotated_corners
 
+
 def __get_coco_bbox(
     points: list,
     rotation: int,
@@ -371,7 +380,7 @@ def __to_coco_segmentation(annotation_type: str, points: list) -> list:
 def __to_bbox(annotation_type: str, points: list) -> list:
     if not points:
         return []
-    base_points = []
+    base_points: list = []
     if annotation_type == AnnotationType.segmentation.value:
         base_points = sum(__get_without_hollowed_points(points), [])
     else:
@@ -393,7 +402,7 @@ def __to_bbox(annotation_type: str, points: list) -> list:
 def __to_area(annotation_type: str, points: list) -> float:
     if not points:
         return 0
-    area = 0
+    area = 0.0
     if annotation_type == AnnotationType.segmentation.value:
         for region in __get_without_hollowed_points(points):
             area += __calc_area(annotation_type, region)
@@ -423,7 +432,7 @@ def __calc_area(annotation_type: str, points: list) -> float:
         raise Exception(f"Unsupported annotation type: {annotation_type}")
 
 
-def __serialize(value: any) -> any:
+def __serialize(value: Any) -> Any:
     if isinstance(value, datetime):
         return value.isoformat()
     if isinstance(value, Decimal):
@@ -562,7 +571,7 @@ def __to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) ->
     return annos, categories
 
 
-def __get_yolo_annotation(data: dict) -> dict:
+def __get_yolo_annotation(data: dict) -> List[str] | None:
     points = data["annotation_points"]
     annotation_type = data["annotation_type"]
     value = data["annotation_value"]
@@ -668,7 +677,7 @@ def to_pascalvoc(project_type: str, tasks: list, output_dir: str) -> list:
     return pascalvoc
 
 
-def __get_pascalvoc_obj(data: dict) -> dict:
+def __get_pascalvoc_obj(data: dict) -> dict | None:
     points = data["annotation_points"]
     type = data["annotation_type"]
     value = data["annotation_value"]
@@ -763,7 +772,7 @@ def to_labelme(tasks: list) -> list:
     return labelmes
 
 
-def __to_labelme_shape_type(annotation_type: str) -> str:
+def __to_labelme_shape_type(annotation_type: str) -> str | None:
     if annotation_type == "polygon" or annotation_type == "segmentation":
         return "polygon"
     if annotation_type == "bbox":
@@ -871,7 +880,7 @@ def __remove_duplicated_coordinates(points: List[int]) -> List[int]:
     return new_points
 
 
-def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
+def __get_pixel_coordinates(points: List[Union[int, float]]) -> List[int]:
     """
     Remove diagonal coordinates and return pixel outline coordinates.
     """
@@ -907,7 +916,7 @@ def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
     return new_points
 
 
-def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
+def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict | None:
     coco_images = {}
     for c in coco["images"]:
         coco_images[c["id"]] = c["file_name"]
@@ -929,7 +938,7 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
             coco_annotations,
         )
         if not target_coco_annotations:
-            return
+            return None
 
         annotations = []
         for target_coco_annotation in target_coco_annotations:
@@ -940,7 +949,7 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
             ]
             category_name = coco_categories[target_coco_annotation["category_id"]]
             if not category_name:
-                return
+                return None
 
             if annotation_type in [
                 AnnotationType.bbox.value,
@@ -1001,7 +1010,9 @@ def execute_coco_to_fastlabel(coco: dict, annotation_type: str) -> dict:
     return results
 
 
-def execute_labelme_to_fastlabel(labelme: dict, file_path: str = None) -> tuple:
+def execute_labelme_to_fastlabel(
+    labelme: dict, file_path: Optional[str] = None
+) -> tuple | None:
     file_name = ""
     if file_path:
         file_name = file_path.replace(
@@ -1015,7 +1026,7 @@ def execute_labelme_to_fastlabel(labelme: dict, file_path: str = None) -> tuple:
     for labelme_annotation in labelme_annotations:
         label = labelme_annotation["label"]
         if not label:
-            return
+            return None
 
         points = np.ravel(labelme_annotation["points"])
         annotation_type = __get_annotation_type_by_labelme(
@@ -1028,7 +1039,9 @@ def execute_labelme_to_fastlabel(labelme: dict, file_path: str = None) -> tuple:
     return (file_name, annotations)
 
 
-def execute_pascalvoc_to_fastlabel(pascalvoc: dict, file_path: str = None) -> tuple:
+def execute_pascalvoc_to_fastlabel(
+    pascalvoc: dict, file_path: Optional[str] = None
+) -> tuple | None:
     target_pascalvoc = pascalvoc["annotation"]
     file_name = ""  # file_path if file_path else target_pascalvoc["filename"]
     if file_path:
@@ -1045,7 +1058,7 @@ def execute_pascalvoc_to_fastlabel(pascalvoc: dict, file_path: str = None) -> tu
     for pascalvoc_annotation in pascalvoc_annotations:
         category_name = pascalvoc_annotation["name"]
         if not category_name:
-            return
+            return None
 
         points = [
             int(pascalvoc_annotation["bndbox"][item])
@@ -1066,7 +1079,7 @@ def execute_yolo_to_fastlabel(
     classes: dict,
     image_sizes: dict,
     yolo_annotations: dict,
-    dataset_folder_path: str = None,
+    dataset_folder_path: Optional[str] = None,
 ) -> dict:
     results = {}
     for yolo_anno_key in yolo_annotations:
@@ -1113,7 +1126,7 @@ def execute_yolo_to_fastlabel(
     return results
 
 
-def __get_annotation_type_by_labelme(shape_type: str) -> str:
+def __get_annotation_type_by_labelme(shape_type: str) -> str | None:
     if shape_type == "rectangle":
         return "bbox"
     if shape_type == "polygon":
@@ -1202,11 +1215,10 @@ def _get_annotation_points_for_image_annotation(annotation: dict):
 
 
 def _get_coco_annotation_attributes(annotation: dict) -> Dict[str, AttributeValue]:
-    coco_attributes = {}
+    coco_attributes: Dict[str, AttributeValue] = {}
     attributes = annotation.get("attributes")
     if not attributes:
         return coco_attributes
     for attribute in attributes:
         coco_attributes[attribute["key"]] = attribute["value"]
     return coco_attributes
-
