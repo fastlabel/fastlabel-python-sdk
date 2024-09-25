@@ -116,8 +116,6 @@ task_id = client.create_image_task(
 )
 ```
 
-> Check [examples/create_image_task.py](/examples/create_image_task.py).
-
 ##### Limitation
 
 - You can upload up to a size of 20 MB.
