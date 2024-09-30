@@ -498,7 +498,7 @@ def __coco2yolo(project_type: str, coco: dict) -> tuple:
 
         # Get objects
         objs = []
-        if (project_type == "image_segmentation"):
+        if project_type == "image_segmentation":
             objs = __coco2yolo_segmentation(coco, categories, image, dw, dh)
         else:
             objs = __coco2yolo_rect(coco, categories, image, dw, dh)
@@ -510,7 +510,9 @@ def __coco2yolo(project_type: str, coco: dict) -> tuple:
     return annos, categories
 
 
-def __coco2yolo_rect(coco: dict, categories: list, image: dict, dw: float, dh: float) -> list[str]:
+def __coco2yolo_rect(
+    coco: dict, categories: list, image: dict, dw: float, dh: float
+) -> list[str]:
     objs = []
     for annotation in coco["annotations"]:
         if image["id"] != annotation["image_id"]:
@@ -541,7 +543,9 @@ def __coco2yolo_rect(coco: dict, categories: list, image: dict, dw: float, dh: f
         return obj
 
 
-def __coco2yolo_segmentation(coco: dict, categories: list, image: dict, dw: float, dh: float) -> list[str]:
+def __coco2yolo_segmentation(
+    coco: dict, categories: list, image: dict, dw: float, dh: float
+) -> list[str]:
     objs = []
     for annotation in coco["annotations"]:
         if image["id"] != annotation["image_id"]:
@@ -556,7 +560,10 @@ def __coco2yolo_segmentation(coco: dict, categories: list, image: dict, dw: floa
         for coordinates in annotation["segmentation"]:
             # 座標を(x, y)のペアに分割し、yoloの小数で表す形式に変換する。
             yolo_vertices = [
-                {"x": str(_truncate(coordinates[i] * dw, 7)), "y": str(_truncate(coordinates[i + 1] * dh, 7))}
+                {
+                    "x": str(_truncate(coordinates[i] * dw, 7)),
+                    "y": str(_truncate(coordinates[i + 1] * dh, 7)),
+                }
                 for i in range(0, len(coordinates), 2)
             ]
 
@@ -658,7 +665,10 @@ def __segmentation2yolo(value: str, classes: list, dw: float, dh: float, points:
         for coordinates in shapes:
             # 座標を(x, y)のペアに分割し、yoloの小数で表す形式に変換する。
             yolo_vertices = [
-                {"x": str(_truncate(coordinates[i] * dw, 7)), "y": str(_truncate(coordinates[i + 1] * dh, 7))}
+                {
+                    "x": str(_truncate(coordinates[i] * dw, 7)),
+                    "y": str(_truncate(coordinates[i + 1] * dh, 7)),
+                }
                 for i in range(0, len(coordinates), 2)
             ]
             # category_index の後に x, yを順番に足していく。

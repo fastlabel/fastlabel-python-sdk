@@ -1,4 +1,5 @@
 import fastlabel
+
 client = fastlabel.Client()
 
 project_slug = "YOUR_PROJECT_SLUG"
