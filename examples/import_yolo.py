@@ -1,4 +1,7 @@
 import fastlabel
+import os
+import glob
+import time
 
 client = fastlabel.Client()
 
@@ -8,7 +11,8 @@ input_file_path = "./classes.txt"
 input_dataset_path = "./dataset/"
 annotations_map = client.convert_yolo_to_fastlabel(
     classes_file_path=input_file_path,
-    dataset_folder_path=input_dataset_path
+    dataset_folder_path=input_dataset_path,
+    project_type="segmentation"
 )
 for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"), recursive=True):
     time.sleep(1)
