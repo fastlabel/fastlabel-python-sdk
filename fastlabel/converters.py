@@ -684,9 +684,7 @@ def to_pascalvoc(project_type: str, tasks: list, output_dir: str) -> list:
             }
 
             if len(filtered_pascalvoc_objs) > 0:
-                voc["annotation"]["object"] = list(
-                    sorted(filtered_pascalvoc_objs, key=itemgetter("name"))
-                )
+                voc["annotation"]["object"] = filtered_pascalvoc_objs
 
             pascalvoc.append(voc)
     return pascalvoc
