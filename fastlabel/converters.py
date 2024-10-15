@@ -8,7 +8,7 @@ from decimal import Decimal
 from operator import itemgetter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import cv2
 import geojson
@@ -878,7 +878,7 @@ def __remove_duplicated_coordinates(points: List[int]) -> List[int]:
     return new_points
 
 
-def get_pixel_coordinates(points: List[int | float]) -> List[int]:
+def get_pixel_coordinates(points: List[Union[int, float]]) -> List[int]:
     """
     Remove diagonal coordinates and return pixel outline coordinates.
     """

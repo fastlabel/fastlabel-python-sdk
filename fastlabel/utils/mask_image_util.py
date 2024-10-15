@@ -1,4 +1,4 @@
-from typing import Any, Sequence, Union, cast
+from typing import Any, Optional, Sequence, Union, cast
 
 import cv2
 import numpy as np
@@ -49,7 +49,7 @@ def mask_to_segmentation(
 
 
 def __detect_segmentation_list(
-    hierarchy: np.ndarray, contours: Sequence[np.ndarray | Mat]
+    hierarchy: np.ndarray, contours: Sequence[Union[np.ndarray, Mat]]
 ) -> list[Any]:
     outer_polygon_hierarchy_indexes = list(
         filter(lambda x: hierarchy[0][x][3] == -1, range(hierarchy[0].shape[0]))
@@ -76,7 +76,7 @@ def __detect_segmentation(
     parent_polygon_hierarchy_index: int,
     hierarchy: np.ndarray,
     contours: Sequence[np.ndarray],
-    hierarchy_indexes: list[int] | None = None,
+    hierarchy_indexes: Optional[list[int]] = None,
     is_recursive: bool = True,
 ) -> tuple[list, list]:
     separate_place_hierarchy_indexes: list[int] = hierarchy_indexes or []
