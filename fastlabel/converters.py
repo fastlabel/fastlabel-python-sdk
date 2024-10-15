@@ -886,7 +886,6 @@ def get_pixel_coordinates(points: List[int | float]) -> List[int]:
         return []
 
     new_points = []
-    print(points)
     new_points.append(int(points[0]))
     new_points.append(int(points[1]))
     for i in range(int(len(points) / 2)):
