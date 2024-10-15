@@ -8,7 +8,7 @@ from decimal import Decimal
 from operator import itemgetter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 import cv2
 import geojson
@@ -239,7 +239,7 @@ def __to_coco_annotation(data: dict) -> dict:
         image_id,
         annotation_type,
         annotation_attributes,
-        rotation
+        rotation,
     )
 
 
@@ -254,7 +254,11 @@ def __get_coco_category_by_name(categories: list, name: str) -> Optional[dict]:
 
 def __get_coco_annotation_keypoints(keypoints: list, category_keypoints: list) -> list:
     coco_annotation_keypoints = []
-    keypoint_values = {keypoint["key"]: keypoint["value"] for keypoint in keypoints if keypoint["value"]}
+    keypoint_values = {
+        keypoint["key"]: keypoint["value"]
+        for keypoint in keypoints
+        if keypoint["value"]
+    }
     for category_key in category_keypoints:
         value = keypoint_values.get(category_key, [0, 0, 0])
         # Adjust fastlabel data definition to coco format
@@ -271,20 +275,22 @@ def __get_coco_annotation(
     image_id: str,
     annotation_type: str,
     annotation_attributes: Dict[str, AttributeValue],
-    rotation: int
+    rotation: int,
 ) -> dict:
     annotation = {}
     annotation["num_keypoints"] = len(keypoints) if keypoints else 0
     annotation["keypoints"] = (
-        __get_coco_annotation_keypoints(keypoints, category["keypoints"]) if keypoints else []
+        __get_coco_annotation_keypoints(keypoints, category["keypoints"])
+        if keypoints
+        else []
     )
     annotation["segmentation"] = __to_coco_segmentation(annotation_type, points)
     annotation["iscrowd"] = 0
     annotation["area"] = __to_area(annotation_type, points)
     annotation["image_id"] = image_id
     annotation["bbox"] = (
-        __get_coco_bbox(points, rotation) 
-        if annotation_type == AnnotationType.bbox 
+        __get_coco_bbox(points, rotation)
+        if annotation_type == AnnotationType.bbox
         else __to_bbox(annotation_type, points)
     )
     annotation["rotation"] = rotation
@@ -328,6 +334,7 @@ def __get_rotated_rectangle_coordinates(
     )
 
     return rotated_corners
+
 
 def __get_coco_bbox(
     points: list,
@@ -788,12 +795,12 @@ def to_pixel_coordinates(tasks: list) -> list:
                 for region in annotation["points"]:
                     new_region = []
                     for points in region:
-                        new_points = __get_pixel_coordinates(points)
+                        new_points = get_pixel_coordinates(points)
                         new_region.append(new_points)
                     new_regions.append(new_region)
                 annotation["points"] = new_regions
             elif annotation["type"] == AnnotationType.polygon.value:
-                new_points = __get_pixel_coordinates(annotation["points"])
+                new_points = get_pixel_coordinates(annotation["points"])
                 annotation["points"] = new_points
             elif annotation["type"] == AnnotationType.bbox.value:
                 points = annotation["points"]
@@ -871,7 +878,7 @@ def __remove_duplicated_coordinates(points: List[int]) -> List[int]:
     return new_points
 
 
-def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
+def get_pixel_coordinates(points: List[int | float]) -> List[int]:
     """
     Remove diagonal coordinates and return pixel outline coordinates.
     """
@@ -879,6 +886,7 @@ def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
         return []
 
     new_points = []
+    print(points)
     new_points.append(int(points[0]))
     new_points.append(int(points[1]))
     for i in range(int(len(points) / 2)):
@@ -1209,4 +1217,3 @@ def _get_coco_annotation_attributes(annotation: dict) -> Dict[str, AttributeValu
     for attribute in attributes:
         coco_attributes[attribute["key"]] = attribute["value"]
     return coco_attributes
-

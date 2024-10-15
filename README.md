@@ -33,6 +33,7 @@
   - [YOLO To FastLabel](#yolo-to-fastlabel)
   - [Pascal VOC To FastLabel](#pascal-voc-to-fastlabel)
   - [labelme To FastLabel](#labelme-to-fastlabel)
+  - [Mask To FastLabel Segmentation Points](#mask-to-fastlabel-segmentation-points)
 - [Model](#model)
 - [API Docs](#api-docs)
 
@@ -588,7 +589,6 @@ task = client.create_multi_image_classification_task(
 ```
 
 ##### Limitation
-
 
 - You can upload up to a size of 20 MB.
 - You can upload up to a total size of 2 GB.
@@ -2667,7 +2667,7 @@ dataset_object = client.create_dataset_object(
     tags=["dog"], # max 5 tags per dataset object.
     licenses=["MIT", "my-license"],  # max 10 licenses per dataset object
     annotations=[
-        { 
+        {
             "type": "classification",
             "value": "classification",
             "points": [],
@@ -2824,6 +2824,7 @@ client.download_dataset_objects(
 ```
 
 ### Update Dataset Object
+
 ```python
 dataset_object = client.update_dataset_object(
     dataset_id="YOUR_DATASET_ID",
@@ -3209,6 +3210,16 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
 ```
 
 > Please check const.COLOR_PALLETE for index colors.
+
+### Mask To FastLabel Segmentation Points
+
+Convert mask image to FastLabel's segmentation coordinate format.
+
+```python
+points = client.mask_to_fastlabel_segmentation_points(
+    mask_image = binary_image_path (or binary_image_array)
+)
+```
 
 ## Model
 
