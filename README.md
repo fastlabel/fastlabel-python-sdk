@@ -2973,7 +2973,7 @@ Only support the following annotation types.
 
 - bbox
 - polygon
-- segmentation (Hollowed points are not supported.)
+- segmentation
 
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
