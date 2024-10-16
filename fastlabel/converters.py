@@ -8,7 +8,7 @@ from decimal import Decimal
 from operator import itemgetter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import cv2
 import geojson
@@ -810,12 +810,12 @@ def to_pixel_coordinates(tasks: list) -> list:
                 for region in annotation["points"]:
                     new_region = []
                     for points in region:
-                        new_points = __get_pixel_coordinates(points)
+                        new_points = get_pixel_coordinates(points)
                         new_region.append(new_points)
                     new_regions.append(new_region)
                 annotation["points"] = new_regions
             elif annotation["type"] == AnnotationType.polygon.value:
-                new_points = __get_pixel_coordinates(annotation["points"])
+                new_points = get_pixel_coordinates(annotation["points"])
                 annotation["points"] = new_points
             elif annotation["type"] == AnnotationType.bbox.value:
                 points = annotation["points"]
@@ -893,7 +893,7 @@ def __remove_duplicated_coordinates(points: List[int]) -> List[int]:
     return new_points
 
 
-def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
+def get_pixel_coordinates(points: List[Union[int, float]]) -> List[int]:
     """
     Remove diagonal coordinates and return pixel outline coordinates.
     """

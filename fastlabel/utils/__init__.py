@@ -10,6 +10,8 @@ import numpy as np
 
 from fastlabel import const
 
+from .mask_image_util import mask_to_segmentation  # noqa: F401
+
 
 def base64_encode(file_path: str) -> str:
     with open(file_path, "rb") as f:

@@ -4718,6 +4718,14 @@ class Client:
 
         return self.api.get_request(endpoint, params=params)
 
+    def mask_to_fastlabel_segmentation_points(
+        self, mask_image: Union[str, np.ndarray]
+    ) -> List[List[List[int]]]:
+        return [
+            [converters.get_pixel_coordinates(p) for p in point]
+            for point in utils.mask_to_segmentation(mask_image)
+        ]
+
 
 def delete_extra_annotations_parameter(annotations: list) -> list:
     for annotation in annotations:
