@@ -44,6 +44,7 @@ def mask_to_segmentation(
     points = [
         __convert_fastlabel_segmentation(segmentation)
         for segmentation in segmentation_list
+        if len(segmentation) > 0
     ]
     return points
 
@@ -51,6 +52,7 @@ def mask_to_segmentation(
 def __detect_segmentation_list(
     hierarchy: np.ndarray, contours: Sequence[Union[np.ndarray, Mat]]
 ) -> list[Any]:
+
     outer_polygon_hierarchy_indexes = list(
         filter(lambda x: hierarchy[0][x][3] == -1, range(hierarchy[0].shape[0]))
     )
@@ -126,10 +128,15 @@ def __convert_fastlabel_segmentation(segmentation: list) -> list[Any]:
 
 
 # TODO: maybe return points number is not correct. (ex. only 2 points)
-def __convert_fastlabel_points(polygon_array: np.ndarray) -> list[int]:
+def __convert_fastlabel_points(cv2_polygon_array: np.ndarray) -> list[int]:
     # Notices
     #   polygon_array → anticlockwise coordinates
     #   return value → clockwise coordinates
+    polygon_array = (
+        np.append(cv2_polygon_array, [cv2_polygon_array[0]], axis=0)
+        if not np.array_equal(cv2_polygon_array[0], cv2_polygon_array[-1])
+        else cv2_polygon_array
+    )
     x_array = polygon_array[:, 0]
     y_array = polygon_array[:, 1]
     # Rectangle with height of 1px
@@ -289,4 +296,10 @@ def __convert_fastlabel_points(polygon_array: np.ndarray) -> list[int]:
             ) and (x_next_value == x_current_value and y_next_value > y_current_value):
                 new_array.append([x_current_value + 1, y_current_value])
                 continue
-    return np.flipud(np.array(new_array)).flatten().tolist()
+    new_point_array = np.flipud(np.array(new_array)).flatten().tolist()
+    if not (
+        (new_point_array[0] == new_point_array[-2])
+        and (new_point_array[1] == new_point_array[-1])
+    ):
+        new_point_array.extend([new_point_array[0], new_point_array[1]])
+    return new_point_array
