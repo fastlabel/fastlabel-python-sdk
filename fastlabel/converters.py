@@ -8,7 +8,7 @@ from decimal import Decimal
 from operator import itemgetter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import cv2
 import geojson
@@ -260,11 +260,28 @@ def __get_coco_annotation_keypoints(keypoints: list, category_keypoints: list) -
         if keypoint["value"]
     }
     for category_key in category_keypoints:
-        value = keypoint_values.get(category_key, [0, 0, 0])
+        value = keypoint_values.get(category_key)
+        if not value:
+            coco_annotation_keypoints.extend([0, 0, 0])
+            continue
         # Adjust fastlabel data definition to coco format
         visibility = 2 if value[2] == 1 else 1
         coco_annotation_keypoints.extend([value[0], value[1], visibility])
     return coco_annotation_keypoints
+
+
+COCO_KEYPOINT_V_INDEX = 2
+
+
+def __get_coco_num_keypoints(keypoints: list) -> int:
+    # https://cocodataset.org/#format-data
+    if not keypoints:
+        return 0
+    num_keypoints = 0
+    for keypoint in keypoints:
+        if keypoint["value"]:
+            num_keypoints += 1
+    return num_keypoints
 
 
 def __get_coco_annotation(
@@ -278,7 +295,7 @@ def __get_coco_annotation(
     rotation: int,
 ) -> dict:
     annotation = {}
-    annotation["num_keypoints"] = len(keypoints) if keypoints else 0
+    annotation["num_keypoints"] = __get_coco_num_keypoints(keypoints)
     annotation["keypoints"] = (
         __get_coco_annotation_keypoints(keypoints, category["keypoints"])
         if keypoints
@@ -667,9 +684,7 @@ def to_pascalvoc(project_type: str, tasks: list, output_dir: str) -> list:
             }
 
             if len(filtered_pascalvoc_objs) > 0:
-                voc["annotation"]["object"] = list(
-                    sorted(filtered_pascalvoc_objs, key=itemgetter("name"))
-                )
+                voc["annotation"]["object"] = filtered_pascalvoc_objs
 
             pascalvoc.append(voc)
     return pascalvoc
@@ -795,12 +810,12 @@ def to_pixel_coordinates(tasks: list) -> list:
                 for region in annotation["points"]:
                     new_region = []
                     for points in region:
-                        new_points = __get_pixel_coordinates(points)
+                        new_points = get_pixel_coordinates(points)
                         new_region.append(new_points)
                     new_regions.append(new_region)
                 annotation["points"] = new_regions
             elif annotation["type"] == AnnotationType.polygon.value:
-                new_points = __get_pixel_coordinates(annotation["points"])
+                new_points = get_pixel_coordinates(annotation["points"])
                 annotation["points"] = new_points
             elif annotation["type"] == AnnotationType.bbox.value:
                 points = annotation["points"]
@@ -878,7 +893,7 @@ def __remove_duplicated_coordinates(points: List[int]) -> List[int]:
     return new_points
 
 
-def __get_pixel_coordinates(points: List[int or float]) -> List[int]:
+def get_pixel_coordinates(points: List[Union[int, float]]) -> List[int]:
     """
     Remove diagonal coordinates and return pixel outline coordinates.
     """

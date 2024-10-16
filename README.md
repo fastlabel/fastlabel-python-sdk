@@ -8,6 +8,7 @@
 - [Task](#task)
   - [Image](#image)
   - [Image Classification](#image-classification)
+  - [Multi Image Classification](#multi-image-classification)
   - [Sequential Image](#sequential-image)
   - [Video](#video)
   - [Video Classification](#video-classification)
@@ -32,6 +33,7 @@
   - [YOLO To FastLabel](#yolo-to-fastlabel)
   - [Pascal VOC To FastLabel](#pascal-voc-to-fastlabel)
   - [labelme To FastLabel](#labelme-to-fastlabel)
+  - [Mask To FastLabel Segmentation Points](#mask-to-fastlabel-segmentation-points)
 - [Model](#model)
 - [API Docs](#api-docs)
 
@@ -551,6 +553,128 @@ Example of a single image classification task object
             "name": "Kind",
             "type": "text",
             "value": "Scottish field"
+        }
+    ],
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
+```
+
+### Multi Image Classification
+
+Supported following project types:
+
+- Multi Image - Classification
+
+#### Create Task
+
+Create a new task.
+
+```python
+task = client.create_multi_image_classification_task(
+    project="YOUR_PROJECT_SLUG",
+    name="sample",
+    folder_path="./sample",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
+    attributes=[
+        {
+            "type": "text",
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ]
+)
+```
+
+##### Limitation
+
+- You can upload up to a size of 20 MB.
+- You can upload up to a total size of 2 GB.
+- You can upload up to 6 files in total.
+
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_multi_image_classification_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_multi_image_classification_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
+#### Get Tasks
+
+Get tasks.
+
+```python
+tasks = client.get_multi_image_classification_tasks(project="YOUR_PROJECT_SLUG")
+```
+
+#### Update Task
+
+Update a single task.
+
+```python
+task_id = client.update_multi_image_classification_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"],
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
+    attributes=[
+        {
+            "type": "text",
+            "key": "attribute-key",
+            "value": "attribute-value"
+        }
+    ]
+)
+```
+
+#### Response
+
+Example of a single task object
+
+```python
+{
+    "id": "YOUR_TASK_ID",
+    "name": "sample",
+    "contents": [
+        {
+            "name": "content-name-1",
+            "url": "content-url-1",
+            "width": 100,
+            "height": 100,
+        },
+        {
+            "name": "content-name-2",
+            "url": "content-url-2",
+            "width": 100,
+            "height": 100,
+        }
+    ],
+    "status": "registered",
+    "externalStatus": "registered",
+    "priority": 10,
+    "tags": [],
+    "assignee": "ASSIGNEE_NAME",
+    "reviewer": "REVIEWER_NAME",
+    "externalAssignee": "EXTERNAL_ASSIGNEE_NAME",
+    "externalReviewer": "EXTERNAL_REVIEWER_NAME",
+    "attributes": [
+        {
+            "type": "text",
+            "key": "attribute-key-1",
+            "value": "attribute-value-1"
+        },
+        {
+            "type": "text",
+            "key": "attribute-key-2",
+            "value": "attribute-value-2"
         }
     ],
     "createdAt": "2021-02-22T11:25:27.158Z",
@@ -2510,6 +2634,7 @@ dataset_object = client.create_dataset_object(
             ],
             "attributes": [
                 {
+                    "type": "text",
                     "value": "Scottish field",
                     "key": "kind"
                 }
@@ -2527,6 +2652,32 @@ dataset_object = client.create_dataset_object(
       "key": "value",
       "metadata": "metadata-value"
     }
+)
+```
+
+If you would like to create a new dataset object with classification type annotations, please pass empty points and value of the annotation named 'classification'.
+
+```python
+dataset_object = client.create_dataset_object(
+    dataset="YOUR_DATASET_NAME",
+    name="brushwood_dog.jpg",
+    file_path="./brushwood_dog.jpg",
+    tags=["dog"], # max 5 tags per dataset object.
+    licenses=["MIT", "my-license"],  # max 10 licenses per dataset object
+    annotations=[
+        {
+            "type": "classification",
+            "value": "classification",
+            "points": [],
+            "attributes": [
+                {
+                    "type": "text",
+                    "value": "Scottish field",
+                    "key": "kind"
+                }
+            ]
+        }
+    ]
 )
 ```
 
@@ -2671,6 +2822,7 @@ client.download_dataset_objects(
 ```
 
 ### Update Dataset Object
+
 ```python
 dataset_object = client.update_dataset_object(
     dataset_id="YOUR_DATASET_ID",
@@ -2819,7 +2971,7 @@ Only support the following annotation types.
 
 - bbox
 - polygon
-- segmentation (Hollowed points are not supported.)
+- segmentation
 
 ```python
 tasks = client.get_image_tasks(project="YOUR_PROJECT_SLUG")
@@ -3056,6 +3208,16 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
 ```
 
 > Please check const.COLOR_PALLETE for index colors.
+
+### Mask To FastLabel Segmentation Points
+
+Convert mask image to FastLabel's segmentation coordinate format.
+
+```python
+points = client.mask_to_fastlabel_segmentation_points(
+    mask_image = binary_image_path (or binary_image_array)
+)
+```
 
 ## Model
 
