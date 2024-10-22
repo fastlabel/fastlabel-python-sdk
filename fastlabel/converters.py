@@ -1158,7 +1158,7 @@ def execute_pascalvoc_to_fastlabel(pascalvoc: dict, file_path: str = None) -> tu
     return (file_name, annotations)
 
 
-def execute_yolo_to_fastlabel(
+def execute_bbox_yolo_to_fastlabel(
     classes: dict,
     image_sizes: dict,
     yolo_annotations: dict,
@@ -1194,6 +1194,52 @@ def execute_yolo_to_fastlabel(
                     "value": classs_name,
                     "points": points,
                     "type": AnnotationType.bbox.value,
+                }
+            )
+
+        file_path = (
+            image_sizes[yolo_anno_key]["image_file_path"].replace(
+                os.path.join(*[dataset_folder_path, ""]), ""
+            )
+            if dataset_folder_path
+            else image_sizes[yolo_anno_key]["image_file_path"]
+        )
+        results[file_path] = annotations
+
+    return results
+
+
+def execute_segmentation_yolo_to_fastlabel(
+    classes: dict,
+    image_sizes: dict,
+    yolo_annotations: dict,
+    dataset_folder_path: str = None,
+) -> dict:
+    results = {}
+    for yolo_anno_key in yolo_annotations:
+        annotations = []
+        for each_image_annotation in yolo_annotations[yolo_anno_key]:
+            yolo_class_id = each_image_annotation[0]
+            coordinates = each_image_annotation[1:]
+            image_width, image_height = image_sizes[yolo_anno_key]["size"]
+
+            classs_name = classes[str(yolo_class_id)]
+
+            points = [[[]]]
+            # 座標を(x, y)のペアに分割
+            vertices = [
+                {"x": coordinates[i], "y": coordinates[i + 1]}
+                for i in range(0, len(coordinates), 2)
+            ]
+            for vertice in vertices:
+                points[0][0].append(round(float(image_width) * float(vertice["x"])))
+                points[0][0].append(round(float(image_height) * float(vertice["y"])))
+
+            annotations.append(
+                {
+                    "value": classs_name,
+                    "points": points,
+                    "type": AnnotationType.segmentation.value,
                 }
             )
 
