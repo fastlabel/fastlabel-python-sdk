@@ -1,5 +1,6 @@
 import json
 import os
+
 from visual_inspection_ai import VisualInspectionAi
 
 
