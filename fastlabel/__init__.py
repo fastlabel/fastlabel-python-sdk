@@ -2948,6 +2948,8 @@ class Client:
         image_sizes = self.__get_yolo_image_sizes(dataset_folder_path)
         yolo_annotations = self.__get_yolo_format_annotations(dataset_folder_path)
 
+        print("yolo_annotations")
+        print(yolo_annotations)
         if (project_type == "segmentation"):
             return converters.execute_segmentation_yolo_to_fastlabel(
                 classes,
@@ -3109,7 +3111,8 @@ class Client:
             raise FastLabelInvalidException(
                 "Project not found. Check the project slag.", 422
             )
-
+        print("水流2")
+        print(project)
         os.makedirs(output_dir, exist_ok=True)
         annos, categories = converters.to_yolo(
             project_type=project["type"],
@@ -3117,6 +3120,9 @@ class Client:
             classes=classes,
             output_dir=output_dir,
         )
+        print("水流3")
+        print(annos)
+        print(categories)
         for anno in annos:
             file_name = anno["filename"]
             basename = utils.get_basename(file_name)

@@ -7,8 +7,9 @@ from .exceptions import FastLabelException, FastLabelInvalidException
 
 
 class Api:
-    base_url = "https://api.fastlabel.ai/v1/"
-    access_token = None
+    # base_url = "https://api.fastlabel.ai/v1/"
+    base_url = "http://localhost:4000/v1/"
+    access_token = "NmYwODdlNjYtZjIwZC00YWUwLWI1MjItNTkzNWEzMDBlMDk5"
 
     def __init__(self):
         if os.environ.get("FASTLABEL_API_URL"):

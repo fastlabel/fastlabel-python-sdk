@@ -476,10 +476,16 @@ def __serialize(value: any) -> any:
 
 
 def to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) -> tuple:
+    print("水流44")
+    print(classes)
     if len(classes) == 0:
         coco = to_coco(project_type=project_type, tasks=tasks, output_dir=output_dir)
+        print("水流4-1")
+        print(coco)
         return __coco2yolo(project_type, coco)
     else:
+        print("水流4")
+        print(project_type)
         return __to_yolo(
             project_type=project_type,
             tasks=tasks,
@@ -491,6 +497,11 @@ def to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) -> t
 def __coco2yolo(project_type: str, coco: dict) -> tuple:
     categories = coco["categories"]
 
+    print("水流6")
+    print(project_type)
+    print(coco)
+    print("水流6-2")
+    print(coco["annotations"])
     annos = []
     for image in coco["images"]:
         dw = 1.0 / image["width"]
@@ -608,11 +619,16 @@ def __to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) ->
                 }
                 for annotation in task["annotations"]
             ]
+            print("水流77")
+            print(params)
             with ThreadPoolExecutor(max_workers=8) as executor:
                 image_anno_dicts = executor.map(__get_yolo_annotation, params)
 
             filtered_image_anno_dicts = list(filter(None, image_anno_dicts))
 
+            print("水流77-3")
+            print(image_anno_dicts)
+            print(filtered_image_anno_dicts)
             anno = {"filename": image_file_name}
 
             if len(filtered_image_anno_dicts) > 0:
@@ -622,6 +638,8 @@ def __to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) ->
                     if anno
                 ]
 
+            print("水流77-4")
+            print(anno)
             annos.append(anno)
 
     categories = map(lambda val: {"name": val}, sorted(classes))
@@ -659,10 +677,15 @@ def __get_yolo_annotation(data: dict) -> dict:
 
 
 def __segmentation2yolo(value: str, classes: list, dw: float, dh: float, points: list):
+    print("水流9 seg2 yolo")
     objs = []
     category_index = str(classes.index(value))
     for shapes in points:
+        print("水流9")
+        print(shapes)
         for coordinates in shapes:
+            print("水流9-2")
+            print(coordinates)
             # 座標を(x, y)のペアに分割し、yoloの小数で表す形式に変換する。
             yolo_vertices = [
                 {
@@ -677,6 +700,8 @@ def __segmentation2yolo(value: str, classes: list, dw: float, dh: float, points:
                 obj.append(v["x"])
                 obj.append(v["y"])
             objs.append(" ".join(obj))
+    print("水流9-3")
+    print(objs)
     return objs
 
 
@@ -1253,6 +1278,7 @@ def execute_segmentation_yolo_to_fastlabel(
         results[file_path] = annotations
 
     return results
+
 
 
 def __get_annotation_type_by_labelme(shape_type: str) -> str:
