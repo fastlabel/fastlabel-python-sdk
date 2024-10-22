@@ -812,6 +812,11 @@ def to_pixel_coordinates(tasks: list) -> list:
                     for points in region:
                         new_points = __get_pixel_coordinates(points)
                         new_region.append(new_points)
+                        if not (
+                            new_points[0] == new_points[-2]
+                            and new_points[1] == new_points[-1]
+                        ):
+                            new_points.extend([new_points[0], new_points[1]])
                     new_regions.append(new_region)
                 annotation["points"] = new_regions
             elif annotation["type"] == AnnotationType.polygon.value:
