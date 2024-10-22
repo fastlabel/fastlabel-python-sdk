@@ -9,7 +9,7 @@ class VisualInspectionAiConverter:
         visual_inspection_ai = VisualInspectionAi.from_bbox(bbox_json)
 
         os.makedirs(os.path.dirname(export_file_path), exist_ok=True)
-        with open(export_file_path, 'w') as file:
+        with open(export_file_path, "w") as file:
             file.write(visual_inspection_ai.as_jsonl())
 
     def open_bbox(self, file_path: str) -> any:
