@@ -8,6 +8,16 @@ class VisualInspectionAiFigure:
         self.vertex = vertex
         self.project_type = project_type
 
+    @classmethod
+    def fromBbox(cls, width, height, points):
+        vertices = [
+            (points[0] / width, points[1] / height),  # 左上
+            (points[2] / width, points[1] / height),  # 右上
+            (points[0] / width, points[3] / height),  # 左下
+            (points[2] / width, points[3] / height),  # 右下
+        ]
+        return VisualInspectionAiFigure(vertices, "bbox")
+
     # VisualInspectionAiのjsonlを作成する。
     def make_jsonl(self) -> dict:
         return {
@@ -44,13 +54,7 @@ class VisualInspectionAi:
         height = bbox_json["height"]
         for annotation in bbox_json["annotations"]:
             points = annotation["points"]
-            vertices = [
-                (points[0] / width, points[1] / height),  # 左上
-                (points[2] / width, points[1] / height),  # 右上
-                (points[0] / width, points[3] / height),  # 左下
-                (points[2] / width, points[3] / height),  # 右下
-            ]
-            result.append(VisualInspectionAiFigure(vertices, "bbox"))
+            result.append(VisualInspectionAiFigure.fromBbox(width, height, points))
         return result
 
     @classmethod
