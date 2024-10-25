@@ -1,7 +1,7 @@
 import json
 
 
-# visualInspectionAiの一要素として表せる図形の情報。
+# visualInspectionAiの一要素として表せる図形のValue Object。
 # jsonl型として出力するのが責務
 class VisualInspectionAiFigure:
     def __init__(self, vertex, project_type):
@@ -32,23 +32,39 @@ class VisualInspectionAiFigure:
 
     # VisualInspectionAiのjsonlを作成する。
     def make_jsonl(self) -> dict:
+        vi_annotations = (
+            self.__make_bbox_vi_annotations_jsonl()
+            if self.project_type == "bbox"
+            else self.__make_segmentation_vi_annotations_jsonl()
+        )
         return {
             "image_gcs_uri": "gs://ffod-98sm/20240613/NG/test/BQ1334B__11-7_18-19_0004.png",  # TODO ここに入れ込めそうな値はjsonにはないので、調査
-            "vi_annotations": self.__make_vi_annotations_jsonl(),
+            "vi_annotations": vi_annotations,
             "dataItemResourceLabels": {
                 "goog_vi_ml_use": "test"
             },  # TODO この値が何を指しているのか調査
         }
 
-    def __make_vi_annotations_jsonl(self) -> dict:
+    def __make_bbox_vi_annotations_jsonl(self) -> dict:
+        # TODO とりあえず貰ったjsonlを再現するように値を埋めた。各プロパティの正確な仕様を確認
         return {
             "viBoundingPoly": {"vertex": self.vertex},
-            "annotationSpec": "defect",  # TODO ここにクラスが入る場合は入れる。
-            "annotationSet": (
-                "Polygons Regions"
-                if self.project_type == "bbox"
-                else "TODO segmentationの場合の表記調査"
-            ),
+            "annotationSpec": "defect",
+            "annotationSet": "Polygons Regions",
+        }
+
+    def __make_segmentation_vi_annotations_jsonl(self) -> dict:
+        # TODO とりあえず貰ったjsonlを再現するように値を埋めた。各プロパティの正確な仕様を確認
+        return {
+            "viBoundingPoly": {"vertex": self.vertex},
+            "annotationId": "1466198469755535360",
+            "annotationSpecId": "5575973384027635712",
+            "annotationSpec": "defect",
+            "annotationSet": "Polygons Regions",
+            "annotationSetId": "8581633279210291200",
+            "annotationResourceLabels": {
+                "goog_vi_annotation_set_name": "8581633279210291200"
+            },
         }
 
 
