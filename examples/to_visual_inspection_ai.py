@@ -5,10 +5,10 @@ from visual_inspection_ai import VisualInspectionAi
 
 
 class VisualInspectionAiConverter:
-    def convert_from_bbox(
+    def convert_from_json(
         self, file_path: str, export_file_path: str, project_type: str
     ) -> dict:
-        json = self.open_bbox(file_path)
+        json = self.open_file(file_path)
         if project_type == "bbox":
             visual_inspection_ai = VisualInspectionAi.from_bbox(json)
         else:
@@ -18,7 +18,7 @@ class VisualInspectionAiConverter:
         with open(export_file_path, "w") as file:
             file.write(visual_inspection_ai.as_jsonl())
 
-    def open_bbox(self, file_path: str) -> any:
+    def open_file(self, file_path: str) -> any:
         return json.load(open(file_path, "r"))
 
 
@@ -38,4 +38,4 @@ export_file_path = (
 file_path = "./import/visual_inspection_ai/segmentation/annotations.json"  # 入力元のファイルパスを指定
 project_type = "segmentation"
 
-result = converter.convert_from_bbox(file_path, export_file_path, project_type)
+result = converter.convert_from_json(file_path, export_file_path, project_type)
