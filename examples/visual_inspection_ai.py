@@ -1,8 +1,8 @@
 import json
 
-# いろいろなフォーマットを受け取って、VisualInspectionAiのjsonlで出力するのが責務
 
-
+# visualInspectionAiの一要素として表せる図形の情報。
+# jsonl型として出力するのが責務
 class VisualInspectionAiFigure:
     def __init__(self, vertex, project_type):
         self.vertex = vertex
@@ -51,6 +51,8 @@ class VisualInspectionAiFigure:
             ),
         }
 
+
+# いろいろなフォーマットを受け取って、VisualInspectionAiのjsonlで出力するのが責務
 
 class VisualInspectionAi:
     def __init__(self, figures):
