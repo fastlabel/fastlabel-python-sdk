@@ -53,8 +53,6 @@ class VisualInspectionAiFigure:
 
 
 # いろいろなフォーマットを受け取って、VisualInspectionAiのjsonlで出力するのが責務
-
-
 class VisualInspectionAi:
     def __init__(self, figures):
         self.figures = figures
