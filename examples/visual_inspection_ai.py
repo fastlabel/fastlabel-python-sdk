@@ -20,7 +20,7 @@ class VisualInspectionAiFigure:
 
     @classmethod
     def from_segmentation(cls, width, height, points):
-        # サンプルのjsonには矩形しかなかったので、とりあえずで変換
+        # FIXME サンプルのjsonには矩形しかなかったので、とりあえずで変換
         figure_points = points[0][
             0
         ]  # FIXME fastlabelでは飛地がある場合に配列に複数の要素がある場合があるが、VisualInspectionAiで飛地をどのように扱うか不明なため、一旦最初の図形だけパース。
