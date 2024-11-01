@@ -1974,6 +1974,32 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def import_appendix_file(
+        self,
+        project: str,
+        file_path: str,
+    ) -> list:
+        """
+        Import calibration file zip.
+            project is slug of your project (Required).
+            file_path is a path to data. Supported extensions are zip (Required).
+        """
+
+        if not utils.is_appendix_supported_ext(file_path):
+            raise FastLabelInvalidException("Supported extensions are zip.", 422)
+
+        endpoint = "contents/imports/appendix/batch"
+        payload = {"project": project}
+        signed_url = self.__get_signed_path(
+            project=project,
+            file_name=os.path.basename(file_path),
+            file_type="application/zip",
+        )
+        self.api.upload_zipfile(url=signed_url["url"], file_path=file_path)
+        payload["fileKey"] = signed_url["name"]
+
+        return self.api.post_request(endpoint, payload=payload)
+
     # Task Update
 
     def update_task(
