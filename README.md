@@ -20,6 +20,7 @@
   - [Sequential PCD](#sequential-pcd)
   - [DICOM](#dicom)
   - [Common](#common)
+- [Appendix](#appendix)
 - [Annotation](#annotation)
 - [Project](#project)
 - [Dataset](#dataset)
@@ -2172,6 +2173,35 @@ Example of a single history object
     "createdAt": "2021-02-22T11:25:27.158Z",
     "updatedAt": "2021-02-22T11:25:27.158Z"
 }
+```
+
+
+## Appendix
+
+Processing of various types of appendix information is supported.
+
+### Import Camera Calibration
+
+Import camera calibration and image appendix information for tasks in pcd and sequential pcd projects.
+
+
+```python
+client.import_appendix_file(project="YOUR_PROJECT_SLUG", file_path="ZIP_FILE_PATH")
+```
+
+The folder structure inside the ZIP file is as follows
+
+```
+.
+└── task_name
+    ├── content_name_1.pcd
+    │   ├── 000001.png
+    │   └── 000001.yaml
+    └── content_name_2.pcd
+        ├── 000002.png
+        ├── 000002.yaml
+        ├── 000003.png
+        └── 000003.yaml
 ```
 
 ## Annotation
