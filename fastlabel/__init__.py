@@ -2000,6 +2000,58 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def get_appendix_data(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = None,
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 10000,
+    ) -> list:
+        """
+        Returns a list of appendixes urls and params.
+        params = {
+            id: uuid,
+            url: image file url,
+            name: {task_name}/{content_name}/{file_name},
+            format: yml or kitti or none,
+            calibration: calibration data,
+        }
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined',
+        'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        task_name is a task name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 10000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 10000.", 422
+            )
+        endpoint = "contents/export/appendix"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+
+        return self.api.get_request(endpoint, params=params)
+
     # Task Update
 
     def update_task(
