@@ -42,6 +42,10 @@ def is_dicom_supported_ext(file_path: str) -> bool:
     return file_path.lower().endswith((".zip"))
 
 
+def is_appendix_supported_ext(file_path: str) -> bool:
+    return file_path.lower().endswith((".zip"))
+
+
 def is_pcd_supported_ext(file_path: str) -> bool:
     # .ply is not yet supported. To support it, modification of the API
     # needs to be considered as well.
