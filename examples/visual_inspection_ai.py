@@ -11,17 +11,17 @@ class VisualInspectionAiFigure:
         vertex,
         project_type,
         image_gcs_uri,
-        label,
         goog_vi_ml_use,
-        annotationId,
-        annotationSpec,
-        annotationSpecId,
+        label=None,
+        annotationId=None,
+        annotationSpec=None,
+        annotationSpecId=None,
     ):
         self.vertex = vertex
         self.project_type = project_type
         self.image_gcs_uri = image_gcs_uri
-        self.label = label
         self.goog_vi_ml_use = goog_vi_ml_use
+        self.label = label
         self.annotationId = annotationId
         self.annotationSpec = annotationSpec
         self.annotationSpecId = annotationSpecId
@@ -42,7 +42,18 @@ class VisualInspectionAiFigure:
         )
 
     @classmethod
-    def from_segmentation(cls, width, height, points):
+    def from_segmentation(
+        cls,
+        width,
+        height,
+        points,
+        image_gcs_uri,
+        goog_vi_ml_use,
+        label,
+        annotationId,
+        annotationSpec,
+        annotationSpecId,
+    ):
         # FIXME サンプルのjsonには矩形しかなかったので、とりあえずで変換
         figure_points = points[0][
             0
@@ -51,7 +62,16 @@ class VisualInspectionAiFigure:
             {"x": figure_points[i] / width, "y": figure_points[i + 1] / height}
             for i in range(0, len(figure_points), 2)
         ]
-        return VisualInspectionAiFigure(vertices, "segmentation")
+        return VisualInspectionAiFigure(
+            vertex=vertices,
+            project_type="segmentation",
+            image_gcs_uri=image_gcs_uri,
+            goog_vi_ml_use=goog_vi_ml_use,
+            label=label,
+            annotationId=annotationId,
+            annotationSpec=annotationSpec,
+            annotationSpecId=annotationSpecId,
+        )
 
     # VisualInspectionAiのjsonlを作成する。
     def make_jsonl(self) -> dict:
@@ -100,10 +120,6 @@ class VisualInspectionAi:
             figures.extend(VisualInspectionAi.parse_bbox_json(bbox))
         return cls(figures)
 
-    # image_gcs_uri　タスク名をマッピング
-    # dataItemResourceLabels タグ情報をマッピング
-    # goog_vi_ml_use 全量に対して7:3でtrainingとtestがわかれるようにマッピング（分割ロジックがよくわからんので割合変えれるようにきりだしとく）
-
     @classmethod
     def parse_bbox_json(
         cls, bbox_json, goog_mi_use_test_probability=0.3
@@ -112,11 +128,12 @@ class VisualInspectionAi:
         width = bbox_json["width"]
         height = bbox_json["height"]
         image_gcs_uri = bbox_json["name"]
-        goog_vi_ml_use = (
-            "test" if random.random() < goog_mi_use_test_probability else "training"
-        )
+
         for annotation in bbox_json["annotations"]:
             points = annotation["points"]
+            goog_vi_ml_use = (
+                "test" if random.random() < goog_mi_use_test_probability else "training"
+            )
             result.append(
                 VisualInspectionAiFigure.from_bbox(
                     width, height, points, image_gcs_uri, goog_vi_ml_use
@@ -132,22 +149,43 @@ class VisualInspectionAi:
         return cls(figures)
 
     @classmethod
-    def parse_segmentation_json(cls, json) -> list[VisualInspectionAiFigure]:
+    def parse_segmentation_json(
+        cls, json, goog_mi_use_test_probability=0.3
+    ) -> list[VisualInspectionAiFigure]:
         result = []
         width = json["width"]
         height = json["height"]
+        # TODO 配列と文字で型の互換がないが問題ないか確認
+        label = json["tags"]
+        image_gcs_uri = json["name"]
         for annotation in json["annotations"]:
+            annotationId = annotation["id"]
+            annotationSpec = annotation["title"]
+            annotationSpecId = annotation["value"]
             points = annotation["points"]
+            goog_vi_ml_use = (
+                "test" if random.random() < goog_mi_use_test_probability else "training"
+            )
             result.append(
-                VisualInspectionAiFigure.from_segmentation(width, height, points)
+                VisualInspectionAiFigure.from_segmentation(
+                    width,
+                    height,
+                    points,
+                    image_gcs_uri,
+                    goog_vi_ml_use,
+                    label,
+                    annotationId,
+                    annotationSpec,
+                    annotationSpecId,
+                )
             )
         return result
 
     def __make_jsonl(self) -> list:
         # TODO 削除
-        print(self.figures)
-        print(self.figures[0].make_jsonl())
-        print(list(map(lambda it: it.make_jsonl(), self.figures)))
+        # print(self.figures)
+        # print(self.figures[0].make_jsonl())
+        # print(list(map(lambda it: it.make_jsonl(), self.figures)))
         return list(map(lambda it: it.make_jsonl(), self.figures))
 
     def as_jsonl(self):
