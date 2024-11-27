@@ -1,22 +1,45 @@
 import json
-
+import random
 
 # visualInspectionAiの一要素として表せる図形のValue Object。
 # jsonl型として出力するのが責務
+
+
 class VisualInspectionAiFigure:
-    def __init__(self, vertex, project_type):
+    def __init__(
+        self,
+        vertex,
+        project_type,
+        image_gcs_uri,
+        label,
+        goog_vi_ml_use,
+        annotationId,
+        annotationSpec,
+        annotationSpecId,
+    ):
         self.vertex = vertex
         self.project_type = project_type
+        self.image_gcs_uri = image_gcs_uri
+        self.label = label
+        self.goog_vi_ml_use = goog_vi_ml_use
+        self.annotationId = annotationId
+        self.annotationSpec = annotationSpec
+        self.annotationSpecId = annotationSpecId
 
     @classmethod
-    def from_bbox(cls, width, height, points):
+    def from_bbox(cls, width, height, points, image_gcs_uri, goog_vi_ml_use):
         vertices = [
             (points[0] / width, points[1] / height),  # 左上
             (points[2] / width, points[1] / height),  # 右上
             (points[0] / width, points[3] / height),  # 左下
             (points[2] / width, points[3] / height),  # 右下
         ]
-        return VisualInspectionAiFigure(vertices, "bbox")
+        return VisualInspectionAiFigure(
+            vertex=vertices,
+            project_type="bbox",
+            image_gcs_uri=image_gcs_uri,
+            goog_vi_ml_use=goog_vi_ml_use,
+        )
 
     @classmethod
     def from_segmentation(cls, width, height, points):
@@ -38,33 +61,30 @@ class VisualInspectionAiFigure:
             else self.__make_segmentation_vi_annotations_jsonl()
         )
         return {
-            "image_gcs_uri": "gs://ffod-98sm/20240613/NG/test/BQ1334B__11-7_18-19_0004.png",  # TODO ここに入れ込めそうな値はjsonにはないので、調査
+            "image_gcs_uri": self.image_gcs_uri,
             "vi_annotations": vi_annotations,
             "dataItemResourceLabels": {
-                "goog_vi_ml_use": "test"
-            },  # TODO この値が何を指しているのか調査
+                "label": self.label,
+                "goog_vi_ml_use": self.goog_vi_ml_use,
+            },
         }
 
     def __make_bbox_vi_annotations_jsonl(self) -> dict:
-        # TODO とりあえず貰ったjsonlを再現するように値を埋めた。各プロパティの正確な仕様を確認
         return {
             "viBoundingPoly": {"vertex": self.vertex},
-            "annotationSpec": "defect",
+            "annotationSpec": self.annotationSpec,
             "annotationSet": "Polygons Regions",
         }
 
     def __make_segmentation_vi_annotations_jsonl(self) -> dict:
-        # TODO とりあえず貰ったjsonlを再現するように値を埋めた。各プロパティの正確な仕様を確認
         return {
             "viBoundingPoly": {"vertex": self.vertex},
-            "annotationId": "1466198469755535360",
-            "annotationSpecId": "5575973384027635712",
-            "annotationSpec": "defect",
+            "annotationId": self.annotationId,
+            "annotationSpecId": self.annotationSpecId,
+            "annotationSpec": self.annotationSpec,
             "annotationSet": "Polygons Regions",
-            "annotationSetId": "8581633279210291200",
-            "annotationResourceLabels": {
-                "goog_vi_annotation_set_name": "8581633279210291200"
-            },
+            "annotationSetId": "",
+            "annotationResourceLabels": {"goog_vi_annotation_set_name": ""},
         }
 
 
@@ -80,14 +100,28 @@ class VisualInspectionAi:
             figures.extend(VisualInspectionAi.parse_bbox_json(bbox))
         return cls(figures)
 
+    # image_gcs_uri　タスク名をマッピング
+    # dataItemResourceLabels タグ情報をマッピング
+    # goog_vi_ml_use 全量に対して7:3でtrainingとtestがわかれるようにマッピング（分割ロジックがよくわからんので割合変えれるようにきりだしとく）
+
     @classmethod
-    def parse_bbox_json(cls, bbox_json) -> list[VisualInspectionAiFigure]:
+    def parse_bbox_json(
+        cls, bbox_json, goog_mi_use_test_probability=0.3
+    ) -> list[VisualInspectionAiFigure]:
         result = []
         width = bbox_json["width"]
         height = bbox_json["height"]
+        image_gcs_uri = bbox_json["name"]
+        goog_vi_ml_use = (
+            "test" if random.random() < goog_mi_use_test_probability else "training"
+        )
         for annotation in bbox_json["annotations"]:
             points = annotation["points"]
-            result.append(VisualInspectionAiFigure.from_bbox(width, height, points))
+            result.append(
+                VisualInspectionAiFigure.from_bbox(
+                    width, height, points, image_gcs_uri, goog_vi_ml_use
+                )
+            )
         return result
 
     @classmethod
@@ -110,6 +144,7 @@ class VisualInspectionAi:
         return result
 
     def __make_jsonl(self) -> list:
+        # TODO 削除
         print(self.figures)
         print(self.figures[0].make_jsonl())
         print(list(map(lambda it: it.make_jsonl(), self.figures)))
