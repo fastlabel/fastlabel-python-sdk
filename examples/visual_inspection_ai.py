@@ -156,7 +156,7 @@ class VisualInspectionAi:
         width = json["width"]
         height = json["height"]
         # TODO 配列と文字で型の互換がないが問題ないか確認
-        label = json["tags"]
+        label = ", ".join(json["tags"])
         image_gcs_uri = json["name"]
         for annotation in json["annotations"]:
             annotationId = annotation["id"]
@@ -182,10 +182,6 @@ class VisualInspectionAi:
         return result
 
     def __make_jsonl(self) -> list:
-        # TODO 削除
-        # print(self.figures)
-        # print(self.figures[0].make_jsonl())
-        # print(list(map(lambda it: it.make_jsonl(), self.figures)))
         return list(map(lambda it: it.make_jsonl(), self.figures))
 
     def as_jsonl(self):
