@@ -25,7 +25,7 @@ class VisualInspectionAiConverter:
 converter = VisualInspectionAiConverter()
 
 export_file_path = (
-    "./export/visual_inspection_ai/test.jsonl"  # 出力先のファイルパスを指定
+    "./export/visual_inspection_ai/example.jsonl"  # 出力先のファイルパスを指定
 )
 
 # bboxの場合
