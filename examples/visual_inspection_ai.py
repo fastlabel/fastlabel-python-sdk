@@ -80,13 +80,16 @@ class VisualInspectionAiFigure:
             if self.project_type == "bbox"
             else self.__make_segmentation_vi_annotations_jsonl()
         )
+        dataItemResourceLabels = {
+            "goog_vi_ml_use": self.goog_vi_ml_use,
+        }
+
+        if self.project_type == "segmentation":
+            dataItemResourceLabels["label"] = self.label
         return {
             "image_gcs_uri": self.image_gcs_uri,
             "vi_annotations": vi_annotations,
-            "dataItemResourceLabels": {
-                "label": self.label,
-                "goog_vi_ml_use": self.goog_vi_ml_use,
-            },
+            "dataItemResourceLabels": dataItemResourceLabels,
         }
 
     def __make_bbox_vi_annotations_jsonl(self) -> dict:
