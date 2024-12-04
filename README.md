@@ -2175,7 +2175,6 @@ Example of a single history object
 }
 ```
 
-
 ## Appendix
 
 Processing of various types of appendix information is supported.
@@ -2183,7 +2182,6 @@ Processing of various types of appendix information is supported.
 ### Import Camera Calibration
 
 Import camera calibration and image appendix information for tasks in pcd and sequential pcd projects.
-
 
 ```python
 client.import_appendix_file(project="YOUR_PROJECT_SLUG", file_path="ZIP_FILE_PATH")
@@ -3452,6 +3450,31 @@ training_job = client.execute_evaluation_job(
     use_dataset_test=True,
 )
 
+```
+
+### Execute auto-annotation job
+
+Execute auto-annotation job.
+
+```python
+auto_annotation_job = client.execute_auto_annotation_job(
+    project="YOUR_PROJECT_SLUG",
+    model_name="computer_vision_object_detection",
+    // If you want to use the built-in model, select the following.
+    - "computer_vision_object_detection"
+    - "computer_vision_face_detection"
+    - "segment_anything"
+    - "segment_anything_2"
+    - "segment_anything_high_quality"
+    // Other built-in models require linkage with annotation classes.
+    // If you want to use the custom model, please fill out model name.
+    update_existing: False, // optional, default: False
+    confidence_threshold: 0.4, // optional, default: 0.4
+    use_tta: False, // optional, default: False
+    use_flip: False, // optional, default: False
+    processing_speed: "low", // optional, default: "low", "low" or "medium" or "high"
+    auto_creation: True, // optional, default: True
+)
 ```
 
 ### Execute endpoint
