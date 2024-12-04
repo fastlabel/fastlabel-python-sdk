@@ -4675,6 +4675,39 @@ class Client:
             payload={key: value for key, value in payload.items() if value is not None},
         )
 
+    def execute_auto_annotation_job(
+        self,
+        project: str,
+        model_name: str,
+        update_existing: bool = False,
+        confidence_threshold: float = 0.4,
+        use_tta: bool = False,
+        use_flip: bool = False,
+        processing_speed: Optional[Literal["low", "medium", "high"]] = "low",
+        auto_creation: bool = True,
+    ) -> str:
+        """
+        Execute auto-annotation job.
+
+        project is slug of your project (Required).
+        """
+        endpoint = "auto-annotations"
+        payload = {
+            "project": project,
+            "modelName": model_name,
+            "updateExisting": update_existing,
+            "confidenceThreshold": confidence_threshold,
+            "useTTA": use_tta,
+            "useFlip": use_flip,
+            "processingSpeed": processing_speed,
+            "autoCreation": auto_creation,
+        }
+
+        return self.api.post_request(
+            endpoint,
+            payload={key: value for key, value in payload.items() if value is not None},
+        )
+
     def execute_endpoint(
         self,
         endpoint_name: str,
