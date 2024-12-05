@@ -3459,14 +3459,16 @@ Execute auto-annotation job.
 ```python
 auto_annotation_job = client.execute_auto_annotation_job(
     project="YOUR_PROJECT_SLUG",
-    model_name="computer_vision_object_detection",
+    model_name="Computer Vision - 汎用",
     // If you want to use the built-in model, select the following.
-    - "computer_vision_object_detection"
-    - "computer_vision_face_detection"
-    - "segment_anything"
-    - "segment_anything_2"
-    - "segment_anything_high_quality"
-    // Other built-in models require linkage with annotation classes.
+    // You can choose either Japanese or English name
+    - "Computer Vision - 汎用(General)"
+    - "Computer Vision - 顔(Face)"
+    - "Segment Anything - 汎用(General)"
+    - "Segment Anything 2 - 汎用(General)"
+    - "Segment Anything High Quality - 汎用(General)"
+    // Other built-in models require annotation class mapping.
+    // See: https://fastlabel.notion.site/cf3f006766d742d5ae25ca4200fa19b4
     // If you want to use the custom model, please fill out model name.
     update_existing: False, // optional, default: False
     confidence_threshold: 0.4, // optional, default: 0.4
