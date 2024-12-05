@@ -4675,6 +4675,46 @@ class Client:
             payload={key: value for key, value in payload.items() if value is not None},
         )
 
+    def execute_auto_annotation_job(
+        self,
+        project: str,
+        model_name: str,
+        update_existing: bool = False,
+        confidence_threshold: float = 0.4,
+        use_tta: bool = False,
+        use_flip: bool = False,
+        processing_speed: Optional[Literal["low", "medium", "high"]] = "low",
+        auto_creation: bool = True,
+    ) -> str:
+        """
+        Execute auto-annotation job.
+
+        project is slug of your project (Required).
+        model_name is name of the model (Required). You can choose Japanese or English name.
+        update_existing is whether to update existing annotations (Optional).
+        confidence_threshold is a threshold of confidence (Optional).
+        use_tta is whether to use test time augmentation (Optional).
+        use_flip is whether to use flip augmentation (Optional).
+        processing_speed is a speed of processing. processing_speed can be 'low', 'medium', 'high' (Optional).
+        auto_creation specifies whether to automatically create annotation classes and mappings (Optional).
+        """
+        endpoint = "auto-annotations"
+        payload = {
+            "project": project,
+            "modelName": model_name,
+            "updateExisting": update_existing,
+            "confidenceThreshold": confidence_threshold,
+            "useTTA": use_tta,
+            "useFlip": use_flip,
+            "processingSpeed": processing_speed,
+            "autoCreation": auto_creation,
+        }
+
+        return self.api.post_request(
+            endpoint,
+            payload={key: value for key, value in payload.items() if value is not None},
+        )
+
     def execute_endpoint(
         self,
         endpoint_name: str,
