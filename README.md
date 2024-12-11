@@ -2202,6 +2202,32 @@ The folder structure inside the ZIP file is as follows
         └── 000003.yaml
 ```
 
+### Export Camera Calibration and Image
+```python
+appendix_data = client.get_appendix_data(
+    project="YOUR_PROJECT_SLUG"
+    # option param is filter task
+    status=None,
+    external_status=None,
+    tags=None,
+    task_name=None,
+    offset=None,
+    limit=10000,
+)
+```
+
+Result data
+```
+    [{
+        id: uuid
+        url: image file download url
+        format: calibration format (yml or kitti or None)
+        imageFileName: {task_name}/{content_name}/{image_file_name}
+        calibrationFileName: {task_name}/{content_name}/{yml_or_txt_fileName} or None
+        calibration: Camera calibration data to write to the calibration file
+    },...]
+```
+
 ## Annotation
 
 ### Create Annotation
