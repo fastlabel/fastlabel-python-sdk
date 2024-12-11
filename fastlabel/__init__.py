@@ -4731,6 +4731,7 @@ class Client:
         self,
         project: str,
         model_name: str,
+        algorithm_type: str = None,
         update_existing: bool = False,
         confidence_threshold: float = 0.4,
         use_tta: bool = False,
@@ -4743,6 +4744,7 @@ class Client:
 
         project is slug of your project (Required).
         model_name is name of the model (Required). You can choose Japanese or English name.
+        algorithm_type is used to identify the model. algorithm_type can be 'object_detection' or 'ocr' or 'image_classification'(Optional).
         update_existing is whether to update existing annotations (Optional).
         confidence_threshold is a threshold of confidence (Optional).
         use_tta is whether to use test time augmentation (Optional).
@@ -4754,6 +4756,7 @@ class Client:
         payload = {
             "project": project,
             "modelName": model_name,
+            "algorithmType": algorithm_type,
             "updateExisting": update_existing,
             "confidenceThreshold": confidence_threshold,
             "useTTA": use_tta,

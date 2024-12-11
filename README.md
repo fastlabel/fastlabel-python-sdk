@@ -2203,6 +2203,7 @@ The folder structure inside the ZIP file is as follows
 ```
 
 ### Export Camera Calibration and Image
+
 ```python
 appendix_data = client.get_appendix_data(
     project="YOUR_PROJECT_SLUG"
@@ -2217,6 +2218,7 @@ appendix_data = client.get_appendix_data(
 ```
 
 Result data
+
 ```
     [{
         id: uuid
@@ -3496,6 +3498,7 @@ auto_annotation_job = client.execute_auto_annotation_job(
     // Other built-in models require annotation class mapping.
     // See: https://fastlabel.notion.site/cf3f006766d742d5ae25ca4200fa19b4
     // If you want to use the custom model, please fill out model name.
+    algorithm_type: "object_detection", // optional, "object_detection", "ocr" or "image_classification"
     update_existing: False, // optional, default: False
     confidence_threshold: 0.4, // optional, default: 0.4
     use_tta: False, // optional, default: False
