@@ -3480,6 +3480,55 @@ training_job = client.execute_evaluation_job(
 
 ```
 
+### Get auto-annotation jobs
+
+Get auto-annotation jobs.
+
+```python
+def get_auto_annotation_jobs() -> list[dict]:
+    all_auto_annotation_jobs = []
+    offset = None
+    while True:
+        time.sleep(1)
+
+        auto_annotation_jobs = client.get_auto_annotation_jobs(project="YOUR_PROJECT_SLUG", offset=offset)
+        all_auto_annotation_jobs.extend(auto_annotation_jobs)
+
+        if len(auto_annotation_jobs) > 0:
+            offset = len(all_auto_annotation_jobs)
+        else:
+            break
+    return all_auto_annotation_jobs
+
+```
+
+#### Response
+
+Example of a single auto-annotation job.
+
+```python
+
+[
+    {
+        'audioSeconds': 0,
+        'autoAnnotationType': 'image_bbox',
+        'completedAt': '2024-09-24T03:27:41.000Z',
+        'contentCount': 1000,
+        'createdAt': '2024-09-24T03:14:26.607Z',
+        'duration': 793,
+        'id': 'YOUR_AUTO_ANNOTATION_JOB_ID',
+        'modelName': 'Computer Vision - 汎用',
+        'msgCode': 'none',
+        'status': 'completed',
+        'taskAnnotationCount': 2598,
+        'updatedAt': '2024-09-24T03:27:40.914Z',
+        'userName': 'USER_NAME',
+        'version': 1
+    }
+]
+
+```
+
 ### Execute auto-annotation job
 
 Execute auto-annotation job.
