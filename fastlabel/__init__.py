@@ -4727,6 +4727,37 @@ class Client:
             payload={key: value for key, value in payload.items() if value is not None},
         )
 
+    def get_auto_annotation_jobs(
+        self,
+        project: str,
+        offset: int = None,
+        limit: int = 1000,
+    ) -> list:
+        """
+        Returns a list of auto-annotation jobs.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+        project is slug of your project (Required).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if project is None:
+            raise FastLabelInvalidException(
+                "Project is required.", 422
+            )
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "auto-annotations"
+        params = {"project": project}
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+
+        return self.api.get_request(endpoint, params=params)
+
     def execute_auto_annotation_job(
         self,
         project: str,
