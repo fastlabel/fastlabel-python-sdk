@@ -4742,9 +4742,7 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         if project is None:
-            raise FastLabelInvalidException(
-                "Project is required.", 422
-            )
+            raise FastLabelInvalidException("Project is required.", 422)
         if limit > 1000:
             raise FastLabelInvalidException(
                 "Limit must be less than or equal to 1000.", 422
