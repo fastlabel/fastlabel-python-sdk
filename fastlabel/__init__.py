@@ -2890,7 +2890,10 @@ class Client:
         return results
 
     def convert_yolo_to_fastlabel(
-        self, classes_file_path: str, dataset_folder_path: str, project_type: str,
+        self,
+        classes_file_path: str,
+        dataset_folder_path: str,
+        project_type: str,
     ) -> dict:
         """
         Convert YOLO format to FastLabel format as annotation files.
@@ -2948,7 +2951,7 @@ class Client:
         image_sizes = self.__get_yolo_image_sizes(dataset_folder_path)
         yolo_annotations = self.__get_yolo_format_annotations(dataset_folder_path)
 
-        if (project_type == "segmentation"):
+        if project_type == "segmentation":
             return converters.execute_segmentation_yolo_to_fastlabel(
                 classes,
                 image_sizes,
