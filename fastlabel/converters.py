@@ -478,7 +478,7 @@ def __serialize(value: any) -> any:
 def to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) -> tuple:
     if len(classes) == 0:
         coco = to_coco(project_type=project_type, tasks=tasks, output_dir=output_dir)
-        return __coco2yolo(coco)
+        return __coco2yolo(project_type, coco)
     else:
         return __to_yolo(
             project_type=project_type,
@@ -488,7 +488,7 @@ def to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) -> t
         )
 
 
-def __coco2yolo(coco: dict) -> tuple:
+def __coco2yolo(project_type: str, coco: dict) -> tuple:
     categories = coco["categories"]
 
     annos = []
@@ -498,39 +498,82 @@ def __coco2yolo(coco: dict) -> tuple:
 
         # Get objects
         objs = []
-        for annotation in coco["annotations"]:
-            if image["id"] != annotation["image_id"]:
-                continue
-
-            category_index = "0"
-            for index, category in enumerate(categories):
-                if category["id"] == annotation["category_id"]:
-                    category_index = str(index)
-                    break
-
-            xmin = annotation["bbox"][0]
-            ymin = annotation["bbox"][1]
-            xmax = annotation["bbox"][0] + annotation["bbox"][2]
-            ymax = annotation["bbox"][1] + annotation["bbox"][3]
-
-            x = (xmin + xmax) / 2
-            y = (ymin + ymax) / 2
-            w = xmax - xmin
-            h = ymax - ymin
-
-            x = str(_truncate(x * dw, 7))
-            y = str(_truncate(y * dh, 7))
-            w = str(_truncate(w * dw, 7))
-            h = str(_truncate(h * dh, 7))
-
-            obj = [category_index, x, y, w, h]
-            objs.append(" ".join(obj))
+        if project_type == "image_segmentation":
+            objs = __coco2yolo_segmentation(coco, categories, image, dw, dh)
+        else:
+            objs = __coco2yolo_rect(coco, categories, image, dw, dh)
 
         # get annotation
         anno = {"filename": image["file_name"], "object": objs}
         annos.append(anno)
 
     return annos, categories
+
+
+def __coco2yolo_rect(
+    coco: dict, categories: list, image: dict, dw: float, dh: float
+) -> list[str]:
+    objs = []
+    for annotation in coco["annotations"]:
+        if image["id"] != annotation["image_id"]:
+            continue
+
+        category_index = "0"
+        for index, category in enumerate(categories):
+            if category["id"] == annotation["category_id"]:
+                category_index = str(index)
+                break
+        xmin = annotation["bbox"][0]
+        ymin = annotation["bbox"][1]
+        xmax = annotation["bbox"][0] + annotation["bbox"][2]
+        ymax = annotation["bbox"][1] + annotation["bbox"][3]
+
+        x = (xmin + xmax) / 2
+        y = (ymin + ymax) / 2
+        w = xmax - xmin
+        h = ymax - ymin
+
+        x = str(_truncate(x * dw, 7))
+        y = str(_truncate(y * dh, 7))
+        w = str(_truncate(w * dw, 7))
+        h = str(_truncate(h * dh, 7))
+
+        obj = [category_index, x, y, w, h]
+        objs.append(" ".join(obj))
+        return obj
+
+
+def __coco2yolo_segmentation(
+    coco: dict, categories: list, image: dict, dw: float, dh: float
+) -> list[str]:
+    objs = []
+    for annotation in coco["annotations"]:
+        if image["id"] != annotation["image_id"]:
+            continue
+
+        category_index = "0"
+        for index, category in enumerate(categories):
+            if category["id"] == annotation["category_id"]:
+                category_index = str(index)
+                break
+        # 座標部分を取得
+        for coordinates in annotation["segmentation"]:
+            # 座標を(x, y)のペアに分割し、yoloの小数で表す形式に変換する。
+            yolo_vertices = [
+                {
+                    "x": str(_truncate(coordinates[i] * dw, 7)),
+                    "y": str(_truncate(coordinates[i + 1] * dh, 7)),
+                }
+                for i in range(0, len(coordinates), 2)
+            ]
+
+            # category_index の後に x, yを順番に足していく。
+            obj = [category_index]
+            for v in yolo_vertices:
+                obj.append(v["x"])
+                obj.append(v["y"])
+            objs.append(" ".join(obj))
+    return objs
 
 
 def __to_yolo(project_type: str, tasks: list, classes: list, output_dir: str) -> tuple:
@@ -594,6 +637,7 @@ def __get_yolo_annotation(data: dict) -> dict:
     if (
         annotation_type != AnnotationType.bbox.value
         and annotation_type != AnnotationType.polygon.value
+        and annotation_type != AnnotationType.segmentation.value
     ):
         return None
     if not points or len(points) == 0:
@@ -607,8 +651,36 @@ def __get_yolo_annotation(data: dict) -> dict:
 
     dw = 1.0 / data["width"]
     dh = 1.0 / data["height"]
+    if annotation_type == AnnotationType.segmentation.value:
+        return __segmentation2yolo(value, classes, dw, dh, points)
+    else:
+        bbox = __to_bbox(annotation_type, points)
+        return __bbox2yolo(value, classes, dw, dh, bbox)
 
-    bbox = __to_bbox(annotation_type, points)
+
+def __segmentation2yolo(value: str, classes: list, dw: float, dh: float, points: list):
+    objs = []
+    category_index = str(classes.index(value))
+    for shapes in points:
+        for coordinates in shapes:
+            # 座標を(x, y)のペアに分割し、yoloの小数で表す形式に変換する。
+            yolo_vertices = [
+                {
+                    "x": str(_truncate(coordinates[i] * dw, 7)),
+                    "y": str(_truncate(coordinates[i + 1] * dh, 7)),
+                }
+                for i in range(0, len(coordinates), 2)
+            ]
+            # category_index の後に x, yを順番に足していく。
+            obj = [category_index]
+            for v in yolo_vertices:
+                obj.append(v["x"])
+                obj.append(v["y"])
+            objs.append(" ".join(obj))
+    return objs
+
+
+def __bbox2yolo(value: str, classes: list, dw: float, dh: float, bbox: list):
     xmin = bbox[0]
     ymin = bbox[1]
     xmax = bbox[0] + bbox[2]
@@ -1089,7 +1161,7 @@ def execute_pascalvoc_to_fastlabel(pascalvoc: dict, file_path: str = None) -> tu
     return (file_name, annotations)
 
 
-def execute_yolo_to_fastlabel(
+def execute_bbox_yolo_to_fastlabel(
     classes: dict,
     image_sizes: dict,
     yolo_annotations: dict,
@@ -1125,6 +1197,52 @@ def execute_yolo_to_fastlabel(
                     "value": classs_name,
                     "points": points,
                     "type": AnnotationType.bbox.value,
+                }
+            )
+
+        file_path = (
+            image_sizes[yolo_anno_key]["image_file_path"].replace(
+                os.path.join(*[dataset_folder_path, ""]), ""
+            )
+            if dataset_folder_path
+            else image_sizes[yolo_anno_key]["image_file_path"]
+        )
+        results[file_path] = annotations
+
+    return results
+
+
+def execute_segmentation_yolo_to_fastlabel(
+    classes: dict,
+    image_sizes: dict,
+    yolo_annotations: dict,
+    dataset_folder_path: str = None,
+) -> dict:
+    results = {}
+    for yolo_anno_key in yolo_annotations:
+        annotations = []
+        for each_image_annotation in yolo_annotations[yolo_anno_key]:
+            yolo_class_id = each_image_annotation[0]
+            coordinates = each_image_annotation[1:]
+            image_width, image_height = image_sizes[yolo_anno_key]["size"]
+
+            classs_name = classes[str(yolo_class_id)]
+
+            points = [[[]]]
+            # 座標を(x, y)のペアに分割
+            vertices = [
+                {"x": coordinates[i], "y": coordinates[i + 1]}
+                for i in range(0, len(coordinates), 2)
+            ]
+            for vertice in vertices:
+                points[0][0].append(round(float(image_width) * float(vertice["x"])))
+                points[0][0].append(round(float(image_height) * float(vertice["y"])))
+
+            annotations.append(
+                {
+                    "value": classs_name,
+                    "points": points,
+                    "type": AnnotationType.segmentation.value,
                 }
             )
 

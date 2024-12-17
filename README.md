@@ -2971,6 +2971,7 @@ Support the following annotation types.
 
 - bbox
 - polygon
+- segmentation
 
 Get tasks and export as YOLO format files.
 
@@ -3097,7 +3098,7 @@ for image_file_path in glob.iglob(os.path.join(input_dataset_path, "**/**.jpg"),
 
 ### YOLO To FastLabel
 
-Supported bbox annotation type.
+Supported bbox and segmentation annotation type.
 
 Convert annotation file of YOLO format as a Fastlabel format and create task.
 
