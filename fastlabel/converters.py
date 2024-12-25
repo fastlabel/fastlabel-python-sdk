@@ -540,7 +540,7 @@ def __coco2yolo_rect(
 
         obj = [category_index, x, y, w, h]
         objs.append(" ".join(obj))
-        return obj
+    return objs
 
 
 def __coco2yolo_segmentation(
