@@ -180,7 +180,10 @@ def __get_coco_categories(tasks: list, annotations: list) -> list:
         coco_skeleton = []
         coco_keypoints = []
         coco_keypoint_colors = []
-        if annotation["type"] in [AnnotationType.pose_estimation.value, AnnotationType.bbox.value]:
+        if annotation["type"] in [
+            AnnotationType.pose_estimation.value,
+            AnnotationType.bbox.value,
+        ]:
             keypoints = annotation["keypoints"]
             for keypoint in keypoints:
                 coco_keypoints.append(keypoint["key"])
