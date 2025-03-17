@@ -2956,7 +2956,7 @@ Export with specifying output directory and file name.
 client.export_coco(project="YOUR_PROJECT_SLUG", tasks=tasks, output_dir="YOUR_DIRECTROY", output_file_name="YOUR_FILE_NAME")
 ```
 
-If you would like to export pose estimation type annotations, please pass annotations.
+If you would like to export pose estimation type annotations or bbox type annotations with keypoints, please pass annotations.
 
 ```python
 project_slug = "YOUR_PROJECT_SLUG"

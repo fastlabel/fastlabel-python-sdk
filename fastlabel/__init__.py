@@ -3136,7 +3136,7 @@ class Client:
     ) -> None:
         """
         Convert tasks to COCO format and export as a file.
-        If you pass annotations, you can export Pose Estimation type annotations.
+        If you pass annotations, you can export Pose Estimation type annotations or Bbox type annotations with keypoints.
 
         project is slug of your project (Required).
         tasks is a list of tasks (Required).
