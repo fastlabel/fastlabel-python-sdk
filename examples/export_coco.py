@@ -2,7 +2,7 @@ import fastlabel
 
 client = fastlabel.Client()
 
-project_slug = "issue-9274"
+project_slug = "YOUR_PROJECT_SLUG"
 tasks = client.get_image_tasks(project=project_slug)
 annotations = client.get_annotations(project=project_slug)
 
