@@ -3371,7 +3371,7 @@ Example of two training jobs.
 
 ### Execute training job
 
-Get training jobs.
+Execute training jobs.
 
 ```python
 training_job = client.execute_training_job(
