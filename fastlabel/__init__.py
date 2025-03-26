@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import re
+import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
 from typing import Dict, List, Literal, Optional, Union
@@ -11,7 +12,6 @@ import cv2
 import numpy as np
 import requests
 import xmltodict
-import urllib.parse
 from PIL import Image, ImageColor, ImageDraw
 
 from fastlabel import const, converters, utils
