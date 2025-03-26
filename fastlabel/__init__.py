@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 import requests
 import xmltodict
+import urllib.parse
 from PIL import Image, ImageColor, ImageDraw
 
 from fastlabel import const, converters, utils
@@ -4251,7 +4252,8 @@ class Client:
             raise FastLabelInvalidException(
                 "only use specify one of revisionId or version.", 400
             )
-        endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
+        encoded_object_name = urllib.parse.quote(object_name, safe="")
+        endpoint = "dataset-objects-v2/" + dataset_id + "/objects/" + encoded_object_name
         params = {}
         if revision_id:
             params["revisionId"] = revision_id
@@ -4474,7 +4476,8 @@ class Client:
         """
         Delete a dataset object.
         """
-        endpoint = "datasets-v2/" + dataset_id + "/objects/" + object_name
+        encoded_object_name = urllib.parse.quote(object_name, safe="")
+        endpoint = "dataset-objects-v2/" + dataset_id + "/objects/" + encoded_object_name
         self.api.delete_request(endpoint)
 
     def update_aws_s3_storage(
