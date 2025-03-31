@@ -4254,7 +4254,10 @@ class Client:
             )
         encoded_object_name = urllib.parse.quote(object_name, safe="")
         endpoint = (
-            "dataset-objects-v2/" + dataset_id + "/objects/" + encoded_object_name
+            "dataset-revision-objects/datasets/"
+            + dataset_id
+            + "/objects/"
+            + encoded_object_name
         )
         params = {}
         if revision_id:
@@ -4283,10 +4286,10 @@ class Client:
         revision_id is dataset rebision (Optional).
         Only use specify one of revision_id or version.
         """
-        endpoint = "dataset-objects-v2"
+        endpoint = "dataset-revision-objects"
         types = [DatasetObjectType.create(type_) for type_ in types or []]
         params = self._prepare_params(
-            dataset=dataset,
+            dataset_name=dataset,
             version=version,
             tags=tags,
             licenses=licenses,
@@ -4299,7 +4302,7 @@ class Client:
 
     def _prepare_params(
         self,
-        dataset: str,
+        dataset_name: str,
         offset: int,
         limit: int,
         version: str,
@@ -4317,7 +4320,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         params: DatasetObjectGetQuery = {
-            "dataset": dataset,
+            "datasetName": dataset_name,
             "offset": offset,
             "limit": limit,
         }
@@ -4345,10 +4348,10 @@ class Client:
         offset: int = 0,
         limit: int = 1000,
     ):
-        endpoint = "dataset-objects-v2/signed-urls"
+        endpoint = "dataset-revision-objects/signed-urls"
         types = [DatasetObjectType.create(type_) for type_ in types or []]
         params = self._prepare_params(
-            dataset=dataset,
+            dataset_name=dataset,
             offset=offset,
             limit=limit,
             version=version,
@@ -4433,14 +4436,14 @@ class Client:
         """
         tags = tags or []
         annotations = annotations or []
-        endpoint = "dataset-objects-v2"
+        endpoint = "dataset-revision-objects"
         if not utils.is_object_supported_size(file_path):
             raise FastLabelInvalidException(
                 "Supported object size is under 250 MB.", 422
             )
         payload = {
-            "dataset": dataset,
-            "name": name,
+            "datasetName": dataset,
+            "objectName": name,
             "filePath": utils.base64_encode(file_path),
         }
         if tags:
@@ -4462,7 +4465,7 @@ class Client:
         annotations: Optional[List[dict]] = None,
         custom_metadata: Optional[dict] = None,
     ) -> dict:
-        endpoint = "dataset-objects-v2"
+        endpoint = "dataset-revision-objects"
         payload = {"datasetId": dataset_id, "objectName": object_name}
         if tags is not None:
             payload["tags"] = tags
@@ -4480,7 +4483,10 @@ class Client:
         """
         encoded_object_name = urllib.parse.quote(object_name, safe="")
         endpoint = (
-            "dataset-objects-v2/" + dataset_id + "/objects/" + encoded_object_name
+            "dataset-revision-objects/datasets/"
+            + dataset_id
+            + "/objects/"
+            + encoded_object_name
         )
         self.api.delete_request(endpoint)
 
