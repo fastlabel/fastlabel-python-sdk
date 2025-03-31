@@ -4254,7 +4254,10 @@ class Client:
             )
         encoded_object_name = urllib.parse.quote(object_name, safe="")
         endpoint = (
-            "dataset-revision-objects/datasets/" + dataset_id + "/objects/" + encoded_object_name
+            "dataset-revision-objects/datasets/"
+            + dataset_id
+            + "/objects/"
+            + encoded_object_name
         )
         params = {}
         if revision_id:
@@ -4480,7 +4483,10 @@ class Client:
         """
         encoded_object_name = urllib.parse.quote(object_name, safe="")
         endpoint = (
-            "dataset-revision-objects/datasets/" + dataset_id + "/objects/" + encoded_object_name
+            "dataset-revision-objects/datasets/"
+            + dataset_id
+            + "/objects/"
+            + encoded_object_name
         )
         self.api.delete_request(endpoint)
 
