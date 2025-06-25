@@ -4113,7 +4113,13 @@ class Client:
         endpoint = "projects/copy"
         return self.api.post_request(endpoint, payload=payload)
 
-    def update_project_metadata(self, project_id: str, external_code_1: str | None, external_code_2: str | None, external_code_3: str | None) -> dict:
+    def update_project_metadata(
+        self,
+        project_id: str,
+        external_code_1: str | None,
+        external_code_2: str | None,
+        external_code_3: str | None,
+    ) -> dict:
         """
         Update project metadata.
 
@@ -4130,7 +4136,6 @@ class Client:
             "externalCode3": external_code_3,
         }
         return self.api.put_request(endpoint, payload=payload)
-
 
     # Tags
 
