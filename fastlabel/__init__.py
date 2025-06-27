@@ -4116,10 +4116,10 @@ class Client:
     def update_project_metadata(
         self,
         project_id: str,
-        external_code_1: str | None,
-        external_code_2: str | None,
-        external_code_3: str | None,
-    ) -> dict:
+        external_code_1: Optional[str],
+        external_code_2: Optional[str],
+        external_code_3: Optional[str],
+    ) -> str:
         """
         Update project metadata.
 
