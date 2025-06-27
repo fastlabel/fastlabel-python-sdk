@@ -2534,6 +2534,19 @@ Copy a project.
 project_id = client.copy_project(project_id="YOUR_PROJECT_ID")
 ```
 
+### Update Project Metadata
+
+Update a project metadata.
+
+```python
+project_metadata_id = client.update_project_metadata(
+  project_id="YOUR_PROJECT_ID",
+  external_code_1="ExternalCode1",
+  external_code_2="ExternalCode2",
+  external_code_3=None
+)
+```
+
 ## Tags
 
 ### Get Tags

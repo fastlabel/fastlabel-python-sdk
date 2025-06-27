@@ -4113,6 +4113,30 @@ class Client:
         endpoint = "projects/copy"
         return self.api.post_request(endpoint, payload=payload)
 
+    def update_project_metadata(
+        self,
+        project_id: str,
+        external_code_1: Optional[str],
+        external_code_2: Optional[str],
+        external_code_3: Optional[str],
+    ) -> str:
+        """
+        Update project metadata.
+
+        project_id is an id of the project (Required).
+        external_code_1 is a code for external identification.
+        external_code_2 is a code for external identification.
+        external_code_3 is a code for external identification.
+
+        """
+        endpoint = "projects/" + project_id + "/metadata"
+        payload = {
+            "externalCode1": external_code_1,
+            "externalCode2": external_code_2,
+            "externalCode3": external_code_3,
+        }
+        return self.api.put_request(endpoint, payload=payload)
+
     # Tags
 
     def get_tags(
