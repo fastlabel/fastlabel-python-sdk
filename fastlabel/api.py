@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import Optional, Union
 
 import requests
 
@@ -11,12 +11,13 @@ class Api:
 
     access_token = None
 
-    def __init__(self):
-        if os.environ.get("FASTLABEL_API_URL"):
-            self.base_url = os.environ.get("FASTLABEL_API_URL")
-        if not os.environ.get("FASTLABEL_ACCESS_TOKEN"):
+    def __init__(self, access_token: Optional[str] = None):
+        if api_url := os.environ.get("FASTLABEL_API_URL"):
+            self.base_url = api_url
+        access_token = access_token or os.environ.get("FASTLABEL_ACCESS_TOKEN")
+        if not access_token:
             raise ValueError("FASTLABEL_ACCESS_TOKEN is not configured.")
-        self.access_token = "Bearer " + os.environ.get("FASTLABEL_ACCESS_TOKEN")
+        self.access_token = "Bearer " + access_token
 
     def get_request(self, endpoint: str, params=None) -> Union[dict, list]:
         """Makes a get request to an endpoint.

@@ -41,8 +41,8 @@ logging.basicConfig(
 class Client:
     api = None
 
-    def __init__(self):
-        self.api = Api()
+    def __init__(self, access_token: Optional[str] = None):
+        self.api = Api(access_token=access_token)
 
     # Task Find
 

@@ -61,6 +61,13 @@ import fastlabel
 client = fastlabel.Client()
 ```
 
+Or initialize with API Key directly.
+
+```python
+import fastlabel
+client = fastlabel.Client("YOUR_ACCESS_TOKEN")
+```
+
 ### Limitation
 
 API is allowed to call 10000 times per 10 minutes. If you create/delete a large size of tasks, please wait a second for every requests.
