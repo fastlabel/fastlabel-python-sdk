@@ -656,9 +656,22 @@ def __get_yolo_annotation(data: dict) -> dict:
     dh = 1.0 / data["height"]
     if annotation_type == AnnotationType.segmentation.value:
         return __segmentation2yolo(value, classes, dw, dh, points)
+    elif annotation_type == AnnotationType.polygon.value:
+        return _polygon2yolo(value, classes, dw, dh, points)
     else:
         bbox = __to_bbox(annotation_type, points)
         return __bbox2yolo(value, classes, dw, dh, bbox)
+
+
+def _polygon2yolo(value: str, classes: list, dw: float, dh: float, points: list):
+    category_index = str(classes.index(value))
+    # polygon の points は [x1, y1, x2, y2, ...] の形式
+    # 各座標を正規化して一つのリストにまとめる
+    normalized_coords = [
+        str(_truncate(points[i] * (dw if i % 2 == 0 else dh), 7))
+        for i in range(len(points))
+    ]
+    return [" ".join([category_index] + normalized_coords)]
 
 
 def __segmentation2yolo(value: str, classes: list, dw: float, dh: float, points: list):
