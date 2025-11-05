@@ -1975,6 +1975,54 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def create_task_without_content(
+        self,
+        project: str,
+        name: str,
+        status: str | None = None,
+        external_status: str | None = None,
+        priority: Priority | None = None,
+        tags: list[str] = [],
+        **kwargs,
+    ) -> str:
+        """
+        Create a single task without content.
+        Currently only supports robotics projects.
+
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/without-content"
+
+        payload = {"project": project, "name": name}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
+        if tags:
+            payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
     def import_appendix_file(
         self,
         project: str,
