@@ -1975,7 +1975,7 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
-    def create_task_without_content(
+    def create_robotics_task(
         self,
         project: str,
         name: str,
@@ -1986,8 +1986,7 @@ class Client:
         **kwargs,
     ) -> str:
         """
-        Create a single task without content.
-        Currently only supports robotics projects.
+        Create a single robotics task without content.
 
         project is slug of your project (Required).
         name is an unique identifier of task in your project (Required).
@@ -2007,7 +2006,7 @@ class Client:
         external_reviewer is slug of external review user (Optional).
         external_approver is slug of external approve user (Optional).
         """
-        endpoint = "tasks/without-content"
+        endpoint = "tasks/robotics"
 
         payload = {"project": project, "name": name}
         if status:

@@ -19,6 +19,7 @@
   - [PCD](#pcd)
   - [Sequential PCD](#sequential-pcd)
   - [DICOM](#dicom)
+  - [Robotics](#robotics)
   - [Common](#common)
 - [Appendix](#appendix)
 - [Annotation](#annotation)
@@ -2064,7 +2065,7 @@ Example of a single dicom task object
 }
 ```
 
-### Task without Content
+### Robotics
 
 Supported following project types:
 
@@ -2072,10 +2073,10 @@ Supported following project types:
 
 #### Create Tasks
 
-Create a new task.
+Create a new task (Content creation is required separately).
 
 ```python
-task_id = client.create_task_without_content(
+task_id = client.create_robotics_task(
     project="YOUR_PROJECT_SLUG",
     name="TASK_NAME",
 )
