@@ -2064,6 +2064,23 @@ Example of a single dicom task object
 }
 ```
 
+### Task without Content
+
+Supported following project types:
+
+- Robotics - Task Classification
+
+#### Create Tasks
+
+Create a new task.
+
+```python
+task_id = client.create_task_without_content(
+    project="YOUR_PROJECT_SLUG",
+    name="TASK_NAME",
+)
+```
+
 ### Common
 
 APIs for update and delete and count are same over all tasks.
