@@ -1979,10 +1979,10 @@ class Client:
         self,
         project: str,
         name: str,
-        status: str | None = None,
-        external_status: str | None = None,
-        priority: Priority | None = None,
-        tags: list[str] = [],
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
+        tags: Optional[list[str]] = None,
         **kwargs,
     ) -> str:
         """
@@ -2016,7 +2016,7 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if tags:
-            payload["tags"] = tags
+            payload["tags"] = tags or []
 
         self.__fill_assign_users(payload, **kwargs)
 
