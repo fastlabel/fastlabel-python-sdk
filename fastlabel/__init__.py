@@ -4149,16 +4149,12 @@ class Client:
         project is the slug of the project (Required).
         email is the email address of the user (Required).
         role is the role of the user in the project (Required).
-        role can be 'annotator', 'reviewer', 'owner', 
-        'external_annotator', 'external_reviewer', 'external_approver', 
+        role can be 'annotator', 'reviewer', 'owner',
+        'external_annotator', 'external_reviewer', 'external_approver',
         'external_sub_owner', 'external_owner', or 'none' to remove user from project.
         """
         endpoint = "projects-users"
-        payload = {
-            "project": project,
-            "email": email,
-            "role": role
-        }
+        payload = {"project": project, "email": email, "role": role}
         return self.api.put_request(endpoint, payload=payload)
 
     # Tags
@@ -4704,9 +4700,11 @@ class Client:
             "learningRate": learning_rate,
             "resizeOption": resize_option,
             "resizeDimension": resize_dimension,
-            "configFile": utils.base64_encode(str(config_file_path))
-            if config_file_path is not None
-            else None,
+            "configFile": (
+                utils.base64_encode(str(config_file_path))
+                if config_file_path is not None
+                else None
+            ),
         }
         if annotation_value:
             payload["annotationValue"] = annotation_value

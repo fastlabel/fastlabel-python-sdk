@@ -27,7 +27,7 @@ def mask_to_polygon(mask_image: Union[str, np.ndarray]) -> list[list[list[int]]]
 
 
 def mask_to_segmentation(
-    mask_image: Union[str, np.ndarray, Mat, UMat, Image]
+    mask_image: Union[str, np.ndarray, Mat, UMat, Image],
 ) -> list[list[list[int]]]:
     if isinstance(mask_image, str):
         mask_image_path = mask_image
