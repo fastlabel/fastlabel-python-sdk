@@ -2547,6 +2547,32 @@ project_metadata_id = client.update_project_metadata(
 )
 ```
 
+### Update Project User Permission
+
+Update or assign user permissions for a project.
+
+```python
+# Add or update user permission
+result = client.update_project_user_permission(
+  project="YOUR_PROJECT_SLUG",
+  email="user@example.com",
+  role="annotator"
+)
+
+# Remove user from project
+result = client.update_project_user_permission(
+  project="YOUR_PROJECT_SLUG",
+  email="user@example.com",
+  role="none"
+)
+```
+
+Available roles:
+- `annotator`: Annotator
+- `reviewer`: Reviewer  
+- `owner`: Project owner
+- `none`: Remove user from project
+
 ## Tags
 
 ### Get Tags
