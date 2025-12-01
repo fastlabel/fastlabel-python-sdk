@@ -2082,6 +2082,17 @@ task_id = client.create_robotics_task(
 )
 ```
 
+#### Import Contents
+
+Import contents zip file
+
+```python
+history = client.import_robotics_contents_file(
+    project="YOUR_PROJECT_SLUG",
+    file_path="ZIP_FILE_PATH",
+)
+```
+
 ### Common
 
 APIs for update and delete and count are same over all tasks.
