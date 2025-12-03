@@ -19,6 +19,7 @@
   - [PCD](#pcd)
   - [Sequential PCD](#sequential-pcd)
   - [DICOM](#dicom)
+  - [Robotics](#robotics)
   - [Common](#common)
 - [Appendix](#appendix)
 - [Annotation](#annotation)
@@ -2062,6 +2063,23 @@ Example of a single dicom task object
     "createdAt": "2021-02-22T11:25:27.158Z",
     "updatedAt": "2021-02-22T11:25:27.158Z"
 }
+```
+
+### Robotics
+
+Supported following project types:
+
+- Robotics - Task Classification
+
+#### Create Tasks
+
+Create a new task (Content creation is required separately).
+
+```python
+task_id = client.create_robotics_task(
+    project="YOUR_PROJECT_SLUG",
+    name="TASK_NAME",
+)
 ```
 
 ### Common
