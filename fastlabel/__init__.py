@@ -2100,6 +2100,43 @@ class Client:
 
         return self.api.get_request(endpoint, params=params)
 
+    def get_task_appendix_data(
+        self,
+        project: str,
+        task_name: Optional[str] = None,
+        offset: Optional[int] = None,
+        limit: int = 10000,
+    ) -> list:
+        """
+        Returns a list of appendixes urls and params.
+        params = {
+            id: uuid,
+            url: image file url,
+            name: {task_name}/{content_name}/{file_name},
+            format: yml or kitti or none,
+            calibration: calibration data,
+        }
+
+        project is slug of your project (Required).
+        task_name is a task name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 10000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 10000.", 422
+            )
+        endpoint = "tasks/appendix"
+        params = {"project": project}
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+
+        return self.api.get_request(endpoint, params=params)
+
     def import_robotics_contents_file(
         self,
         project: str,

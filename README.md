@@ -2133,6 +2133,31 @@ client.delete_task_annotations(task_id="YOUR_TASK_ID")
 id_name_map = client.get_task_id_name_map(project="YOUR_PROJECT_SLUG")
 ```
 
+#### Get Task Appendix Data
+
+Get appendix data (URLs and parameters) for tasks.
+
+```python
+appendix_data = client.get_task_appendix_data(project="YOUR_PROJECT_SLUG")
+```
+
+Filter by task name:
+
+```python
+appendix_data = client.get_task_appendix_data(
+    project="YOUR_PROJECT_SLUG",
+    task_name="YOUR_TASK_NAME"
+)
+```
+
+Response includes:
+
+- `id`: UUID of the appendix
+- `url`: Image file URL
+- `name`: Format is `{task_name}/{content_name}/{file_name}`
+- `format`: `yml`, `kitti`, or `none`
+- `calibration`: Calibration data
+
 #### Count Task
 
 ```python
