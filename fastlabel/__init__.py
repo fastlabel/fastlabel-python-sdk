@@ -1975,6 +1975,53 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def create_robotics_task(
+        self,
+        project: str,
+        name: str,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
+        tags: Optional[list[str]] = None,
+        **kwargs,
+    ) -> str:
+        """
+        Create a single robotics task without content.
+
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
+        tags is a list of tag to be set in advance (Optional).
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/robotics"
+
+        payload = {"project": project, "name": name}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
+        if tags:
+            payload["tags"] = tags or []
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
     def import_appendix_file(
         self,
         project: str,
@@ -2089,6 +2136,32 @@ class Client:
             params["limit"] = limit
 
         return self.api.get_request(endpoint, params=params)
+
+    def import_robotics_contents_file(
+        self,
+        project: str,
+        file_path: str,
+    ) -> list:
+        """
+        Import robotics contents file zip.
+            project is slug of your project (Required).
+            file_path is a path to data. Supported extensions are zip (Required).
+        """
+
+        if not utils.is_robotics_contents_supported_ext(file_path):
+            raise FastLabelInvalidException("Supported extensions are zip.", 422)
+
+        endpoint = "contents/imports/robotics-contents/batch"
+        payload = {"project": project}
+        signed_url = self.__get_signed_path(
+            project=project,
+            file_name=os.path.basename(file_path),
+            file_type="application/zip",
+        )
+        self.api.upload_zipfile(url=signed_url["url"], file_path=file_path)
+        payload["fileKey"] = signed_url["name"]
+
+        return self.api.post_request(endpoint, payload=payload)
 
     # Task Update
 
