@@ -2528,10 +2528,18 @@ client.delete_project(project_id="YOUR_PROJECT_ID")
 
 ### Copy Project
 
-Copy a project.
+Copy a project. You can optionally specify a custom name and slug for the copied project.
 
 ```python
+# Copy project with default name/slug
 project_id = client.copy_project(project_id="YOUR_PROJECT_ID")
+
+# Copy project with custom name and slug
+project_id = client.copy_project(
+    project_id="YOUR_PROJECT_ID",
+    project_name="Custom Project Name",
+    project_slug="custom-project-slug"
+)
 ```
 
 ### Update Project Metadata

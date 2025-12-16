@@ -4105,13 +4105,25 @@ class Client:
         endpoint = "projects/" + project_id
         self.api.delete_request(endpoint)
 
-    def copy_project(self, project_id: str) -> None:
+    def copy_project(
+        self,
+        project_id: str,
+        project_name: Optional[str] = None,
+        project_slug: Optional[str] = None,
+    ) -> None:
         """
         Copy a project.
         """
-        payload = {"id": project_id}
         endpoint = "projects/copy"
-        return self.api.post_request(endpoint, payload=payload)
+        payload = {"id": project_id}
+        if project_name:
+            payload["name"] = project_name
+        if project_slug:
+            payload["slug"] = project_slug
+        return self.api.post_request(
+            endpoint,
+            payload=payload,
+        )
 
     def update_project_metadata(
         self,
