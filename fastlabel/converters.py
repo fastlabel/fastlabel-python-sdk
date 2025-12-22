@@ -34,9 +34,6 @@ def to_coco(
     annotation_id = 0
     image_index = 0
     for task in tasks:
-        if task["height"] == 0 or task["width"] == 0:
-            continue
-
         if is_video_project_type(project_type):
             image_file_names = _export_image_files_for_video_task(
                 task, str((Path(output_dir) / "images").resolve())
@@ -726,9 +723,6 @@ def _truncate(n, decimals=0) -> float:
 def to_pascalvoc(project_type: str, tasks: list, output_dir: str) -> list:
     pascalvoc = []
     for task in tasks:
-        if task["height"] == 0 or task["width"] == 0:
-            continue
-
         if is_video_project_type(project_type):
             image_file_names = _export_image_files_for_video_task(
                 task, str((Path(output_dir) / "images").resolve())
