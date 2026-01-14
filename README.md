@@ -23,6 +23,7 @@
   - [Common](#common)
 - [Appendix](#appendix)
 - [Annotation](#annotation)
+- [Metadata](#metadata)
 - [Project](#project)
 - [Dataset](#dataset)
 - [Converter](#converter)
@@ -2512,6 +2513,35 @@ Delete an annotation.
 client.delete_annotation(annotation_id="YOUR_ANNOTATION_ID")
 ```
 
+## Metadata
+
+### Get Metadatas
+
+Get metadatas. (Up to 1000 metadatas)
+
+```python
+metadatas = client.get_metadatas(project="YOUR_PROJECT_SLUG")
+```
+
+### Response
+
+Example of a metadata object
+
+```python
+{
+    "id": "YOUR_METADATA_ID",
+    "key": "YOUR_METADATA_KEY",
+    "type": "text",
+    "options": [],
+    "defaultValue": "",
+    "order": 1,
+    "isAdmin": True,
+    "isRequired": False,
+    "createdAt": "2021-04-20T03:20:41.427Z",
+    "updatedAt": "2021-04-20T03:20:41.427Z",
+}
+```
+
 ## Project
 
 ### Create Project
@@ -2622,8 +2652,9 @@ result = client.update_project_user_permission(
 ```
 
 Available roles:
+
 - `annotator`: Annotator
-- `reviewer`: Reviewer  
+- `reviewer`: Reviewer
 - `owner`: Project owner
 - `none`: Remove user from project
 

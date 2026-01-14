@@ -4017,6 +4017,35 @@ class Client:
         endpoint = "annotations/" + annotation_id
         self.api.delete_request(endpoint)
 
+    # Metadata
+
+    def get_metadatas(
+        self,
+        project: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        """
+        Returns a list of metadatas.
+        Returns up to 1000 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        project is slug of your project (Required).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "metadatas"
+        params = {"project": project}
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
     # Project
 
     def find_project(self, project_id: str) -> dict:
