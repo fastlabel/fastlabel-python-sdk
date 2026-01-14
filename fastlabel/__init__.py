@@ -955,6 +955,7 @@ class Client:
         priority: Priority = None,
         annotations: list = [],
         tags: list = [],
+        metadatas: list = [],
         is_delete_exif: bool = False,
         **kwargs,
     ) -> str:
@@ -978,6 +979,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -1008,6 +1011,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
         if is_delete_exif:
             payload["isDeleteExif"] = is_delete_exif
         if custom_task_status:
@@ -1026,6 +1031,7 @@ class Client:
         external_status: str = None,
         annotations: list = None,
         tags: list = None,
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -1040,6 +1046,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -1068,6 +1076,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1299,6 +1309,7 @@ class Client:
         priority: Priority = None,
         annotations: list = [],
         tags: list = [],
+        metadatas: list = [],
         is_delete_exif: bool = False,
         **kwargs,
     ) -> str:
@@ -1322,6 +1333,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -1375,6 +1388,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
         if is_delete_exif:
             payload["isDeleteExif"] = is_delete_exif
 
@@ -1392,6 +1407,7 @@ class Client:
         priority: Priority = None,
         annotations: list = [],
         tags: list = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -1412,6 +1428,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -1446,6 +1464,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1528,6 +1548,7 @@ class Client:
         priority: Priority = None,
         annotations: list = [],
         tags: list = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -1548,6 +1569,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -1575,6 +1598,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1650,6 +1675,7 @@ class Client:
         priority: Priority = None,
         annotations: list = [],
         tags: list = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -1670,6 +1696,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -1701,6 +1729,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1777,6 +1807,7 @@ class Client:
         status: str = None,
         external_status: str = None,
         tags: list = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -1790,6 +1821,8 @@ class Client:
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -1810,6 +1843,8 @@ class Client:
             payload["externalStatus"] = external_status
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1833,6 +1868,7 @@ class Client:
         priority: Priority = None,
         annotations: list = [],
         tags: list = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -1853,6 +1889,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -1880,6 +1918,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -1895,6 +1935,7 @@ class Client:
         priority: Priority = None,
         annotations: list = [],
         tags: list = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -1917,6 +1958,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         annotations is a list of annotation to be set in advance (Optional).
         tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -1970,6 +2013,8 @@ class Client:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2172,6 +2217,7 @@ class Client:
         external_status: str = None,
         priority: Priority = None,
         tags: list = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -2189,6 +2235,8 @@ class Client:
             high = 30,
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -2206,6 +2254,8 @@ class Client:
             payload["priority"] = priority
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2221,6 +2271,7 @@ class Client:
         tags: list = [],
         annotations: List[dict] = [],
         relations: Optional[List[dict]] = None,
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -2242,6 +2293,8 @@ class Client:
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
         relations is a list of annotation relations to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -2270,6 +2323,8 @@ class Client:
             payload["relations"] = relations
         if custom_task_status:
             payload["customTaskStatus"] = custom_task_status
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2383,6 +2438,7 @@ class Client:
         priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -2401,6 +2457,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -2420,6 +2478,8 @@ class Client:
             payload["tags"] = tags
         if annotations:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2433,6 +2493,7 @@ class Client:
         priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -2451,6 +2512,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -2472,6 +2535,8 @@ class Client:
             for annotation in annotations:
                 annotation["content"] = ""
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2535,6 +2600,7 @@ class Client:
         priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -2553,6 +2619,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -2574,6 +2642,8 @@ class Client:
             for annotation in annotations:
                 annotation["content"] = ""
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2637,6 +2707,7 @@ class Client:
         priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -2655,6 +2726,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -2676,6 +2749,8 @@ class Client:
             for annotation in annotations:
                 annotation["content"] = ""
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2739,6 +2814,7 @@ class Client:
         priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -2757,6 +2833,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -2780,6 +2858,8 @@ class Client:
                 # the content will be filled on the server side.
                 annotation["content"] = ""
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -2793,6 +2873,7 @@ class Client:
         priority: Priority = None,
         tags: list = [],
         annotations: List[dict] = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -2811,6 +2892,8 @@ class Client:
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
         annotations is a list of annotation to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -2834,6 +2917,8 @@ class Client:
                 # the content will be filled on the server side.
                 annotation["content"] = ""
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
@@ -4072,6 +4157,7 @@ class Client:
         status: str = None,
         external_status: str = None,
         tags: list = [],
+        metadatas: list = [],
         **kwargs,
     ) -> str:
         """
@@ -4083,6 +4169,8 @@ class Client:
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
         'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
         tags is a list of tag to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -4098,6 +4186,8 @@ class Client:
             payload["externalStatus"] = external_status
         if tags:
             payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
