@@ -152,10 +152,10 @@ task_id = client.create_integrated_image_task(
 )
 ```
 
-Create a new task with pre-defined annotations. (Class should be configured on your project in advance)
+Create a new task with pre-defined annotations and metadatas. (Class and metadata should be configured on your project in advance)
 
 ```python
-task_id = client.create_image_task(
+task_id = client.create_integrated_image_task(
     project="YOUR_PROJECT_SLUG",
     file_path="<integrated-storage-dir>/sample.jpg",
     storage_type="gcp",
@@ -174,7 +174,13 @@ task_id = client.create_image_task(
             200,  # bottom-right x
             200   # bottom-right y
         ]
-    }]
+    }],
+    metadatas=[  # (optional) pre-defined metadata key-value pairs
+        {
+            "key": "metadata_key",
+            "value": "some_value"
+        }
+    ]
 )
 ```
 
@@ -748,7 +754,13 @@ task = client.create_sequential_image_task(
             100,
             100
         ]]] # clockwise rotation
-    }]
+    }],
+    metadatas=[  # (optional) pre-defined metadata key-value pairs
+        {
+            "key": "metadata_key",
+            "value": "some_value"
+        }
+    ]
 )
 ```
 
@@ -800,6 +812,12 @@ task_id = client.update_sequential_image_task(
                 { "key": "key", "value": "value1" }
             ],
             "points": [990, 560, 980, 550]
+        }
+    ],
+    metadatas=[  # (optional) metadata key-value pairs
+        {
+            "key": "metadata_key",
+            "value": "metadata_value"
         }
     ]
 )
@@ -1877,6 +1895,12 @@ task_id = client.create_sequential_pcd_task(
                 },
             },
         },
+    ],
+    metadatas=[  # (optional) pre-defined metadata key-value pairs
+        {
+            "key": "metadata_key",
+            "value": "some_value"
+        }
     ]
 )
 ```
@@ -1953,6 +1977,12 @@ task_id = client.update_sequential_pcd_task(
                 },
             },
         },
+    ],
+    metadatas=[  # (optional) metadata key-value pairs
+        {
+            "key": "metadata_key",
+            "value": "metadata_value"
+        }
     ]
 )
 ```
@@ -2049,7 +2079,13 @@ Once you receive the status completed, you can get the task.
 ```python
 history = client.create_dicom_task(
     project="YOUR_PROJECT_SLUG",
-    file_path="./sample.zip"
+    file_path="./sample.zip",
+    metadatas=[  # (optional) pre-defined metadata key-value pairs
+        {
+            "key": "metadata_key",
+            "value": "some_value"
+        }
+    ]
 )
 ```
 
@@ -2088,7 +2124,13 @@ task_id = client.update_dicom_task(
     task_id="YOUR_TASK_ID",
     status="approved",
     assignee="USER_SLUG",
-    tags=["tag1", "tag2"]
+    tags=["tag1", "tag2"],
+    metadatas=[  # (optional) metadata key-value pairs
+        {
+            "key": "metadata_key",
+            "value": "metadata_value"
+        }
+    ]
 )
 ```
 
@@ -2140,6 +2182,12 @@ Create a new task (Content creation is required separately).
 task_id = client.create_robotics_task(
     project="YOUR_PROJECT_SLUG",
     name="TASK_NAME",
+    metadatas=[  # (optional) pre-defined metadata key-value pairs
+        {
+            "key": "metadata_key",
+            "value": "some_value"
+        }
+    ]
 )
 ```
 
