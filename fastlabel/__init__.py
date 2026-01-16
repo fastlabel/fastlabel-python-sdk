@@ -2028,6 +2028,7 @@ class Client:
         external_status: Optional[str] = None,
         priority: Optional[Priority] = None,
         tags: Optional[list[str]] = None,
+        metadatas: Optional[list] = None,
         **kwargs,
     ) -> str:
         """
@@ -2044,6 +2045,8 @@ class Client:
             medium = 20,
             high = 30,
         tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
         reviewer is slug of review user (Optional).
         approver is slug of approve user (Optional).
@@ -2062,6 +2065,8 @@ class Client:
             payload["priority"] = priority
         if tags:
             payload["tags"] = tags or []
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
