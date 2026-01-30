@@ -1,7 +1,7 @@
 # FastLabel Python SDK
 
 ## Table of Contents
-
+- [API docs](#api-docs)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Limitation](#limitation)
@@ -39,6 +39,10 @@
   - [Mask To FastLabel Segmentation Points](#mask-to-fastlabel-segmentation-points)
 - [Model](#model)
 - [API Docs](#api-docs)
+
+## API docs
+
+https://api.fastlabel.ai/docs
 
 ## Installation
 
