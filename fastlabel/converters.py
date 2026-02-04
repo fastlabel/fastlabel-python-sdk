@@ -5,10 +5,12 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from datetime import datetime
 from decimal import Decimal
+from logging import Logger
 from operator import itemgetter
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
+from xml.etree import ElementTree as ET
 
 import cv2
 import geojson
@@ -978,6 +980,204 @@ def __remove_duplicated_coordinates(points: List[int]) -> List[int]:
                 new_points.append(points[i * 2])
                 new_points.append(points[i * 2 + 1])
     return new_points
+
+
+class CvatConverter:
+    CVAT_VERSION = "1.1"
+    _ANNOTATION_BUILDERS = {
+        "bbox": "_add_bbox",
+        "polygon": "_add_polygon",
+        "polyline": "_add_polyline",
+        "keypoint": "_add_keypoints",
+        "line": "_add_line",
+        "segmentation": "_add_segmentation",
+    }
+
+    def __init__(
+        self,
+        logger: Logger,
+    ) -> None:
+        self.logger = logger
+
+    def tasks_to_cvat(self, tasks: Iterable[dict]) -> ET.Element:
+        """Convert FastLabel tasks to CVAT XML format.
+
+        tasks schema (dict):
+        - task: {
+            "name": str,
+            "width": int,
+            "height": int,
+            "annotations": [annotation, ...]
+          }
+        - annotation: {
+            "id": str,
+            "title": str | None,
+            "type": str,            # bbox / polygon / polyline / keypoint / line / segmentation
+            "value": str,
+            "points": Any,
+            "attributes": [{"name": str, "value": Any}, ...],
+            "rotation": float | None (optional, bbox only)
+          }
+
+        returns:
+        - root: <annotations>...</annotations>
+
+        XML outline:
+        <annotations>
+            <version>1.1</version>
+            <image ...>
+                <box ...>
+                    <attribute name="...">...</attribute>
+                </box>
+            </image>
+        </annotations>
+        """
+        root = ET.Element("annotations")
+        self._make_tag(root, "version", CvatConverter.CVAT_VERSION)
+
+        for index, task in enumerate(tasks):
+            image = self._make_tag(
+                root,
+                "image",
+                attrib={
+                    "id": index,
+                    "name": task["name"].replace("/", "_"),
+                    "width": task["width"],
+                    "height": task["height"],
+                },
+            )
+            for annotation in task["annotations"]:
+                elems: list[ET.Element] = []
+                try:
+                    fl_type = annotation["type"]
+                    if fl_type not in self._ANNOTATION_BUILDERS:
+                        raise ValueError(
+                            f"Unsupported fastLabel annotation type: {annotation['type']}"
+                        )
+                    builder = getattr(self, self._ANNOTATION_BUILDERS[fl_type])
+                    elems = builder(image, annotation)
+
+                    for elem in elems:
+                        for attr in annotation["attributes"]:
+                            self._make_tag(
+                                elem,
+                                "attribute",
+                                attr["value"],
+                                attrib={"name": attr["name"]},
+                            )
+                except Exception as e:
+                    for elem in elems or []:
+                        if elem in image:
+                            image.remove(elem)
+
+                    self.logger.error(
+                        "task_name=%s annotation_id=%s annotation_title=%s annotation_type=%s error=%s",
+                        task.get("name"),
+                        annotation.get("id"),
+                        annotation.get("title"),
+                        annotation.get("type"),
+                        e,
+                    )
+                    continue
+
+        return root
+
+    @staticmethod
+    def _make_tag(
+        root: ET.Element, tag: str, value: Any = None, attrib: dict | None = None
+    ) -> ET.Element:
+        safe_attrib = {
+            k: "" if v is None else str(v) for k, v in (attrib or {}).items()
+        }
+        elem = ET.SubElement(root, tag, attrib=safe_attrib)
+        if value is not None:
+            elem.text = str(value)
+        return elem
+
+    def _add_points_shape(
+        self, image_elem: ET.Element, annotation: dict, tag: str
+    ) -> list[ET.Element]:
+        points = list(annotation["points"])
+        if len(points) % 2 != 0:
+            raise ValueError(
+                f"ポイントが偶数ではありません。Annotation({annotation['value']}): {len(points)}"
+            )
+        flatten = []
+        while points:
+            x, y, *points = points
+            flatten.append(f"{x}, {y}")
+        elem = self._make_tag(
+            image_elem,
+            tag,
+            attrib={"label": annotation["value"], "points": ";".join(flatten)},
+        )
+        return [elem]
+
+    def _add_bbox(self, image_elem: ET.Element, annotation: dict) -> list[ET.Element]:
+        points = annotation["points"]
+        if len(points) != 4:
+            raise ValueError("矩形のポイントが 4 つではありません。")
+        elem = self._make_tag(
+            image_elem,
+            "box",
+            attrib={
+                "label": annotation["value"],
+                "xtl": points[0],
+                "ytl": points[1],
+                "xbr": points[2],
+                "ybr": points[3],
+                "rotation": annotation.get("rotation", 0),
+            },
+        )
+        return [elem]
+
+    def _add_polygon(
+        self, image_elem: ET.Element, annotation: dict
+    ) -> list[ET.Element]:
+        return self._add_points_shape(image_elem, annotation, "polygon")
+
+    def _add_polyline(
+        self, image_elem: ET.Element, annotation: dict
+    ) -> list[ET.Element]:
+        return self._add_points_shape(image_elem, annotation, "polyline")
+
+    def _add_keypoints(
+        self, image_elem: ET.Element, annotation: dict
+    ) -> list[ET.Element]:
+        return self._add_points_shape(image_elem, annotation, "points")
+
+    def _add_line(self, image_elem: ET.Element, annotation: dict) -> list[ET.Element]:
+        return self._add_points_shape(image_elem, annotation, "polyline")
+
+    def _add_segmentation(
+        self, image_elem: ET.Element, annotation: dict
+    ) -> list[ET.Element]:
+        polygons = []
+        points = annotation["points"]
+        if not points:
+            raise ValueError("セグメンテーションのポイント数が 0 です。")
+        try:
+            points[0][0][0]
+        except IndexError as exc:
+            raise ValueError("セグメンテーションが3次元配列ではありません。") from exc
+        for segment in points:
+            for region in segment:
+                flatten = []
+                region_points = list(region)
+                while region_points:
+                    x, y, *region_points = region_points
+                    flatten.append(f"{x}, {y}")
+                polygons.append(
+                    self._make_tag(
+                        image_elem,
+                        "polygon",
+                        attrib={
+                            "label": annotation["value"],
+                            "points": ";".join(flatten),
+                        },
+                    )
+                )
+        return polygons
 
 
 def get_pixel_coordinates(points: List[Union[int, float]]) -> List[int]:
