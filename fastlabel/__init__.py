@@ -5184,7 +5184,7 @@ class Client:
 
         return self.api.get_request(endpoint, params=params)
 
-    def get_comments(
+    def get_task_comments(
         self,
         project: str,
         task_id: str,
