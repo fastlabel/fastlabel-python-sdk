@@ -24,6 +24,7 @@
 - [Appendix](#appendix)
 - [Annotation](#annotation)
 - [Metadata](#metadata)
+- [Comment](#comment)
 - [Project](#project)
 - [Dataset](#dataset)
 - [Converter](#converter)
@@ -2651,6 +2652,48 @@ Example of a metadata object
     "isRequired": False,
     "createdAt": "2021-04-20T03:20:41.427Z",
     "updatedAt": "2021-04-20T03:20:41.427Z",
+}
+```
+
+## Comment
+
+### Get Task Comments
+
+Get comments of a task. (Up to 1000 comments)
+
+```python
+comments = client.get_task_comments(project="YOUR_PROJECT_SLUG", task_id="YOUR_TASK_ID")
+```
+
+### Response
+
+Example of a comment object
+
+```python
+{
+    "id": "YOUR_COMMENT_ID",
+    "taskId": "YOUR_TASK_ID",
+    "contentId": "YOUR_CONTENT_ID",
+    "type": "text",
+    "isResolved": False,
+    "points": [185.98, 86.55],
+    "scale": 0,
+    "frame": 0,
+    "status": "todo",
+    "priority": 0,
+    "taskAnnotationId": None,
+    "issueCategoryId": None,
+    "color": None,
+    "threads": [
+        {
+            "id": "YOUR_THREAD_ID",
+            "text": "comment text",
+            "createdAt": "2026-03-03T03:51:55.247Z",
+            "updatedAt": "2026-03-03T03:51:55.247Z",
+        },
+    ],
+    "createdAt": "2026-03-03T03:51:55.240Z",
+    "updatedAt": "2026-03-03T03:51:55.240Z",
 }
 ```
 
