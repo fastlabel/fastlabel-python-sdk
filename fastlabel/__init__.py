@@ -226,6 +226,13 @@ class Client:
         endpoint = "tasks/audio/classification/" + task_id
         return self.api.get_request(endpoint)
 
+    def find_multi_modal_video_audio_task(self, task_id: str) -> dict:
+        """
+        Find a single multi modal video audio task.
+        """
+        endpoint = "tasks/multi-modal-video-audio/" + task_id
+        return self.api.get_request(endpoint)
+
     def find_audio_task_by_name(self, project: str, task_name: str) -> dict:
         """
         Find a single audio task by name.
@@ -758,6 +765,51 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/audio/classification"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def get_multi_modal_video_audio_tasks(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 10,
+    ) -> list:
+        """
+        Returns a list of multi modal video audio tasks.
+        Returns up to 10 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        task_name is a task name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 10:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 10.", 422
+            )
+        endpoint = "tasks/multi-modal-video-audio"
         params = {"project": project}
         if status:
             params["status"] = status
@@ -1800,6 +1852,80 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def create_multi_modal_video_audio_task(
+        self,
+        project: str,
+        name: str,
+        file_path: str,
+        status: str = None,
+        external_status: str = None,
+        priority: Priority = None,
+        annotations: list = [],
+        tags: list = [],
+        metadatas: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Create a single multi modal video audio task.
+
+        project is slug of your project (Required).
+        name is an unique identifier of task in your project (Required).
+        file_path is a path to data. Supported extensions are mp4 (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
+        annotations is a list of annotation to be set in advance (Optional).
+        tags is a list of tag to be set in advance (Optional).
+        metadatas is a list of metadata key-value pairs to be set in advance (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/multi-modal-video-audio"
+        if not utils.is_video_supported_ext(file_path):
+            raise FastLabelInvalidException("Supported extensions are mp4.", 422)
+        if not utils.is_video_supported_size(file_path):
+            raise FastLabelInvalidException(
+                "Supported video size is under 250 MB.", 422
+            )
+        if not utils.is_video_supported_codec(file_path):
+            raise FastLabelInvalidException(
+                "Supported video encoding for registration through the SDK is only AVC/H.264",
+                422,
+            )
+
+        file = utils.base64_encode(file_path)
+        payload = {"project": project, "name": name, "file": file}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
+        if annotations:
+            for annotation in annotations:
+                annotation["content"] = name
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
+        if tags:
+            payload["tags"] = tags
+        if metadatas:
+            payload["metadatas"] = metadatas
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.post_request(endpoint, payload=payload)
+
     def create_dicom_task(
         self,
         project: str,
@@ -2806,6 +2932,63 @@ class Client:
             payload["attributes"] = delete_extra_attributes_parameter(attributes)
         if tags:
             payload["tags"] = tags
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
+
+    def update_multi_modal_video_audio_task(
+        self,
+        task_id: str,
+        status: str = None,
+        external_status: str = None,
+        priority: Priority = None,
+        tags: list = [],
+        annotations: List[dict] = [],
+        metadatas: list = [],
+        **kwargs,
+    ) -> str:
+        """
+        Update a single multi modal video audio task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
+        tags is a list of tag to be set (Optional).
+        annotations is a list of annotation to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/multi-modal-video-audio/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
+        if tags:
+            payload["tags"] = tags
+        if annotations:
+            for annotation in annotations:
+                annotation["content"] = ""
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
+        if metadatas:
+            payload["metadatas"] = metadatas
 
         self.__fill_assign_users(payload, **kwargs)
 
