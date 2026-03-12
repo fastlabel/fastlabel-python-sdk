@@ -20,6 +20,7 @@
   - [Sequential PCD](#sequential-pcd)
   - [DICOM](#dicom)
   - [Robotics](#robotics)
+    - [Import LeRobot Dataset](#import-lerobot-dataset)
   - [Common](#common)
 - [Appendix](#appendix)
 - [Annotation](#annotation)
@@ -2206,6 +2207,37 @@ history = client.import_robotics_contents_file(
     file_path="ZIP_FILE_PATH",
 )
 ```
+
+#### Import LeRobot Dataset
+
+Import a [LeRobot](https://github.com/huggingface/lerobot) dataset (v3) into a FastLabel robotics project.
+
+Requires additional dependencies:
+
+```bash
+pip install fastlabel[robotics]
+```
+
+For each episode, this method creates a robotics task and uploads the video files and frame data (converted from parquet to JSON).
+
+```python
+results = client.import_lerobot(
+    project="YOUR_PROJECT_SLUG",
+    lerobot_data_path="/path/to/lerobot/dataset",
+)
+```
+
+You can also specify which episodes to import:
+
+```python
+results = client.import_lerobot(
+    project="YOUR_PROJECT_SLUG",
+    lerobot_data_path="/path/to/lerobot/dataset",
+    episode_indices=[0, 1, 2],
+)
+```
+
+> **Note:** Only LeRobot dataset v3 is supported. v2 datasets need to be converted to v3 before importing.
 
 ### Common
 
