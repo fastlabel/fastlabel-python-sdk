@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
@@ -14,7 +15,7 @@ import requests
 import xmltodict
 from PIL import Image, ImageColor, ImageDraw
 
-from fastlabel import const, converters, utils
+from fastlabel import const, converters, lerobot, utils
 from fastlabel.const import (
     EXPORT_IMAGE_WITH_ANNOTATIONS_SUPPORTED_IMAGE_TYPES,
     KEYPOINT_MIN_STROKE_WIDTH,
@@ -2071,6 +2072,54 @@ class Client:
         self.__fill_assign_users(payload, **kwargs)
 
         return self.api.post_request(endpoint, payload=payload)
+
+    def import_lerobot(
+        self,
+        project: str,
+        lerobot_data_path: str,
+        episode_indices: list = None,
+    ) -> list:
+        """
+        Import a LeRobot dataset into a FastLabel robotics project.
+
+        Automatically detects LeRobot dataset version (v2 or v3).
+        For each episode, creates a robotics task and uploads the video files
+        and frame data (converted from parquet to JSON).
+
+        Requires: pip install fastlabel[robotics]
+
+        project is slug of your project (Required).
+        lerobot_data_path is the path to the LeRobot dataset directory (Required).
+        episode_indices is a list of episode indices to import.
+            If None, all episodes are imported (Optional).
+        """
+        data_path = Path(lerobot_data_path)
+        if episode_indices is None:
+            episode_indices = lerobot.get_episode_indices(data_path)
+
+        results = []
+        for episode_index in episode_indices:
+            episode_name = lerobot.format_episode_name(episode_index)
+            self.create_robotics_task(project=project, name=episode_name)
+
+            zip_path = lerobot.create_episode_zip(
+                lerobot_data_path=data_path,
+                episode_index=episode_index,
+            )
+            try:
+                result = self.import_robotics_contents_file(
+                    project=project, file_path=zip_path
+                )
+                results.append(
+                    {"episode": episode_name, "success": True, "result": result}
+                )
+            finally:
+                zip_file = Path(zip_path)
+                tmp_dir = zip_file.parent
+                if tmp_dir.exists():
+                    shutil.rmtree(tmp_dir)
+
+        return results
 
     def import_appendix_file(
         self,

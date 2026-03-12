@@ -22,6 +22,9 @@ dependencies = [
 
 dynamic = ["version"]
 
+[project.optional-dependencies]
+robotics = ["pandas>=2.0.0", "pyarrow>=14.0.0"]
+
 [tool.setuptools]
 include-package-data = true
 
