@@ -1642,6 +1642,28 @@ task_id = client.update_audio_classification_task(
 )
 ```
 
+### Multi Modal Video Audio
+
+Supported following project types:
+
+- Multi Modal Video Audio - Segmentation
+
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_multi_modal_video_audio_task(task_id="YOUR_TASK_ID")
+```
+
+#### Get Tasks
+
+Get tasks. (Up to 10 tasks)
+
+```python
+tasks = client.get_multi_modal_video_audio_tasks(project="YOUR_PROJECT_SLUG")
+```
+
 ### PCD
 
 Supported following project types:
