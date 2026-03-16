@@ -7,6 +7,8 @@ import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
 from typing import Dict, List, Literal, Optional, Union
+from xml.dom import minidom
+from xml.etree import ElementTree as ET
 
 import cv2
 import numpy as np
@@ -3599,6 +3601,26 @@ class Client:
                 classes=target_classes,
                 start_index=start_index,
             )
+
+    def export_cvat(
+        self,
+        tasks: list,
+        output_dir: str = os.path.join("output", "cvat"),
+        pretty_print: bool = True,
+    ) -> None:
+        xml_elements = converters.CvatConverter(logger).tasks_to_cvat(tasks)
+
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, "annotations.xml")
+        with open(output_path, "w", encoding="utf-8") as f:
+            if pretty_print:
+                doct = minidom.parseString(ET.tostring(xml_elements))
+                doct.writexml(
+                    f, encoding="utf-8", indent=" ", newl="\n", addindent="  "
+                )
+            else:
+                tree = ET.ElementTree(xml_elements)
+                tree.write(f, encoding="unicode", xml_declaration=True)
 
     def __export_index_color_image(
         self,
