@@ -226,6 +226,13 @@ class Client:
         endpoint = "tasks/audio/classification/" + task_id
         return self.api.get_request(endpoint)
 
+    def find_multi_modal_video_audio_task(self, task_id: str) -> dict:
+        """
+        Find a single multi modal video audio task.
+        """
+        endpoint = "tasks/multi-modal-video-audio/" + task_id
+        return self.api.get_request(endpoint)
+
     def find_audio_task_by_name(self, project: str, task_name: str) -> dict:
         """
         Find a single audio task by name.
@@ -758,6 +765,51 @@ class Client:
         limit is the max number to fetch (Optional).
         """
         endpoint = "tasks/audio/classification"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def get_multi_modal_video_audio_tasks(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = [],
+        task_name: str = None,
+        offset: int = None,
+        limit: int = 10,
+    ) -> list:
+        """
+        Returns a list of multi modal video audio tasks.
+        Returns up to 10 at a time, to get more, set offset as the starting position
+        to fetch.
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        task_name is a task name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 10:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 10.", 422
+            )
+        endpoint = "tasks/multi-modal-video-audio"
         params = {"project": project}
         if status:
             params["status"] = status
