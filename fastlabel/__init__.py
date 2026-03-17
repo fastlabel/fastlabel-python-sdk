@@ -5257,6 +5257,36 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
+    def get_project_comments(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = None,
+        issue_category_id: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "comments"
+        params = {"project": project}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if issue_category_id:
+            params["issueCategoryId"] = issue_category_id
+        if offset:
+            params["offset"] = offset
+        if limit:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
     def mask_to_fastlabel_segmentation_points(
         self, mask_image: Union[str, np.ndarray]
     ) -> List[List[List[int]]]:
