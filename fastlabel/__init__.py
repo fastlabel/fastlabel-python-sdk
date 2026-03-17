@@ -5274,11 +5274,11 @@ class Client:
         endpoint = "comments"
         params = {"project": project}
         if status:
-            params["status"] = status
+            params["taskStatus"] = status
         if external_status:
-            params["externalStatus"] = external_status
+            params["taskExternalStatus"] = external_status
         if tags:
-            params["tags"] = tags
+            params["taskTags"] = tags
         if issue_category_id:
             params["issueCategoryId"] = issue_category_id
         if offset:
