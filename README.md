@@ -2721,10 +2721,10 @@ Example of a comment object
 
 ### Get Project Comments
 
-Get comments of a project. Returns up to 1000 comments per request. Use `offset` for pagination.
+Get comment threads of a project. Returns up to 1000 comment threads per request. Use `offset` for pagination.
 
 ```python
-comments = client.get_project_comments(project="YOUR_PROJECT_SLUG")
+comment_threads = client.get_project_comments(project="YOUR_PROJECT_SLUG")
 ```
 
 #### Parameters
@@ -2732,42 +2732,40 @@ comments = client.get_project_comments(project="YOUR_PROJECT_SLUG")
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | project | str | Yes | Project slug |
-| status | str | No | Filter by status |
-| external_status | str | No | Filter by external status |
-| tags | list | No | Filter by tags |
+| status | str | No | Filter by task status |
+| external_status | str | No | Filter by task external status |
+| tags | list | No | Filter by task tags |
 | issue_category_id | str | No | Filter by issue category ID |
 | offset | int | No | Offset for pagination |
-| limit | int | No | Number of comments to retrieve (default: 100, max: 1000) |
+| limit | int | No | Number of comment threads to retrieve (default: 100, max: 1000) |
 
 ### Response
 
-Example of a comment object
+Example of a comment thread object
 
 ```python
 {
-    "id": "YOUR_COMMENT_ID",
-    "taskId": "YOUR_TASK_ID",
-    "contentId": "YOUR_CONTENT_ID",
-    "type": "text",
-    "isResolved": False,
-    "points": [185.98, 86.55],
-    "scale": 0,
-    "frame": 0,
-    "status": "todo",
-    "priority": 0,
-    "taskAnnotationId": None,
-    "issueCategoryId": None,
-    "color": None,
-    "threads": [
-        {
-            "id": "YOUR_THREAD_ID",
-            "text": "comment text",
-            "createdAt": "2026-03-03T03:51:55.247Z",
-            "updatedAt": "2026-03-03T03:51:55.247Z",
-        },
-    ],
-    "createdAt": "2026-03-03T03:51:55.240Z",
-    "updatedAt": "2026-03-03T03:51:55.240Z",
+    "id": "YOUR_THREAD_ID",
+    "text": "comment text",
+    "comment": {
+        "id": "YOUR_COMMENT_ID",
+        "taskId": "YOUR_TASK_ID",
+        "contentId": "YOUR_CONTENT_ID",
+        "type": "text",
+        "isResolved": False,
+        "points": [185.98, 86.55],
+        "scale": 0,
+        "frame": 0,
+        "status": "todo",
+        "priority": 0,
+        "taskAnnotationId": None,
+        "issueCategoryId": None,
+        "color": None,
+        "createdAt": "2026-03-03T03:51:55.240Z",
+        "updatedAt": "2026-03-03T03:51:55.240Z",
+    },
+    "createdAt": "2026-03-03T03:51:55.247Z",
+    "updatedAt": "2026-03-03T03:51:55.247Z",
 }
 ```
 

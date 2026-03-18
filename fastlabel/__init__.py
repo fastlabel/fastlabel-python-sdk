@@ -5248,9 +5248,7 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "comments"
-        params = {"project": project}
-        if task_id:
-            params["taskId"] = task_id
+        params = {"project": project, "taskId": task_id}
         if offset:
             params["offset"] = offset
         if limit:
@@ -5271,7 +5269,7 @@ class Client:
             raise FastLabelInvalidException(
                 "Limit must be less than or equal to 1000.", 422
             )
-        endpoint = "comments"
+        endpoint = "comments/threads"
         params = {"project": project}
         if status:
             params["taskStatus"] = status
