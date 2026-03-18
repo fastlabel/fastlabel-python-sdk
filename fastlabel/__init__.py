@@ -5249,9 +5249,9 @@ class Client:
             )
         endpoint = "comments"
         params = {"project": project, "taskId": task_id}
-        if offset:
+        if offset is not None:
             params["offset"] = offset
-        if limit:
+        if limit is not None:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
@@ -5279,9 +5279,9 @@ class Client:
             params["taskTags"] = tags
         if issue_category_id:
             params["issueCategoryId"] = issue_category_id
-        if offset:
+        if offset is not None:
             params["offset"] = offset
-        if limit:
+        if limit is not None:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
