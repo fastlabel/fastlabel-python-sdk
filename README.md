@@ -2719,6 +2719,56 @@ Example of a comment object
 }
 ```
 
+### Get Project Comments
+
+Get comment threads of a project. Returns up to 1000 comment threads per request. Use `offset` for pagination.
+
+```python
+comment_threads = client.get_project_comments(project="YOUR_PROJECT_SLUG")
+```
+
+#### Parameters
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| project | str | Yes | Project slug |
+| status | str | No | Filter by task status |
+| external_status | str | No | Filter by task external status |
+| tags | list | No | Filter by task tags |
+| issue_category_id | str | No | Filter by issue category ID |
+| offset | int | No | Offset for pagination |
+| limit | int | No | Number of comment threads to retrieve (default: 100, max: 1000) |
+
+#### Response
+
+Example of a comment thread object
+
+```python
+{
+    "id": "YOUR_THREAD_ID",
+    "text": "comment text",
+    "comment": {
+        "id": "YOUR_COMMENT_ID",
+        "taskId": "YOUR_TASK_ID",
+        "contentId": "YOUR_CONTENT_ID",
+        "type": "text",
+        "isResolved": False,
+        "points": [185.98, 86.55],
+        "scale": 0,
+        "frame": 0,
+        "status": "todo",
+        "priority": 0,
+        "taskAnnotationId": None,
+        "issueCategoryId": None,
+        "color": None,
+        "createdAt": "2026-03-03T03:51:55.240Z",
+        "updatedAt": "2026-03-03T03:51:55.240Z",
+    },
+    "createdAt": "2026-03-03T03:51:55.247Z",
+    "updatedAt": "2026-03-03T03:51:55.247Z",
+}
+```
+
 ## Project
 
 ### Create Project

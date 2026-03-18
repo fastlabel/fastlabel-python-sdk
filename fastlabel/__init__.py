@@ -5248,12 +5248,40 @@ class Client:
                 "Limit must be less than or equal to 1000.", 422
             )
         endpoint = "comments"
-        params = {"project": project}
-        if task_id:
-            params["taskId"] = task_id
-        if offset:
+        params = {"project": project, "taskId": task_id}
+        if offset is not None:
             params["offset"] = offset
-        if limit:
+        if limit is not None:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def get_project_comments(
+        self,
+        project: str,
+        status: str = None,
+        external_status: str = None,
+        tags: list = None,
+        issue_category_id: str = None,
+        offset: int = None,
+        limit: int = 100,
+    ) -> list:
+        if limit > 1000:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 1000.", 422
+            )
+        endpoint = "comments/threads"
+        params = {"project": project}
+        if status:
+            params["taskStatus"] = status
+        if external_status:
+            params["taskExternalStatus"] = external_status
+        if tags:
+            params["taskTags"] = tags
+        if issue_category_id:
+            params["issueCategoryId"] = issue_category_id
+        if offset is not None:
+            params["offset"] = offset
+        if limit is not None:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
