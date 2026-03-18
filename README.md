@@ -2739,7 +2739,7 @@ comment_threads = client.get_project_comments(project="YOUR_PROJECT_SLUG")
 | offset | int | No | Offset for pagination |
 | limit | int | No | Number of comment threads to retrieve (default: 100, max: 1000) |
 
-### Response
+#### Response
 
 Example of a comment thread object
 
