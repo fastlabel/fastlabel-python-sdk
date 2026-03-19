@@ -3,9 +3,8 @@ Import a LeRobot dataset into a FastLabel robotics project.
 
 Requires: pip install fastlabel[robotics]
 
-Supports both LeRobot v2 and v3 dataset formats.
-  v2: data/chunk-*/episode_*.parquet, videos/.../chunk-*/episode_*.mp4
-  v3: data/file-*.parquet, videos/.../file-*.mp4
+Supports LeRobot v3 dataset format only.
+  v3: data/chunk-*/file-*.parquet, videos/.../chunk-*/file-*.mp4
 """
 
 from fastlabel import Client

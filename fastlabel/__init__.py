@@ -29,7 +29,7 @@ from fastlabel.const import (
 )
 
 from .api import Api
-from .exceptions import FastLabelInvalidException
+from .exceptions import FastLabelException, FastLabelInvalidException
 from .query import DatasetObjectGetQuery
 
 logger = logging.getLogger(__name__)
@@ -2082,7 +2082,7 @@ class Client:
         """
         Import a LeRobot dataset into a FastLabel robotics project.
 
-        Automatically detects LeRobot dataset version (v2 or v3).
+        Automatically detects LeRobot dataset version (v3).
         For each episode, creates a robotics task and uploads the video files
         and frame data (converted from parquet to JSON).
 
@@ -2094,8 +2094,9 @@ class Client:
             If None, all episodes are imported (Optional).
         """
         data_path = Path(lerobot_data_path)
+        episode_map = lerobot.build_episode_map(data_path)
         if episode_indices is None:
-            episode_indices = lerobot.get_episode_indices(data_path)
+            episode_indices = sorted(episode_map.keys())
 
         results = []
         for episode_index in episode_indices:
@@ -2105,6 +2106,7 @@ class Client:
             zip_path = lerobot.create_episode_zip(
                 lerobot_data_path=data_path,
                 episode_index=episode_index,
+                episode_map=episode_map,
             )
             try:
                 result = self.import_robotics_contents_file(
@@ -2112,6 +2114,14 @@ class Client:
                 )
                 results.append(
                     {"episode": episode_name, "success": True, "result": result}
+                )
+            except FastLabelException as e:
+                results.append(
+                    {
+                        "episode": episode_name,
+                        "success": False,
+                        "result": {"error": str(e)},
+                    }
                 )
             finally:
                 zip_file = Path(zip_path)

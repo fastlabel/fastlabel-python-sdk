@@ -89,26 +89,30 @@ def _extract_video_segment(
     writer = cv2.VideoWriter(str(output_path), fourcc, fps, (width, height))
     cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
 
-    for _ in range(num_frames):
-        ret, frame = cap.read()
-        if not ret:
-            break
-        writer.write(frame)
+    try:
+        for _ in range(num_frames):
+            ret, frame = cap.read()
+            if not ret:
+                break
+            writer.write(frame)
+    finally:
+        writer.release()
+        cap.release()
 
-    writer.release()
-    cap.release()
 
-
-def create_episode_zip(lerobot_data_path: Path, episode_index: int) -> str:
+def create_episode_zip(
+    lerobot_data_path: Path, episode_index: int, episode_map: dict = None
+) -> str:
     """Create a ZIP for a single v3 episode.
 
     v3 video layout: videos/{key}/chunk-XXX/file-YYY.mp4
     """
-    episode_map = _build_episode_map(lerobot_data_path)
+    if episode_map is None:
+        episode_map = _build_episode_map(lerobot_data_path)
 
     if episode_index not in episode_map:
         raise FastLabelInvalidException(
-            f"Episode index {episode_index} not found in dataset.",  # noqa: E713
+            "Episode index " + str(episode_index) + " not found in dataset.",
             422,
         )
 

@@ -8,6 +8,7 @@ from fastlabel.lerobot.common import (
 )
 
 __all__ = [
+    "build_episode_map",
     "get_episode_indices",
     "create_episode_zip",
     "format_episode_name",
@@ -27,7 +28,19 @@ def get_episode_indices(lerobot_data_path):
     return v3.get_episode_indices(lerobot_data_path)
 
 
-def create_episode_zip(lerobot_data_path, episode_index):
+def build_episode_map(lerobot_data_path):
+    """Build episode map from dataset. Returns a dict keyed by episode index."""
+    check_dependencies()
+    version = detect_version(lerobot_data_path)
+    if version == "v2":
+        raise FastLabelInvalidException(
+            "LeRobot dataset v2 is not supported. Please convert to v3.",
+            422,
+        )
+    return v3._build_episode_map(lerobot_data_path)
+
+
+def create_episode_zip(lerobot_data_path, episode_index, episode_map=None):
     """Create a ZIP file for a single episode in the format expected by FastLabel.
 
     Supports LeRobot dataset v3 only.
@@ -47,4 +60,4 @@ def create_episode_zip(lerobot_data_path, episode_index):
             "LeRobot dataset v2 is not supported. Please convert to v3.",
             422,
         )
-    return v3.create_episode_zip(lerobot_data_path, episode_index)
+    return v3.create_episode_zip(lerobot_data_path, episode_index, episode_map)
