@@ -116,7 +116,7 @@ def create_episode_zip(
 
     if episode_index not in episode_map:
         raise FastLabelInvalidException(
-            "Episode index " + str(episode_index) + " not found in dataset.",
+            f"Episode index {episode_index} not found in dataset.",
             422,
         )
 
