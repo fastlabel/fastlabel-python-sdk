@@ -52,7 +52,7 @@ def format_episode_name(episode_index: int) -> str:
 def get_camera_dirs(lerobot_data_path: Path) -> list:
     """Get camera directories and their content names.
     Returns [(camera_dir, content_name), ...].
-    e.g. observation.images.top -> content_name = "top"
+    e.g. observation.images.top -> content_name = "images_top"
     """
     videos_dir = lerobot_data_path / "videos"
     if not videos_dir.exists():
@@ -63,6 +63,11 @@ def get_camera_dirs(lerobot_data_path: Path) -> list:
         if not obs_dir.is_dir():
             continue
         parts = obs_dir.name.split(".")
-        content_name = parts[-1] if len(parts) > 1 else obs_dir.name
+        if parts[0] != "observation":
+            raise FastLabelInvalidException(
+                f"Unexpected camera dir name: {obs_dir.name}"
+            )
+
+        content_name = "_".join(parts[1:])
         results.append((obs_dir, content_name))
     return results
