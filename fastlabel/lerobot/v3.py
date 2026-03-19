@@ -62,6 +62,10 @@ def _convert_episode_frames(
     df = pd.read_parquet(parquet_path)
     ep_df = df[df["episode_index"] == episode_index]
 
+    required_keys = ["observation.state", "action", "frame_index", "timestamp"]
+    if not all(key in ep_df.columns for key in required_keys):
+        return []
+
     return [
         {
             "observation.state": row["observation.state"].tolist(),
