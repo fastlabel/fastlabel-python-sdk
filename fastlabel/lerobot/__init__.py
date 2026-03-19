@@ -45,10 +45,9 @@ def create_episode_zip(lerobot_data_path, episode_index, episode_map=None):
 
     Supports LeRobot dataset v3 only.
 
-    ZIP structure:
-        {episode_name}/
-            {content_name}.mp4  (one per camera)
-            {episode_name}.json (frame data)
+    ZIP structure (files at root, ZIP name = episode name):
+        {content_name}.mp4  (one per camera)
+        {episode_name}.json (frame data)
 
     Returns the path to the created ZIP file.
     The caller is responsible for cleaning up the returned ZIP file.
