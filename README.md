@@ -2261,6 +2261,85 @@ results = client.import_lerobot(
 
 > **Note:** Only LeRobot dataset v3 is supported. v2 datasets need to be converted to v3 before importing.
 
+#### Find Task
+
+Find a single task.
+
+```python
+task = client.find_robotics_task(task_id="YOUR_TASK_ID")
+```
+
+Find a single task by name.
+
+```python
+tasks = client.find_robotics_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+```
+
+#### Get Tasks
+
+Get tasks. (Up to 100 tasks)
+
+```python
+tasks = client.get_robotics_task(project="YOUR_PROJECT_SLUG")
+```
+
+- Filter and Get tasks. (Up to 100 tasks)
+
+```python
+tasks = client.get_robotics_task(
+    project="YOUR_PROJECT_SLUG",
+    status="approved", # status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'
+    tags=["tag1", "tag2"] # up to 10 tags
+)
+```
+
+#### Response
+
+Example of a single robotics task object
+
+```python
+{
+    "id": "YOUR_TASK_ID",
+    "name": "episode_000000",
+    "status": "registered",
+    "externalStatus": "registered",
+    "contents": [
+        {
+            "name": "images_camera_01.mp4",
+            "url": "YOUR_CONTENT_URL",
+            "width": 640,
+            "height": 480
+        }
+    ],
+    "annotations": [
+        {
+            "id": "YOUR_ANNOTATION_ID",
+            "type": "sub_task",
+            "title": "grab",
+            "value": "grab",
+            "color": "#44AD8E",
+            "attributes": [],
+            "points": [13, 18],
+            "rotation": 0,
+            "keypoints": [],
+            "confidenceScore": -1
+        }
+    ],
+    "relations": [],
+    "tags": [],
+    "assignee": None,
+    "reviewer": None,
+    "approver": None,
+    "externalAssignee": None,
+    "externalReviewer": None,
+    "externalApprover": None,
+    "roboticsOperator": None,
+    "priority": 0,
+    "createdAt": "2021-02-22T11:25:27.158Z",
+    "updatedAt": "2021-02-22T11:25:27.158Z"
+}
+```
+
 ### Common
 
 APIs for update and delete and count are same over all tasks.
