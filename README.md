@@ -2272,7 +2272,7 @@ task = client.find_robotics_task(task_id="YOUR_TASK_ID")
 Find a single task by name.
 
 ```python
-tasks = client.find_robotics_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+task = client.find_robotics_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
 ```
 
 #### Get Tasks
@@ -2280,16 +2280,17 @@ tasks = client.find_robotics_task_by_name(project="YOUR_PROJECT_SLUG", task_name
 Get tasks. (Up to 100 tasks)
 
 ```python
-tasks = client.get_robotics_task(project="YOUR_PROJECT_SLUG")
+tasks = client.get_robotics_tasks(project="YOUR_PROJECT_SLUG")
 ```
 
 - Filter and Get tasks. (Up to 100 tasks)
 
 ```python
-tasks = client.get_robotics_task(
+tasks = client.get_robotics_tasks(
     project="YOUR_PROJECT_SLUG",
-    status="approved", # status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'
-    tags=["tag1", "tag2"] # up to 10 tags
+    status="approved",
+    # status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back', 'approved', 'declined'
+    tags=["tag1", "tag2"]  # up to 10 tags
 )
 ```
 

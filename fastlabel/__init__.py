@@ -2132,19 +2132,21 @@ class Client:
         endpoint = "tasks/robotics/" + task_id
         return self.api.get_request(endpoint)
 
-    def find_robotics_task_by_name(self, project: str, task_name: str) -> dict:
+    def find_robotics_task_by_name(
+        self, project: str, task_name: str
+    ) -> Optional[dict]:
         """
         Find a single robotics task by name.
 
         project is slug of your project (Required).
         task_name is a task name (Required).
         """
-        tasks = self.get_robotics_task(project=project, task_name=task_name)
+        tasks = self.get_robotics_tasks(project=project, task_name=task_name)
         if not tasks:
             return None
         return tasks[0]
 
-    def get_robotics_task(
+    def get_robotics_tasks(
         self,
         project: str,
         status: Optional[str] = None,
@@ -2153,7 +2155,7 @@ class Client:
         task_name: Optional[str] = None,
         offset: int = 0,
         limit: int = 100,
-    ):
+    ) -> List[dict]:
         """
         Returns a list of robotics tasks.
         Returns up to 100 at a time, to get more,
