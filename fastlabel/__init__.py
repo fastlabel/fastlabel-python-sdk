@@ -2125,6 +2125,70 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def find_robotics_task(self, task_id: str) -> dict:
+        """
+        Find a single robotics task.
+        """
+        endpoint = "tasks/robotics/" + task_id
+        return self.api.get_request(endpoint)
+
+    def find_robotics_task_by_name(
+        self, project: str, task_name: str
+    ) -> Optional[dict]:
+        """
+        Find a single robotics task by name.
+
+        project is slug of your project (Required).
+        task_name is a task name (Required).
+        """
+        tasks = self.get_robotics_tasks(project=project, task_name=task_name)
+        if not tasks:
+            return None
+        return tasks[0]
+
+    def get_robotics_tasks(
+        self,
+        project: str,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        tags: Optional[list[str]] = None,
+        task_name: Optional[str] = None,
+        offset: int = 0,
+        limit: int = 100,
+    ) -> List[dict]:
+        """
+        Returns a list of robotics tasks.
+        Returns up to 100 at a time, to get more,
+        set offset as the starting position to fetch.
+
+        project is slug of your project (Required).
+        status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined'. (Optional)
+        external_status can be 'registered', 'completed', 'skipped',
+        'reviewed', 'sent_back', 'approved', 'declined',
+        'customer_declined' (Optional).
+        tags is a list of tag (Optional).
+        task_name is a task name (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional).
+        """
+        if limit > 100:
+            raise FastLabelInvalidException(
+                "Limit must be less than or equal to 100.", 422
+            )
+        endpoint = "tasks/robotics"
+        params = {"project": project, "offset": offset, "limit": limit}
+        if status:
+            params["status"] = status
+        if external_status:
+            params["externalStatus"] = external_status
+        if tags:
+            params["tags"] = tags
+        if task_name:
+            params["taskName"] = task_name
+
+        return self.api.get_request(endpoint, params=params)
+
     def import_lerobot(
         self,
         project: str,
