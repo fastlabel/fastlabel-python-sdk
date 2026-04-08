@@ -2294,6 +2294,35 @@ tasks = client.get_robotics_tasks(
 )
 ```
 
+#### Update Tasks
+
+Update a single robotics task.
+
+```python
+task_id = client.update_robotics_task(
+    task_id="YOUR_TASK_ID",
+    status="approved",
+    priority=10, # (optional) none: 0, low: 10, medium: 20, high: 30
+    assignee="USER_SLUG",
+    tags=["tag1", "tag2"],
+    operator="OPERATOR_NAME",  # (optional) name of operator
+    annotations=[
+        {
+            "type": "sub_task",
+            "value": "grab",
+            "start": 13,
+            "end": 18,
+        }
+    ],
+    metadatas=[  # (optional) metadata key-value pairs
+        {
+            "key": "metadata_key",
+            "value": "metadata_value"
+        }
+    ]
+)
+```
+
 #### Response
 
 Example of a single robotics task object
