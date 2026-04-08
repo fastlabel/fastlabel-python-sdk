@@ -2080,7 +2080,8 @@ class Client:
         status: Optional[str] = None,
         external_status: Optional[str] = None,
         priority: Optional[Priority] = None,
-        tags: Optional[list[str]] = None,
+        tags: Optional[List[str]] = None,
+        operator: Optional[str] = None,
         metadatas: Optional[list] = None,
         **kwargs,
     ) -> str:
@@ -2098,6 +2099,7 @@ class Client:
             medium = 20,
             high = 30,
         tags is a list of tag to be set in advance (Optional).
+        operator is a name of operator (Optional).
         metadatas is a list of metadata key-value pairs to be set in advance (Optional).
             e.g.) [{"key": "metadata_key", "value": "some_value"}]
         assignee is slug of assigned user (Optional).
@@ -2117,7 +2119,9 @@ class Client:
         if priority is not None:
             payload["priority"] = priority
         if tags:
-            payload["tags"] = tags or []
+            payload["tags"] = tags
+        if operator is not None:
+            payload["operator"] = operator
         if metadatas:
             payload["metadatas"] = metadatas
 
@@ -2188,6 +2192,65 @@ class Client:
             params["taskName"] = task_name
 
         return self.api.get_request(endpoint, params=params)
+
+    def update_robotics_task(
+        self,
+        task_id: str,
+        status: Optional[str] = None,
+        external_status: Optional[str] = None,
+        priority: Optional[Priority] = None,
+        tags: Optional[List[str]] = None,
+        operator: Optional[str] = None,
+        annotations: Optional[List[dict]] = None,
+        metadatas: Optional[list] = None,
+        **kwargs,
+    ) -> str:
+        """
+        Update a single robotics task.
+
+        task_id is an id of the task (Required).
+        status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
+        'approved', 'declined' (Optional).
+        external_status can be 'registered', 'completed', 'skipped', 'reviewed',
+        'sent_back', 'approved', 'declined',  'customer_declined'. (Optional)
+        priority is the priority of the task (default: none) (Optional).
+        Set one of the numbers corresponding to:
+            none = 0,
+            low = 10,
+            medium = 20,
+            high = 30,
+        tags is a list of tag to be set (Optional).
+        operator is a name of operator (Optional).
+        annotations is a list of annotation to be set (Optional).
+        metadatas is a list of metadata key-value pairs to be set (Optional).
+            e.g.) [{"key": "metadata_key", "value": "some_value"}]
+        assignee is slug of assigned user (Optional).
+        reviewer is slug of review user (Optional).
+        approver is slug of approve user (Optional).
+        external_assignee is slug of external assigned user (Optional).
+        external_reviewer is slug of external review user (Optional).
+        external_approver is slug of external approve user (Optional).
+        """
+        endpoint = "tasks/robotics/" + task_id
+        payload = {}
+        if status:
+            payload["status"] = status
+        if external_status:
+            payload["externalStatus"] = external_status
+        if priority is not None:
+            payload["priority"] = priority
+        if tags:
+            payload["tags"] = tags
+        if operator is not None:
+            payload["operator"] = operator
+        if annotations:
+            payload["annotations"] = delete_extra_annotations_parameter(annotations)
+        if metadatas:
+            payload["metadatas"] = metadatas
+
+        self.__fill_assign_users(payload, **kwargs)
+
+        return self.api.put_request(endpoint, payload=payload)
 
     def import_lerobot(
         self,
