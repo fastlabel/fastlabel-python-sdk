@@ -24,18 +24,17 @@ def v3_dataset(tmp_path):
     chunk0 = data_dir / "chunk-000"
     chunk0.mkdir(parents=True)
 
-    rows = []
-    for ep in (0, 1):
-        for f in range(3):
-            rows.append(
-                {
-                    "episode_index": ep,
-                    "frame_index": f,
-                    "timestamp": float(f) * 0.1,
-                    "observation.state": [0.1 * f, 0.2 * f],
-                    "action": [1.0, 2.0],
-                }
-            )
+    rows = [
+        {
+            "episode_index": ep,
+            "frame_index": f,
+            "timestamp": float(f) * 0.1,
+            "observation.state": [0.1 * f, 0.2 * f],
+            "action": [1.0, 2.0],
+        }
+        for ep in (0, 1)
+        for f in range(3)
+    ]
     _write_parquet(chunk0 / "file-000.parquet", rows)
 
     chunk1 = data_dir / "chunk-001"
