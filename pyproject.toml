@@ -22,7 +22,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-robotics = ["pandas>=2.0.0", "pyarrow>=14.0.0"]
+robotics = ["pandas>=2.2.2", "pyarrow>=18.0.0"]
 dev = ["pytest>=7.0.0"]
 
 [tool.setuptools]
