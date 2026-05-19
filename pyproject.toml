@@ -8,7 +8,7 @@ description = "The official Python SDK for FastLabel API, the Data Platform for 
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-    { name = "eisuke-ueta", email = "eisuke.ueta@fastlabel.ai" }
+    { name = "fastlabel", email = "dev@fastlabel.ai" }
 ]
 dependencies = [
   "requests>=2.4.2,<3.0",
