@@ -6,13 +6,13 @@ build-backend = "setuptools.build_meta"
 name = "fastlabel"
 description = "The official Python SDK for FastLabel API, the Data Platform for AI"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
     { name = "eisuke-ueta", email = "eisuke.ueta@fastlabel.ai" }
 ]
 dependencies = [
   "requests>=2.4.2,<3.0",
-  "numpy>=1.26.0,<2.0.0",
+  "numpy>=1.26.0,<3.0.0",
   "geojson>=2.0.0,<4.0",
   "xmltodict==0.12.0",
   "Pillow>=11.0.0,<13.0.0",
