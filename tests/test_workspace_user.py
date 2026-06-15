@@ -83,40 +83,6 @@ def test_create_workspace_user_without_modules(monkeypatch, client):
     }
 
 
-def test_create_workspace_user_with_modules(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "post_request", return_value={})
-
-    client.create_workspace_user(
-        name="John Doe",
-        email="john@example.com",
-        language="ja",
-        role="owner",
-        modules=["annotation", "dataset"],
-    )
-
-    assert calls[0]["kwargs"]["payload"] == {
-        "name": "John Doe",
-        "email": "john@example.com",
-        "language": "ja",
-        "role": "owner",
-        "modules": ["annotation", "dataset"],
-    }
-
-
-def test_create_workspace_user_empty_modules_sent(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "post_request", return_value={})
-
-    client.create_workspace_user(
-        name="John Doe",
-        email="john@example.com",
-        language="en",
-        role="member",
-        modules=[],
-    )
-
-    assert calls[0]["kwargs"]["payload"]["modules"] == []
-
-
 # --- update_workspace_user -------------------------------------------------
 
 
@@ -129,30 +95,13 @@ def test_update_workspace_user_role_only(monkeypatch, client):
     assert calls[0]["kwargs"]["payload"] == {"role": "owner"}
 
 
-def test_update_workspace_user_modules_unchanged_when_none(monkeypatch, client):
+def test_update_workspace_user_role_omitted(monkeypatch, client):
     calls = _capture(monkeypatch, client, "put_request", return_value={})
 
-    client.update_workspace_user(id="wsu-1", role="member")
+    client.update_workspace_user(id="wsu-1")
 
-    # modules omitted -> not present in payload (left unchanged server-side)
-    assert "modules" not in calls[0]["kwargs"]["payload"]
-
-
-def test_update_workspace_user_modules_sync(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "put_request", return_value={})
-
-    client.update_workspace_user(id="wsu-1", modules=["annotation", "modelDev"])
-
-    assert calls[0]["kwargs"]["payload"] == {"modules": ["annotation", "modelDev"]}
-
-
-def test_update_workspace_user_empty_modules_revokes_all(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "put_request", return_value={})
-
-    client.update_workspace_user(id="wsu-1", modules=[])
-
-    # empty list is distinct from None: it is sent to revoke all permissions
-    assert calls[0]["kwargs"]["payload"] == {"modules": []}
+    # role omitted -> empty payload
+    assert calls[0]["kwargs"]["payload"] == {}
 
 
 # --- delete_workspace_user -------------------------------------------------
@@ -165,3 +114,93 @@ def test_delete_workspace_user(monkeypatch, client):
 
     assert calls[0]["endpoint"] == "workspaces-users/internal-users/wsu-1"
     assert result is None
+
+
+# --- create_workspace_user_module_permissions ------------------------------
+
+
+@pytest.mark.parametrize(
+    "module, expected_path",
+    [
+        ("annotation", "function-resource-permissions/annotation/internal-users"),
+        ("dataset", "function-resource-permissions/dataset/internal-users"),
+        ("modelDev", "function-resource-permissions/model-dev/internal-users"),
+    ],
+)
+def test_create_module_permissions_single(monkeypatch, client, module, expected_path):
+    calls = _capture(monkeypatch, client, "post_request", return_value=module)
+
+    # a single module string is accepted (not only a list)
+    result = client.create_workspace_user_module_permissions(
+        workspace_user_id="wsu-1", modules=module
+    )
+
+    assert len(calls) == 1
+    assert calls[0]["endpoint"] == expected_path
+    assert calls[0]["kwargs"]["payload"] == {"workspaceUserId": "wsu-1"}
+    assert result == [module]
+
+
+def test_create_module_permissions_multiple(monkeypatch, client):
+    calls = _capture(monkeypatch, client, "post_request", return_value="ok")
+
+    result = client.create_workspace_user_module_permissions(
+        workspace_user_id="wsu-1", modules=["annotation", "dataset"]
+    )
+
+    assert [c["endpoint"] for c in calls] == [
+        "function-resource-permissions/annotation/internal-users",
+        "function-resource-permissions/dataset/internal-users",
+    ]
+    assert all(c["kwargs"]["payload"] == {"workspaceUserId": "wsu-1"} for c in calls)
+    assert result == ["ok", "ok"]
+
+
+def test_create_module_permissions_invalid_module(monkeypatch, client):
+    _capture(monkeypatch, client, "post_request", return_value=None)
+
+    with pytest.raises(fastlabel.exceptions.FastLabelInvalidException):
+        client.create_workspace_user_module_permissions(
+            workspace_user_id="wsu-1", modules="unknown"
+        )
+
+
+# --- delete_workspace_user_module_permissions ------------------------------
+
+
+def test_delete_module_permissions_single(monkeypatch, client):
+    calls = _capture(monkeypatch, client, "delete_request", return_value=None)
+
+    client.delete_workspace_user_module_permissions(
+        workspace_user_id="wsu-1", modules="modelDev"
+    )
+
+    assert len(calls) == 1
+    assert calls[0]["endpoint"] == "function-resource-permissions"
+    assert calls[0]["kwargs"]["payload"] == {
+        "workspaceUserId": "wsu-1",
+        "resource": "modelDev",
+    }
+
+
+def test_delete_module_permissions_multiple(monkeypatch, client):
+    calls = _capture(monkeypatch, client, "delete_request", return_value=None)
+
+    client.delete_workspace_user_module_permissions(
+        workspace_user_id="wsu-1", modules=["annotation", "modelDev"]
+    )
+
+    assert [c["kwargs"]["payload"]["resource"] for c in calls] == [
+        "annotation",
+        "modelDev",
+    ]
+    assert all(c["endpoint"] == "function-resource-permissions" for c in calls)
+
+
+def test_delete_module_permissions_invalid_module(monkeypatch, client):
+    _capture(monkeypatch, client, "delete_request", return_value=None)
+
+    with pytest.raises(fastlabel.exceptions.FastLabelInvalidException):
+        client.delete_workspace_user_module_permissions(
+            workspace_user_id="wsu-1", modules="unknown"
+        )
