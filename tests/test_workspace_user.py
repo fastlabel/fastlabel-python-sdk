@@ -123,7 +123,7 @@ def test_create_workspace_user_empty_modules_sent(monkeypatch, client):
 def test_update_workspace_user_role_only(monkeypatch, client):
     calls = _capture(monkeypatch, client, "put_request", return_value={})
 
-    client.update_workspace_user(user_id="wsu-1", role="owner")
+    client.update_workspace_user(id="wsu-1", role="owner")
 
     assert calls[0]["endpoint"] == "workspaces-users/internal-users/wsu-1"
     assert calls[0]["kwargs"]["payload"] == {"role": "owner"}
@@ -132,7 +132,7 @@ def test_update_workspace_user_role_only(monkeypatch, client):
 def test_update_workspace_user_modules_unchanged_when_none(monkeypatch, client):
     calls = _capture(monkeypatch, client, "put_request", return_value={})
 
-    client.update_workspace_user(user_id="wsu-1", role="member")
+    client.update_workspace_user(id="wsu-1", role="member")
 
     # modules omitted -> not present in payload (left unchanged server-side)
     assert "modules" not in calls[0]["kwargs"]["payload"]
@@ -141,7 +141,7 @@ def test_update_workspace_user_modules_unchanged_when_none(monkeypatch, client):
 def test_update_workspace_user_modules_sync(monkeypatch, client):
     calls = _capture(monkeypatch, client, "put_request", return_value={})
 
-    client.update_workspace_user(user_id="wsu-1", modules=["annotation", "modelDev"])
+    client.update_workspace_user(id="wsu-1", modules=["annotation", "modelDev"])
 
     assert calls[0]["kwargs"]["payload"] == {"modules": ["annotation", "modelDev"]}
 
@@ -149,7 +149,7 @@ def test_update_workspace_user_modules_sync(monkeypatch, client):
 def test_update_workspace_user_empty_modules_revokes_all(monkeypatch, client):
     calls = _capture(monkeypatch, client, "put_request", return_value={})
 
-    client.update_workspace_user(user_id="wsu-1", modules=[])
+    client.update_workspace_user(id="wsu-1", modules=[])
 
     # empty list is distinct from None: it is sent to revoke all permissions
     assert calls[0]["kwargs"]["payload"] == {"modules": []}
@@ -161,7 +161,7 @@ def test_update_workspace_user_empty_modules_revokes_all(monkeypatch, client):
 def test_delete_workspace_user(monkeypatch, client):
     calls = _capture(monkeypatch, client, "delete_request", return_value=None)
 
-    result = client.delete_workspace_user(user_id="wsu-1")
+    result = client.delete_workspace_user(id="wsu-1")
 
     assert calls[0]["endpoint"] == "workspaces-users/internal-users/wsu-1"
     assert result is None

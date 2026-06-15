@@ -5523,20 +5523,20 @@ class Client:
 
     def update_workspace_user(
         self,
-        user_id: str,
+        id: str,
         role: str = None,
         modules: List[str] = None,
     ) -> dict:
         """
         Updates an internal workspace user and returns the updated user.
-        user_id is the id of the workspace user (Required).
+        id is the id of the workspace user (Required).
         role is the workspace role, 'member' or 'owner' (Optional).
         modules is a list of module permissions to sync the user to
         (Optional). Each value is one of 'annotation', 'modelDev', 'dataset'.
         When omitted (None) the module permissions are left unchanged; pass an
         empty list to revoke all module permissions.
         """
-        endpoint = f"workspaces-users/internal-users/{user_id}"
+        endpoint = f"workspaces-users/internal-users/{id}"
         payload = {}
         if role:
             payload["role"] = role
@@ -5544,12 +5544,12 @@ class Client:
             payload["modules"] = modules
         return self.api.put_request(endpoint, payload=payload)
 
-    def delete_workspace_user(self, user_id: str) -> None:
+    def delete_workspace_user(self, id: str) -> None:
         """
         Deletes an internal workspace user.
-        user_id is the id of the workspace user (Required).
+        id is the id of the workspace user (Required).
         """
-        endpoint = f"workspaces-users/internal-users/{user_id}"
+        endpoint = f"workspaces-users/internal-users/{id}"
         self.api.delete_request(endpoint)
 
     def mask_to_fastlabel_segmentation_points(

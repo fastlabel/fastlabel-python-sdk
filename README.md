@@ -4192,7 +4192,7 @@ syncs the user's module permissions to the given set.
 
 ```python
 user = client.update_workspace_user(
-    user_id="YOUR_WORKSPACE_USER_ID",
+    id="YOUR_WORKSPACE_USER_ID",
     role="owner",  # 'member' or 'owner' (Optional)
     # modules omitted -> module permissions are left unchanged.
     # modules=["annotation"] -> sync to exactly this set.
@@ -4206,7 +4206,7 @@ user = client.update_workspace_user(
 Deletes an internal workspace user.
 
 ```python
-client.delete_workspace_user(user_id="YOUR_WORKSPACE_USER_ID")
+client.delete_workspace_user(id="YOUR_WORKSPACE_USER_ID")
 ```
 
 ## API Docs
