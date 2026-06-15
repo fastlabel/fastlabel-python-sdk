@@ -4173,7 +4173,7 @@ users = client.get_workspace_users(
 ### Create workspace user
 
 Creates an internal workspace user. The `slug` is generated automatically on the server side.
-Pass `modules` to grant module permissions on invitation.
+Module permissions are managed separately (see below).
 
 ```python
 user = client.create_workspace_user(
@@ -4181,23 +4181,17 @@ user = client.create_workspace_user(
     email="john@example.com",
     language="en",  # 'en' or 'ja'
     role="member",  # 'member' or 'owner'
-    modules=["annotation", "dataset"],  # Optional. Any of 'annotation', 'modelDev', 'dataset'
 )
 ```
 
 ### Update workspace user
 
-Updates an internal workspace user. The `role` can be changed, and `modules`
-syncs the user's module permissions to the given set.
+Updates an internal workspace user. Only the `role` can be changed.
 
 ```python
 user = client.update_workspace_user(
     id="YOUR_WORKSPACE_USER_ID",
     role="owner",  # 'member' or 'owner' (Optional)
-    # modules omitted -> module permissions are left unchanged.
-    # modules=["annotation"] -> sync to exactly this set.
-    # modules=[] -> revoke all module permissions.
-    modules=["annotation", "modelDev"],
 )
 ```
 
@@ -4207,6 +4201,44 @@ Deletes an internal workspace user.
 
 ```python
 client.delete_workspace_user(id="YOUR_WORKSPACE_USER_ID")
+```
+
+### Grant module permissions
+
+Grants module permissions to an internal workspace user.
+`modules` accepts a single module or a list (each is sent as a separate request).
+
+```python
+# Single module
+client.create_workspace_user_module_permissions(
+    workspace_user_id="YOUR_WORKSPACE_USER_ID",
+    modules="annotation",  # 'annotation', 'modelDev' or 'dataset'
+)
+
+# Multiple modules
+client.create_workspace_user_module_permissions(
+    workspace_user_id="YOUR_WORKSPACE_USER_ID",
+    modules=["annotation", "dataset"],
+)
+```
+
+### Revoke module permissions
+
+Revokes module permissions from an internal workspace user.
+`modules` accepts a single module or a list (each is sent as a separate request).
+
+```python
+# Single module
+client.delete_workspace_user_module_permissions(
+    workspace_user_id="YOUR_WORKSPACE_USER_ID",
+    modules="annotation",  # 'annotation', 'modelDev' or 'dataset'
+)
+
+# Multiple modules
+client.delete_workspace_user_module_permissions(
+    workspace_user_id="YOUR_WORKSPACE_USER_ID",
+    modules=["annotation", "dataset"],
+)
 ```
 
 ## API Docs
