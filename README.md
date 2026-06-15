@@ -4134,6 +4134,81 @@ client.create_model_monitoring_request_results(
 )
 ```
 
+## Workspace User
+
+### Get workspace users
+
+Returns a list of internal workspace users. (Up to 20 at a time by default)
+Each user includes its granted module permissions in `functionResourcePermissions`.
+
+```python
+import fastlabel
+client = fastlabel.Client()
+
+users = client.get_workspace_users(
+    keyword="",  # Search keyword for name or email (Optional)
+    offset=0,    # The starting position number to fetch (Optional)
+    limit=20,    # The max number to fetch (Optional, default 20)
+)
+# [
+#   {
+#     "id": "...",
+#     "userId": "...",
+#     "userSlug": "...",
+#     "userName": "John Doe",
+#     "userEmail": "john@example.com",
+#     "role": "member",
+#     "isExternal": False,
+#     "createdAt": "...",
+#     "updatedAt": "...",
+#     "functionResourcePermissions": {
+#       "annotation": True,
+#       "modelDev": False,
+#       "dataset": False
+#     }
+#   }
+# ]
+```
+
+### Create workspace user
+
+Creates an internal workspace user. The `slug` is generated automatically on the server side.
+Pass `modules` to grant module permissions on invitation.
+
+```python
+user = client.create_workspace_user(
+    name="John Doe",
+    email="john@example.com",
+    language="en",  # 'en' or 'ja'
+    role="member",  # 'member' or 'owner'
+    modules=["annotation", "dataset"],  # Optional. Any of 'annotation', 'modelDev', 'dataset'
+)
+```
+
+### Update workspace user
+
+Updates an internal workspace user. The `role` can be changed, and `modules`
+syncs the user's module permissions to the given set.
+
+```python
+user = client.update_workspace_user(
+    user_id="YOUR_WORKSPACE_USER_ID",
+    role="owner",  # 'member' or 'owner' (Optional)
+    # modules omitted -> module permissions are left unchanged.
+    # modules=["annotation"] -> sync to exactly this set.
+    # modules=[] -> revoke all module permissions.
+    modules=["annotation", "modelDev"],
+)
+```
+
+### Delete workspace user
+
+Deletes an internal workspace user.
+
+```python
+client.delete_workspace_user(user_id="YOUR_WORKSPACE_USER_ID")
+```
+
 ## API Docs
 
 Check [this](https://api.fastlabel.ai/docs/) for further information.

@@ -5471,6 +5471,87 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
+    def get_workspace_users(
+        self,
+        keyword: str = None,
+        offset: int = None,
+        limit: int = 20,
+    ) -> list:
+        """
+        Returns a list of internal workspace users.
+        keyword is a search keyword for name or email (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional, default 20).
+        """
+        endpoint = "workspaces-users"
+        params = {}
+        if keyword:
+            params["keyword"] = keyword
+        if offset is not None:
+            params["offset"] = offset
+        if limit is not None:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def create_workspace_user(
+        self,
+        name: str,
+        email: str,
+        language: str,
+        role: str,
+        modules: List[str] = None,
+    ) -> dict:
+        """
+        Creates an internal workspace user and returns the created user.
+        name is the user's name (Required).
+        email is the user's email address (Required).
+        language is the user's language, 'en' or 'ja' (Required).
+        role is the workspace role, 'member' or 'owner' (Required).
+        modules is a list of module permissions to grant on invitation
+        (Optional). Each value is one of 'annotation', 'modelDev', 'dataset'.
+        """
+        endpoint = "workspaces-users/internal-users"
+        payload = {
+            "name": name,
+            "email": email,
+            "language": language,
+            "role": role,
+        }
+        if modules is not None:
+            payload["modules"] = modules
+        return self.api.post_request(endpoint, payload=payload)
+
+    def update_workspace_user(
+        self,
+        user_id: str,
+        role: str = None,
+        modules: List[str] = None,
+    ) -> dict:
+        """
+        Updates an internal workspace user and returns the updated user.
+        user_id is the id of the workspace user (Required).
+        role is the workspace role, 'member' or 'owner' (Optional).
+        modules is a list of module permissions to sync the user to
+        (Optional). Each value is one of 'annotation', 'modelDev', 'dataset'.
+        When omitted (None) the module permissions are left unchanged; pass an
+        empty list to revoke all module permissions.
+        """
+        endpoint = f"workspaces-users/internal-users/{user_id}"
+        payload = {}
+        if role:
+            payload["role"] = role
+        if modules is not None:
+            payload["modules"] = modules
+        return self.api.put_request(endpoint, payload=payload)
+
+    def delete_workspace_user(self, user_id: str) -> None:
+        """
+        Deletes an internal workspace user.
+        user_id is the id of the workspace user (Required).
+        """
+        endpoint = f"workspaces-users/internal-users/{user_id}"
+        self.api.delete_request(endpoint)
+
     def mask_to_fastlabel_segmentation_points(
         self, mask_image: Union[str, np.ndarray]
     ) -> List[List[List[int]]]:
