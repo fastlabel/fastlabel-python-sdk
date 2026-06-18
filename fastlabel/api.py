@@ -19,7 +19,7 @@ class Api:
             raise ValueError("FASTLABEL_ACCESS_TOKEN is not configured.")
         self.access_token = "Bearer " + access_token
 
-    def get_request(self, endpoint: str, params=None) -> Union[dict, list, str]:
+    def get_request(self, endpoint: str, params=None) -> Union[dict, list]:
         """Makes a get request to an endpoint.
         If an error occurs, assumes that endpoint returns JSON as:
             { 'statusCode': XXX,
