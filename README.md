@@ -3836,6 +3836,7 @@ Example of two training jobs.
         "tags": [],
         "contentCount": 23,
         "userName": "Admin",
+        "userEmail": "admin@example.com",
         "createdAt": "2023-10-31T07:10:28.306Z",
         "completedAt": null,
         "customModel": {
@@ -3862,6 +3863,7 @@ Example of two training jobs.
         ],
         "contentCount": 20,
         "userName": "Admin",
+        "userEmail": "admin@example.com",
         "createdAt": "2023-10-31T06:56:28.112Z",
         "completedAt": "2023-10-31T07:08:26.000Z",
         "customModel": {
@@ -4186,21 +4188,24 @@ user = client.create_workspace_user(
 
 ### Update workspace user
 
-Updates an internal workspace user. Only the `role` can be changed.
+Updates an internal workspace user. The user is identified by `email` and only
+the `role` can be changed. Passing `role="none"` removes the user from the
+workspace (equivalent to `delete_workspace_user`).
 
 ```python
 user = client.update_workspace_user(
-    id="YOUR_WORKSPACE_USER_ID",
-    role="owner",  # 'member' or 'owner' (Optional)
+    email="john@example.com",
+    role="owner",  # 'member', 'owner' or 'none'
 )
 ```
 
 ### Delete workspace user
 
-Deletes an internal workspace user.
+Removes an internal workspace user from the workspace. There is no dedicated
+delete endpoint; this updates the user's role to `none`.
 
 ```python
-client.delete_workspace_user(id="YOUR_WORKSPACE_USER_ID")
+client.delete_workspace_user(email="john@example.com")
 ```
 
 ### Grant module permissions
@@ -4211,13 +4216,13 @@ Grants module permissions to an internal workspace user.
 ```python
 # Single module
 client.create_workspace_user_module_permissions(
-    workspace_user_id="YOUR_WORKSPACE_USER_ID",
+    email="john@example.com",
     modules="annotation",  # 'annotation', 'modelDev' or 'dataset'
 )
 
 # Multiple modules
 client.create_workspace_user_module_permissions(
-    workspace_user_id="YOUR_WORKSPACE_USER_ID",
+    email="john@example.com",
     modules=["annotation", "dataset"],
 )
 ```
@@ -4230,13 +4235,13 @@ Revokes module permissions from an internal workspace user.
 ```python
 # Single module
 client.delete_workspace_user_module_permissions(
-    workspace_user_id="YOUR_WORKSPACE_USER_ID",
+    email="john@example.com",
     modules="annotation",  # 'annotation', 'modelDev' or 'dataset'
 )
 
 # Multiple modules
 client.delete_workspace_user_module_permissions(
-    workspace_user_id="YOUR_WORKSPACE_USER_ID",
+    email="john@example.com",
     modules=["annotation", "dataset"],
 )
 ```

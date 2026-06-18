@@ -5520,39 +5520,41 @@ class Client:
 
     def update_workspace_user(
         self,
-        id: str,
-        role: str = None,
+        email: str,
+        role: str,
     ) -> dict:
         """
         Updates an internal workspace user and returns the updated user.
-        Only the role can be changed.
-        id is the id of the workspace user (Required).
-        role is the workspace role, 'member' or 'owner' (Optional).
+        The user is identified by email. Only the role can be changed.
+        Passing role='none' removes the user from the workspace
+        (equivalent to delete_workspace_user).
+        email is the email address of the workspace user (Required).
+        role is the workspace role, 'member', 'owner' or 'none' (Required).
         """
-        endpoint = f"workspaces-users/internal-users/{id}"
-        payload = {}
-        if role:
-            payload["role"] = role
+        endpoint = "workspaces-users/internal-users"
+        payload = {"email": email, "role": role}
         return self.api.put_request(endpoint, payload=payload)
 
-    def delete_workspace_user(self, id: str) -> None:
+    def delete_workspace_user(self, email: str) -> None:
         """
-        Deletes an internal workspace user.
-        id is the id of the workspace user (Required).
+        Removes an internal workspace user from the workspace.
+        There is no dedicated delete endpoint; this is done by updating the
+        user's role to 'none'.
+        email is the email address of the workspace user (Required).
         """
-        endpoint = f"workspaces-users/internal-users/{id}"
-        self.api.delete_request(endpoint)
+        endpoint = "workspaces-users/internal-users"
+        self.api.put_request(endpoint, payload={"email": email, "role": "none"})
 
     def create_workspace_user_module_permissions(
         self,
-        workspace_user_id: str,
+        email: str,
         modules: Union[str, List[str]],
     ) -> List[str]:
         """
         Grants module permissions to an internal workspace user.
         Each module is granted with a separate request; if one fails (e.g. the
         module user limit is reached), the permissions granted before it remain.
-        workspace_user_id is the id of the workspace user (Required).
+        email is the email address of the workspace user (Required).
         modules is a single module or a list of modules, each one of
         'annotation', 'modelDev', 'dataset' (Required).
         """
@@ -5572,23 +5574,19 @@ class Client:
             endpoint = (
                 f"function-resource-permissions/{module_paths[module]}/internal-users"
             )
-            results.append(
-                self.api.post_request(
-                    endpoint, payload={"workspaceUserId": workspace_user_id}
-                )
-            )
+            results.append(self.api.post_request(endpoint, payload={"email": email}))
         return results
 
     def delete_workspace_user_module_permissions(
         self,
-        workspace_user_id: str,
+        email: str,
         modules: Union[str, List[str]],
     ) -> None:
         """
         Revokes module permissions from an internal workspace user.
         Each module is revoked with a separate request; if one fails, the
         permissions revoked before it remain revoked.
-        workspace_user_id is the id of the workspace user (Required).
+        email is the email address of the workspace user (Required).
         modules is a single module or a list of modules, each one of
         'annotation', 'modelDev', 'dataset' (Required).
         """
@@ -5602,7 +5600,7 @@ class Client:
                 )
             self.api.delete_request(
                 endpoint,
-                payload={"workspaceUserId": workspace_user_id, "resource": module},
+                payload={"email": email, "resource": module},
             )
 
     def mask_to_fastlabel_segmentation_points(
