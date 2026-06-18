@@ -2475,7 +2475,7 @@ class Client:
         task_id: str,
     ) -> str:
         history: dict = self.api.post_request(
-            "data-lake/import-pipeline/start",
+            "data-lake/robotics/import-pipeline/start",
             payload={
                 "project": project,
                 "taskId": task_id,
@@ -2485,15 +2485,16 @@ class Client:
         return history["id"]
 
     def _upload_zip_with_signed_url(self, history_id: str, file_path: str) -> None:
-        url = self.api.get_request(
-            "data-lake/import-pipeline/signed-url", params={"historyId": history_id}
+        signed_url_data = self.api.get_request(
+            "data-lake/robotics/import-pipeline/signed-url",
+            params={"historyId": history_id},
         )
-        res = self.api.upload_zipfile(url=url, file_path=file_path)
+        res = self.api.upload_zipfile(url=signed_url_data["url"], file_path=file_path)
         res.raise_for_status()
 
     def _trigger_batch_import(self, history_id: str) -> dict:
         return self.api.post_request(
-            "data-lake/import-pipeline/run",
+            "data-lake/robotics/import-pipeline/run",
             payload={
                 "historyId": history_id,
             },
