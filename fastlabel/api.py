@@ -112,7 +112,11 @@ class Api:
         r = requests.put(self.base_url + endpoint, json=payload, headers=headers)
 
         if r.status_code == 200:
+            if not r.content:
+                return
             return r.json()
+        elif r.status_code == 204:
+            return
         else:
             try:
                 error = r.json()["message"]
