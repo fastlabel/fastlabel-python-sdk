@@ -2230,6 +2230,20 @@ history = client.import_robotics_contents_file(
 )
 ```
 
+#### Import mcap
+
+Import an mcap zip file into an existing robotics task.
+
+This method starts an import pipeline, uploads the zip file via a signed URL, and triggers the batch import.
+
+```python
+result = client.import_robotics_mcap(
+    project="YOUR_PROJECT_SLUG",
+    task_id="YOUR_TASK_ID",
+    file_path="ZIP_FILE_PATH",  # Supported extension is .zip
+)
+```
+
 #### Import LeRobot Dataset
 
 Import a [LeRobot](https://github.com/huggingface/lerobot) dataset (v3) into a FastLabel robotics project.
