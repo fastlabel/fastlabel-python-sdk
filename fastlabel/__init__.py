@@ -5471,6 +5471,138 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
+    def get_workspace_users(
+        self,
+        keyword: str = None,
+        offset: int = None,
+        limit: int = 20,
+    ) -> list:
+        """
+        Returns a list of internal workspace users.
+        keyword is a search keyword for name or email (Optional).
+        offset is the starting position number to fetch (Optional).
+        limit is the max number to fetch (Optional, default 20).
+        """
+        endpoint = "workspaces-users"
+        params = {}
+        if keyword:
+            params["keyword"] = keyword
+        if offset is not None:
+            params["offset"] = offset
+        if limit is not None:
+            params["limit"] = limit
+        return self.api.get_request(endpoint, params=params)
+
+    def create_workspace_user(
+        self,
+        name: str,
+        email: str,
+        language: str,
+        role: str,
+    ) -> dict:
+        """
+        Creates an internal workspace user and returns the created user.
+        name is the user's name (Required).
+        email is the user's email address (Required).
+        language is the user's language, 'en' or 'ja' (Required).
+        role is the workspace role, 'member' or 'owner' (Required).
+        Module permissions are managed separately; use
+        create_workspace_user_module_permission to grant them.
+        """
+        endpoint = "workspaces-users/internal-users"
+        payload = {
+            "name": name,
+            "email": email,
+            "language": language,
+            "role": role,
+        }
+        return self.api.post_request(endpoint, payload=payload)
+
+    def update_workspace_user(
+        self,
+        email: str,
+        role: str,
+    ) -> dict:
+        """
+        Updates an internal workspace user and returns the updated user.
+        The user is identified by email. Only the role can be changed.
+        Passing role='none' removes the user from the workspace
+        (equivalent to delete_workspace_user).
+        email is the email address of the workspace user (Required).
+        role is the workspace role, 'member', 'owner' or 'none' (Required).
+        """
+        endpoint = "workspaces-users/internal-users"
+        payload = {"email": email, "role": role}
+        return self.api.put_request(endpoint, payload=payload)
+
+    def delete_workspace_user(self, email: str) -> None:
+        """
+        Removes an internal workspace user from the workspace.
+        There is no dedicated delete endpoint; this is done by updating the
+        user's role to 'none'.
+        email is the email address of the workspace user (Required).
+        """
+        endpoint = "workspaces-users/internal-users"
+        self.api.put_request(endpoint, payload={"email": email, "role": "none"})
+
+    def create_workspace_user_module_permissions(
+        self,
+        email: str,
+        modules: Union[str, List[str]],
+    ) -> List[str]:
+        """
+        Grants module permissions to an internal workspace user.
+        Each module is granted with a separate request; if one fails (e.g. the
+        module user limit is reached), the permissions granted before it remain.
+        email is the email address of the workspace user (Required).
+        modules is a single module or a list of modules, each one of
+        'annotation', 'modelDev', 'dataset' (Required).
+        """
+        if isinstance(modules, str):
+            modules = [modules]
+        module_paths = {
+            "annotation": "annotation",
+            "dataset": "dataset",
+            "modelDev": "model-dev",
+        }
+        results = []
+        for module in modules:
+            if module not in module_paths:
+                raise FastLabelInvalidException(
+                    "module must be one of 'annotation', 'modelDev', 'dataset'.", 422
+                )
+            endpoint = (
+                f"function-resource-permissions/{module_paths[module]}/internal-users"
+            )
+            results.append(self.api.post_request(endpoint, payload={"email": email}))
+        return results
+
+    def delete_workspace_user_module_permissions(
+        self,
+        email: str,
+        modules: Union[str, List[str]],
+    ) -> None:
+        """
+        Revokes module permissions from an internal workspace user.
+        Each module is revoked with a separate request; if one fails, the
+        permissions revoked before it remain revoked.
+        email is the email address of the workspace user (Required).
+        modules is a single module or a list of modules, each one of
+        'annotation', 'modelDev', 'dataset' (Required).
+        """
+        if isinstance(modules, str):
+            modules = [modules]
+        endpoint = "function-resource-permissions"
+        for module in modules:
+            if module not in ("annotation", "modelDev", "dataset"):
+                raise FastLabelInvalidException(
+                    "module must be one of 'annotation', 'modelDev', 'dataset'.", 422
+                )
+            self.api.delete_request(
+                endpoint,
+                payload={"email": email, "resource": module},
+            )
+
     def mask_to_fastlabel_segmentation_points(
         self, mask_image: Union[str, np.ndarray]
     ) -> List[List[List[int]]]:

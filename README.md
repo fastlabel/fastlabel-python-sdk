@@ -3836,6 +3836,7 @@ Example of two training jobs.
         "tags": [],
         "contentCount": 23,
         "userName": "Admin",
+        "userEmail": "admin@example.com",
         "createdAt": "2023-10-31T07:10:28.306Z",
         "completedAt": null,
         "customModel": {
@@ -3862,6 +3863,7 @@ Example of two training jobs.
         ],
         "contentCount": 20,
         "userName": "Admin",
+        "userEmail": "admin@example.com",
         "createdAt": "2023-10-31T06:56:28.112Z",
         "completedAt": "2023-10-31T07:08:26.000Z",
         "customModel": {
@@ -4131,6 +4133,116 @@ client.create_model_monitoring_request_results(
             "requestAt": dt_jst.isoformat(),  # The time when your endpoint accepted the request
         }
     ],
+)
+```
+
+## Workspace User
+
+### Get workspace users
+
+Returns a list of internal workspace users. (Up to 20 at a time by default)
+Each user includes its granted module permissions in `functionResourcePermissions`.
+
+```python
+import fastlabel
+client = fastlabel.Client()
+
+users = client.get_workspace_users(
+    keyword="",  # Search keyword for name or email (Optional)
+    offset=0,    # The starting position number to fetch (Optional)
+    limit=20,    # The max number to fetch (Optional, default 20)
+)
+# [
+#   {
+#     "id": "...",
+#     "userId": "...",
+#     "userSlug": "...",
+#     "userName": "John Doe",
+#     "userEmail": "john@example.com",
+#     "role": "member",
+#     "isExternal": False,
+#     "createdAt": "...",
+#     "updatedAt": "...",
+#     "functionResourcePermissions": {
+#       "annotation": True,
+#       "modelDev": False,
+#       "dataset": False
+#     }
+#   }
+# ]
+```
+
+### Create workspace user
+
+Creates an internal workspace user. The `slug` is generated automatically on the server side.
+Module permissions are managed separately (see below).
+
+```python
+user = client.create_workspace_user(
+    name="John Doe",
+    email="john@example.com",
+    language="en",  # 'en' or 'ja'
+    role="member",  # 'member' or 'owner'
+)
+```
+
+### Update workspace user
+
+Updates an internal workspace user. The user is identified by `email` and only
+the `role` can be changed. Passing `role="none"` removes the user from the
+workspace (equivalent to `delete_workspace_user`).
+
+```python
+user = client.update_workspace_user(
+    email="john@example.com",
+    role="owner",  # 'member', 'owner' or 'none'
+)
+```
+
+### Delete workspace user
+
+Removes an internal workspace user from the workspace. There is no dedicated
+delete endpoint; this updates the user's role to `none`.
+
+```python
+client.delete_workspace_user(email="john@example.com")
+```
+
+### Grant module permissions
+
+Grants module permissions to an internal workspace user.
+`modules` accepts a single module or a list (each is sent as a separate request).
+
+```python
+# Single module
+client.create_workspace_user_module_permissions(
+    email="john@example.com",
+    modules="annotation",  # 'annotation', 'modelDev' or 'dataset'
+)
+
+# Multiple modules
+client.create_workspace_user_module_permissions(
+    email="john@example.com",
+    modules=["annotation", "dataset"],
+)
+```
+
+### Revoke module permissions
+
+Revokes module permissions from an internal workspace user.
+`modules` accepts a single module or a list (each is sent as a separate request).
+
+```python
+# Single module
+client.delete_workspace_user_module_permissions(
+    email="john@example.com",
+    modules="annotation",  # 'annotation', 'modelDev' or 'dataset'
+)
+
+# Multiple modules
+client.delete_workspace_user_module_permissions(
+    email="john@example.com",
+    modules=["annotation", "dataset"],
 )
 ```
 

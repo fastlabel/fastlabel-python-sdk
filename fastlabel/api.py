@@ -44,7 +44,7 @@ class Api:
             else:
                 raise FastLabelException(error, r.status_code)
 
-    def delete_request(self, endpoint: str, params=None) -> dict:
+    def delete_request(self, endpoint: str, params=None, payload=None) -> dict:
         """Makes a delete request to an endpoint.
         If an error occurs, assumes that endpoint returns JSON as:
             { 'statusCode': XXX,
@@ -55,7 +55,9 @@ class Api:
             "Content-Type": "application/json",
             "Authorization": self.access_token,
         }
-        r = requests.delete(self.base_url + endpoint, headers=headers, params=params)
+        r = requests.delete(
+            self.base_url + endpoint, headers=headers, params=params, json=payload
+        )
 
         if r.status_code == 200 or r.status_code == 204:
             return
@@ -110,7 +112,11 @@ class Api:
         r = requests.put(self.base_url + endpoint, json=payload, headers=headers)
 
         if r.status_code == 200:
+            if not r.content:
+                return
             return r.json()
+        elif r.status_code == 204:
+            return
         else:
             try:
                 error = r.json()["message"]
