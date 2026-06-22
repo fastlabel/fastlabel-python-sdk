@@ -41,6 +41,13 @@ _Creating and deploying a new package version is easy_
      - input [version](#version) (ex: `1.12.0`)
      - Click `Create new tag: x.x.x`
 
+     > **Note:** The tag name becomes the published package version. It is resolved
+     > automatically from the Git tag by `setuptools_scm` (there is no version string
+     > to edit in the source), so enter the exact version, matching the existing tag
+     > format (e.g. `1.12.0`, no `v` prefix). Creating the tag together with the
+     > release here is fine — the workflow checks out the full history and tags, so
+     > the version always resolves correctly.
+
    - Target: main
 
    - Release title: `Release x.x.x` (ex: `Release 1.12.0`)
@@ -68,6 +75,13 @@ If the workflow fails, follow these steps:
 ---
 
 ### Version
+
+The package version is **derived automatically from the Git tag** by
+[`setuptools_scm`](https://github.com/pypa/setuptools-scm) — see `[tool.setuptools_scm]`
+and `dynamic = ["version"]` in `pyproject.toml`. There is no version string to edit in
+the source; the tag you create in Step 1 is what gets published to PyPI, so it must be a
+valid version. (If the tag cannot be resolved, the build falls back to a dev version like
+`0.1.dev1+g<sha>`, which PyPI rejects with a `400 Bad Request`.)
 
 We use [semantic versioning](https://packaging.python.org/guides/distributing-packages-using-setuptools/#semantic-versioning-preferred).  
 If you are adding a meaningful feature, bump the minor version.  
