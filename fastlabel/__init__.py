@@ -2243,7 +2243,7 @@ class Client:
             payload["tags"] = tags
         if operator is not None:
             payload["operator"] = operator
-        if annotations:
+        if annotations is not None:
             payload["annotations"] = delete_extra_annotations_parameter(annotations)
         if metadatas:
             payload["metadatas"] = metadatas
