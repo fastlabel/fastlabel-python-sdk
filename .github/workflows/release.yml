@@ -10,10 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          fetch-depth: 0 # setuptools_scm needs full history and tags to resolve the version
+          fetch-tags: true
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5
         with:
           python-version: "3.10"
 
@@ -32,6 +35,6 @@ jobs:
 
       - name: Publish a Python distribution to PyPI
         if: startsWith(github.event.ref, 'refs/tags') || github.event_name == 'release'
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
