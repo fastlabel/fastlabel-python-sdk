@@ -52,7 +52,7 @@ https://api.fastlabel.ai/docs
 pip install --upgrade fastlabel
 ```
 
-> Python version 3.8 or greater is required
+> Python version 3.10 or greater is required
 
 ## Usage
 
