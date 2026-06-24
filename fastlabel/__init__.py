@@ -2451,6 +2451,55 @@ class Client:
 
         return self.api.post_request(endpoint, payload=payload)
 
+    def import_robotics_mcap(self, project: str, task_id: str, file_path: str) -> dict:
+        """
+        Import robotics mcap zip file.
+        project is slug of your project (Required).
+        task_id is a id of the robotics task to import contents (Required).
+        file_path is a path to data. Supported extensions are zip (Required).
+        """
+        if not file_path.endswith(".zip"):
+            raise FastLabelInvalidException(
+                "Supported extensions are zip (Required).", 422
+            )
+        history_id = self._start_pipeline(project=project, task_id=task_id)
+        self._upload_zip_with_signed_url(
+            history_id=history_id,
+            file_path=file_path,
+        )
+        return self._trigger_batch_import(history_id=history_id)
+
+    def _start_pipeline(
+        self,
+        project: str,
+        task_id: str,
+    ) -> str:
+        history: dict = self.api.post_request(
+            "data-lake/robotics/import-pipeline/start",
+            payload={
+                "project": project,
+                "taskId": task_id,
+            },
+        )
+        logger.info(f"Started data lake pipeline with history ID: {history['id']}")
+        return history["id"]
+
+    def _upload_zip_with_signed_url(self, history_id: str, file_path: str) -> None:
+        signed_url_data = self.api.get_request(
+            "data-lake/robotics/import-pipeline/signed-url",
+            params={"historyId": history_id},
+        )
+        res = self.api.upload_zipfile(url=signed_url_data["url"], file_path=file_path)
+        res.raise_for_status()
+
+    def _trigger_batch_import(self, history_id: str) -> dict:
+        return self.api.post_request(
+            "data-lake/robotics/import-pipeline/run",
+            payload={
+                "historyId": history_id,
+            },
+        )
+
     # Task Update
 
     def update_task(

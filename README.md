@@ -2230,6 +2230,22 @@ history = client.import_robotics_contents_file(
 )
 ```
 
+#### Import mcap
+
+Import an mcap zip file into an existing robotics task.
+
+This method uploads the zip file and starts the import. The import runs **asynchronously** on the server, so the call returns as soon as the import is accepted — it does **not** wait for the import to finish.
+
+```python
+result = client.import_robotics_mcap(
+    project="YOUR_PROJECT_SLUG",
+    task_id="YOUR_TASK_ID",
+    file_path="ZIP_FILE_PATH",  # Supported extension is .zip
+)
+```
+
+There is no API to poll the import progress. Check the import status (and any errors) on the import history screen (`/imports`) in the FastLabel application.
+
 #### Import LeRobot Dataset
 
 Import a [LeRobot](https://github.com/huggingface/lerobot) dataset (v3) into a FastLabel robotics project.
