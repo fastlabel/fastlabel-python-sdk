@@ -67,7 +67,10 @@ def __detect_segmentation_list(
         segmentation_list.append(segmentation)
 
         for separate_place_hierarchy_index in separate_place_hierarchy_indexes:
-            (segmentation, _,) = __detect_segmentation(
+            (
+                segmentation,
+                _,
+            ) = __detect_segmentation(
                 separate_place_hierarchy_index, hierarchy, contours
             )
             segmentation_list.append(segmentation)

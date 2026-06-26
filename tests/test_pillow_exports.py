@@ -4,6 +4,7 @@ These exercise the Image.open/new/fromarray/composite, convert, putpalette,
 save, ImageDraw, and ImageColor calls inside fastlabel/__init__.py so that
 Pillow major-version bumps surface API breakage in CI.
 """
+
 import os
 
 import numpy as np
