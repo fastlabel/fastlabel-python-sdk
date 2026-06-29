@@ -4,6 +4,7 @@ These verify that get/create/update/delete_workspace_user build the correct
 endpoint, query params and payload. The HTTP layer (client.api.*_request) is
 stubbed so no real request is made.
 """
+
 import pytest
 
 import fastlabel

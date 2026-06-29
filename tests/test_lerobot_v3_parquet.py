@@ -4,6 +4,7 @@ Covers _build_episode_map, get_episode_indices, _convert_episode_frames, and
 check_dependencies so that pandas/pyarrow major-version bumps surface
 breakage in CI.
 """
+
 import pytest
 
 pd = pytest.importorskip("pandas")
