@@ -1948,7 +1948,7 @@ task = client.find_sequential_pcd_task(task_id="YOUR_TASK_ID")
 Find a single task by name.
 
 ```python
-task = client.find_sequential_pcd_task(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
+tasks = client.find_sequential_pcd_task_by_name(project="YOUR_PROJECT_SLUG", task_name="YOUR_TASK_NAME")
 ```
 
 #### Get Tasks
@@ -2941,6 +2941,14 @@ Get projects. (Up to 1000 projects)
 
 ```python
 projects = client.get_projects()
+```
+
+### Get Projects Id and Slug map
+
+Get a map of project ids and slugs. (Up to 1000 projects)
+
+```python
+id_slug_map = client.get_project_id_slug_map()
 ```
 
 ### Response
