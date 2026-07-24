@@ -2261,6 +2261,61 @@ results = client.import_lerobot(
 
 > **Note:** Only LeRobot dataset v3 is supported. v2 datasets need to be converted to v3 before importing.
 
+##### Customize the import with a converter
+
+By default, each frame's full `observation.state` and `action` are written to the telemetry JSON and every camera is uploaded. To control this, subclass `LeRobotConverter` and pass the class (the SDK constructs it with the parsed `meta/info.json`, so you can select by feature name):
+
+```python
+from fastlabel.lerobot import LeRobotConverter
+
+
+class JointsOnlyConverter(LeRobotConverter):
+    # keep only the 4 main cameras (drop tactile gel cameras, etc.)
+    CAMERA_KEYS = ("cam_high", "cam_low", "cam_left_wrist", "cam_right_wrist")
+
+    # keep only joint values (names ending in ".pos") out of a large state vector
+    def select_observation_state_names(self, names):
+        return [n for n in names if n.endswith(".pos")]
+
+    def select_action_names(self, names):
+        return [n for n in names if n.endswith(".pos")]
+
+    # add an extra telemetry item
+    def build_telemetry_frame(self, frame):
+        telemetry = super().build_telemetry_frame(frame)
+        telemetry["gripper"] = self.build_action(frame)[-1]
+        return telemetry
+
+    # set tags / metadata on each created task
+    def build_task_kwargs(self, *, episode_index, episode_name, frames):
+        return {
+            "tags": ["lerobot", self.meta.get("robot_type", "unknown")],
+            "metadatas": [{"key": "num_frames", "value": str(len(frames))}],
+        }
+
+
+results = client.import_lerobot(
+    project="YOUR_PROJECT_SLUG",
+    lerobot_data_path="/path/to/lerobot/dataset",
+    converter=JointsOnlyConverter,
+)
+```
+
+Overridable hooks:
+
+| Hook | Purpose |
+| --- | --- |
+| `OBSERVATION_STATE_NAMES` / `ACTION_NAMES` (class vars, tuples) | Keep only the named values (declared order; `None` = all). |
+| `select_observation_state_names` / `select_action_names` | Pick kept feature names dynamically from the given name list (e.g. by suffix). |
+| `build_observation_state` / `build_action` | Transform the kept values. |
+| `build_telemetry_frame` | Shape each telemetry frame (call `super()` to extend). |
+| `select_cameras` | Choose which cameras to upload. |
+| `build_task_kwargs` | Keyword args forwarded to `create_robotics_task` (tags, metadatas, ...). |
+| `select_episodes` | Which episodes to import when `episode_indices` is omitted. |
+| `build_episode_name` | Task / artifact naming. |
+
+For constructor arguments, pass a factory instead of the class, e.g. `converter=functools.partial(MyConverter, threshold=3)`.
+
 #### Find Task
 
 Find a single task.
