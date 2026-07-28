@@ -1,9 +1,42 @@
+import json
 from pathlib import Path
+from typing import Any, NamedTuple
 
 from fastlabel.exceptions import FastLabelInvalidException
 
 
-def check_dependencies():
+class Camera(NamedTuple):
+    """A dataset camera. Shared contract between data access and converter.
+
+    path is the video directory (v3: videos/observation.images.X).
+    key is the observation feature key (e.g. observation.images.cam_high),
+        matching ``meta["features"][key]`` so converters can look up resolution
+        etc.
+    content_name is the mp4 filename stem inside the ZIP (e.g. images_cam_high).
+    """
+
+    path: Path
+    key: str
+    content_name: str
+
+
+def load_info(lerobot_data_path: Path) -> dict[str, Any]:
+    """Load meta/info.json for a LeRobot dataset.
+
+    Returns the parsed dict, or {} when the file is absent.
+
+    meta/info.json is required for import: ``LeRobotConverter`` selects
+    ``observation.state`` / ``action`` values by feature name, so a dataset
+    without the file (or without ``features[key]["names"]``) raises
+    ``FastLabelInvalidException`` before any episode is imported.
+    """
+    info_path = lerobot_data_path / "meta" / "info.json"
+    if not info_path.exists():
+        return {}
+    return json.loads(info_path.read_text())
+
+
+def check_dependencies() -> None:
     try:
         import pandas  # noqa: F401
         import pyarrow  # noqa: F401
@@ -43,31 +76,3 @@ def detect_version(lerobot_data_path: Path) -> str:
         "or data/chunk-XXX/file-*.parquet (v3).",
         422,
     )
-
-
-def format_episode_name(episode_index: int) -> str:
-    return f"episode_{episode_index:06d}"
-
-
-def get_camera_dirs(lerobot_data_path: Path) -> list:
-    """Get camera directories and their content names.
-    Returns [(camera_dir, content_name), ...].
-    e.g. observation.images.top -> content_name = "images_top"
-    """
-    videos_dir = lerobot_data_path / "videos"
-    if not videos_dir.exists():
-        return []
-
-    results = []
-    for obs_dir in sorted(videos_dir.iterdir()):
-        if not obs_dir.is_dir():
-            continue
-        parts = obs_dir.name.split(".")
-        if parts[0] != "observation":
-            raise FastLabelInvalidException(
-                f"Unexpected camera dir name: {obs_dir.name}"
-            )
-
-        content_name = "_".join(parts[1:])
-        results.append((obs_dir, content_name))
-    return results

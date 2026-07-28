@@ -2,15 +2,31 @@ import json
 import shutil
 import tempfile
 from pathlib import Path
+from typing import Any, TypedDict
 
 import cv2
 
 from fastlabel.exceptions import FastLabelInvalidException
-from fastlabel.lerobot.common import format_episode_name, get_camera_dirs
+from fastlabel.lerobot.common import Camera
 
 
-def _build_episode_map(lerobot_data_path: Path) -> dict:
-    """Build a mapping of episode_index -> {chunk, file_stem, frame_offset, length}.
+class EpisodeInfo(TypedDict):
+    """Per-episode location within the v3 layout."""
+
+    chunk: str
+    file_stem: str
+    frame_offset: int
+    length: int
+
+
+# episode_index -> EpisodeInfo
+EpisodeMap = dict[int, EpisodeInfo]
+# One frame's parquet columns converted to native Python (JSON-serialisable).
+Frame = dict[str, Any]
+
+
+def _build_episode_map(lerobot_data_path: Path) -> EpisodeMap:
+    """Build a mapping of episode_index -> EpisodeInfo.
 
     Reads all data parquet files across all chunks and computes per-episode
     frame offsets within each file (needed for video segment extraction).
@@ -20,7 +36,7 @@ def _build_episode_map(lerobot_data_path: Path) -> dict:
     import pandas as pd
 
     data_dir = lerobot_data_path / "data"
-    episode_map = {}
+    episode_map: EpisodeMap = {}
 
     for chunk_dir in sorted(data_dir.iterdir()):
         if not chunk_dir.is_dir() or not chunk_dir.name.startswith("chunk-"):
@@ -46,35 +62,69 @@ def _build_episode_map(lerobot_data_path: Path) -> dict:
     return episode_map
 
 
-def get_episode_indices(lerobot_data_path: Path) -> list:
+def get_episode_indices(lerobot_data_path: Path) -> list[int]:
     """Get all episode indices from a v3 dataset."""
     episode_map = _build_episode_map(lerobot_data_path)
     return sorted(episode_map.keys())
 
 
-def _convert_episode_frames(
+def get_camera_dirs(lerobot_data_path: Path) -> list[Camera]:
+    """Get camera directories and their content names (v3 video layout).
+
+    v3: videos/{observation.images.X}/chunk-XXX/file-YYY.mp4
+    Returns [(camera_dir, content_name), ...].
+    e.g. observation.images.top -> content_name = "images_top"
+    """
+    videos_dir = lerobot_data_path / "videos"
+    if not videos_dir.exists():
+        return []
+
+    results: list[Camera] = []
+    for obs_dir in sorted(videos_dir.iterdir()):
+        if not obs_dir.is_dir():
+            continue
+        parts = obs_dir.name.split(".")
+        if parts[0] != "observation":
+            raise FastLabelInvalidException(
+                f"Unexpected camera dir name: {obs_dir.name}", 422
+            )
+
+        content_name = "_".join(parts[1:])
+        results.append(
+            Camera(path=obs_dir, key=obs_dir.name, content_name=content_name)
+        )
+    return results
+
+
+def _row_to_native(row: Any) -> Frame:
+    """Convert a pandas row to a dict of JSON-serialisable native Python values.
+
+    numpy arrays become lists and numpy scalars become Python scalars so the
+    result is safe to hand to converter hooks and to json.dumps.
+    """
+    return {
+        key: (value.tolist() if hasattr(value, "tolist") else value)
+        for key, value in row.items()
+    }
+
+
+def get_episode_raw_frames(
     lerobot_data_path: Path, episode_index: int, chunk: str, file_stem: str
-) -> list:
-    """Extract frame dicts for a single episode from a v3 consolidated parquet."""
+) -> list[Frame]:
+    """Return every frame of a single episode as native-Python dicts.
+
+    Each dict contains all parquet columns for the row (observation.state,
+    action, frame_index, timestamp, episode_index, ...). This is the raw data
+    passed to the converter hooks.
+    """
     import pandas as pd
 
     parquet_path = lerobot_data_path / "data" / chunk / f"{file_stem}.parquet"
-    df = pd.read_parquet(parquet_path)
+    # Predicate pushdown so a consolidated file holding many episodes only reads
+    # the relevant row groups instead of the whole file per episode.
+    df = pd.read_parquet(parquet_path, filters=[("episode_index", "==", episode_index)])
     ep_df = df[df["episode_index"] == episode_index]
-
-    required_keys = ["observation.state", "action", "frame_index", "timestamp"]
-    if not all(key in ep_df.columns for key in required_keys):
-        return []
-
-    return [
-        {
-            "observation.state": row["observation.state"].tolist(),
-            "action": row["action"].tolist(),
-            "frame_index": int(row["frame_index"]),
-            "timestamp": float(row["timestamp"]),
-        }
-        for _, row in ep_df.iterrows()
-    ]
+    return [_row_to_native(row) for _, row in ep_df.iterrows()]
 
 
 def _extract_video_segment(
@@ -104,52 +154,55 @@ def _extract_video_segment(
         cap.release()
 
 
-def create_episode_zip(
-    lerobot_data_path: Path, episode_index: int, episode_map: dict = None
+def _assemble_episode_zip(
+    ep_info: EpisodeInfo,
+    episode_name: str,
+    cameras: list[Camera],
+    telemetry_frames: list[dict[str, Any]],
+    output_dir: Path,
 ) -> str:
-    """Create a ZIP for a single v3 episode.
+    """Stage selected video segments + telemetry JSON, then archive as a ZIP.
 
-    v3 video layout: videos/{key}/chunk-XXX/file-YYY.mp4
+    ``telemetry_frames`` is the list of frame dicts written to the episode JSON.
+    The staging directory is removed automatically; the ZIP is written under
+    ``output_dir`` (owned by the caller) and its path returned.
     """
-    if episode_map is None:
-        episode_map = _build_episode_map(lerobot_data_path)
+    chunk = ep_info["chunk"]
+    file_stem = ep_info["file_stem"]
+    frame_offset = ep_info["frame_offset"]
+    length = ep_info["length"]
 
+    with tempfile.TemporaryDirectory() as staging:
+        content_dir = Path(staging)
+
+        # Extract video segments
+        # v3: videos/{key}/chunk-XXX/file-YYY.mp4
+        for camera in cameras:
+            video_path = camera.path / chunk / f"{file_stem}.mp4"
+            if not video_path.exists():
+                continue
+            output_path = content_dir / f"{camera.content_name}.mp4"
+            _extract_video_segment(video_path, frame_offset, length, output_path)
+
+        json_path = content_dir / f"{episode_name}.json"
+        json_path.write_text(json.dumps(telemetry_frames, ensure_ascii=False))
+
+        # Create ZIP (files at root, ZIP name = episode name)
+        return shutil.make_archive(
+            base_name=str(output_dir / episode_name),
+            format="zip",
+            root_dir=str(content_dir),
+        )
+
+
+def resolve_episode(
+    episode_index: int,
+    episode_map: EpisodeMap,
+) -> EpisodeInfo:
+    """Look up an episode's info in the episode map (raises if absent)."""
     if episode_index not in episode_map:
         raise FastLabelInvalidException(
             f"Episode index {episode_index} not found in dataset.",
             422,
         )
-
-    ep_info = episode_map[episode_index]
-    chunk = ep_info["chunk"]
-    file_stem = ep_info["file_stem"]
-    frame_offset = ep_info["frame_offset"]
-    length = ep_info["length"]
-    episode_name = format_episode_name(episode_index)
-
-    tmp_dir = tempfile.mkdtemp()
-    content_dir = Path(tmp_dir) / "content"
-    content_dir.mkdir()
-
-    # Extract video segments
-    # v3: videos/{key}/chunk-XXX/file-YYY.mp4
-    for camera_dir, content_name in get_camera_dirs(lerobot_data_path):
-        video_path = camera_dir / chunk / f"{file_stem}.mp4"
-        if not video_path.exists():
-            continue
-        output_path = content_dir / f"{content_name}.mp4"
-        _extract_video_segment(video_path, frame_offset, length, output_path)
-
-    # Convert parquet to JSON
-    frames = _convert_episode_frames(lerobot_data_path, episode_index, chunk, file_stem)
-    json_path = content_dir / f"{episode_name}.json"
-    json_path.write_text(json.dumps(frames, ensure_ascii=False))
-
-    # Create ZIP (files at root, ZIP name = episode name)
-    zip_path = shutil.make_archive(
-        base_name=str(Path(tmp_dir) / episode_name),
-        format="zip",
-        root_dir=str(content_dir),
-    )
-    shutil.rmtree(content_dir)
-    return zip_path
+    return episode_map[episode_index]

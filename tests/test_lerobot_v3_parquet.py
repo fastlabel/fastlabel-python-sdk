@@ -1,9 +1,11 @@
 """Tests for v3 pandas/pyarrow code paths.
 
-Covers _build_episode_map, get_episode_indices, _convert_episode_frames, and
+Covers _build_episode_map, get_episode_indices, get_episode_raw_frames, and
 check_dependencies so that pandas/pyarrow major-version bumps surface
 breakage in CI.
 """
+
+import json
 
 import pytest
 
@@ -52,6 +54,19 @@ def v3_dataset(tmp_path):
     ]
     _write_parquet(chunk1 / "file-000.parquet", rows)
 
+    meta_dir = tmp_path / "meta"
+    meta_dir.mkdir()
+    (meta_dir / "info.json").write_text(
+        json.dumps(
+            {
+                "features": {
+                    "observation.state": {"names": ["s0", "s1"]},
+                    "action": {"names": ["a0", "a1"]},
+                }
+            }
+        )
+    )
+
     return tmp_path
 
 
@@ -83,35 +98,55 @@ class TestBuildEpisodeMap:
         assert v3.get_episode_indices(v3_dataset) == [0, 1, 2]
 
 
-class TestConvertEpisodeFrames:
-    def test_extracts_frame_dicts(self, v3_dataset):
-        frames = v3._convert_episode_frames(
+class TestGetEpisodeRawFrames:
+    def test_extracts_all_columns_as_native(self, v3_dataset):
+        frames = v3.get_episode_raw_frames(
             v3_dataset, episode_index=1, chunk="chunk-000", file_stem="file-000"
         )
 
         assert len(frames) == 3
         for i, frame in enumerate(frames):
+            assert frame["episode_index"] == 1
             assert frame["frame_index"] == i
             assert frame["timestamp"] == pytest.approx(i * 0.1)
             assert frame["action"] == [1.0, 2.0]
             assert isinstance(frame["observation.state"], list)
 
-    def test_missing_required_columns_returns_empty(self, tmp_path):
-        chunk = tmp_path / "data" / "chunk-000"
-        chunk.mkdir(parents=True)
-        _write_parquet(
-            chunk / "file-000.parquet",
-            [{"episode_index": 0, "frame_index": 0}],
-        )
-
-        assert (
-            v3._convert_episode_frames(
-                tmp_path, episode_index=0, chunk="chunk-000", file_stem="file-000"
-            )
-            == []
-        )
-
 
 class TestCheckDependencies:
     def test_returns_when_available(self):
         common.check_dependencies()
+
+
+class TestCreateEpisodeZip:
+    def test_writes_zip_into_output_dir_without_leaking_staging(
+        self, v3_dataset, tmp_path
+    ):
+        import zipfile
+        from pathlib import Path
+
+        from fastlabel.lerobot import LeRobotConverter, create_episode_zip
+
+        out = tmp_path / "out"
+        out.mkdir()
+        episode_map = v3._build_episode_map(v3_dataset)
+        raw_frames = v3.get_episode_raw_frames(
+            v3_dataset, 1, episode_map[1]["chunk"], episode_map[1]["file_stem"]
+        )
+        zip_path = create_episode_zip(
+            v3_dataset,
+            episode_index=1,
+            episode_name="episode_000001",
+            converter=LeRobotConverter(common.load_info(v3_dataset)),
+            output_dir=out,
+            episode_map=episode_map,
+            raw_frames=raw_frames,
+        )
+
+        # ZIP is written under output_dir; the staging dir is not leaked there.
+        assert Path(zip_path).parent == out
+        assert [p.name for p in out.iterdir()] == ["episode_000001.zip"]
+
+        # No videos in this fixture, so the ZIP holds only the telemetry JSON.
+        with zipfile.ZipFile(zip_path) as zf:
+            assert zf.namelist() == ["episode_000001.json"]

@@ -3,11 +3,11 @@ import json
 import logging
 import os
 import re
-import shutil
+import tempfile
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
 import cv2
 import numpy as np
@@ -2256,8 +2256,11 @@ class Client:
         self,
         project: str,
         lerobot_data_path: str,
-        episode_indices: list = None,
-    ) -> list:
+        episode_indices: list[int] | None = None,
+        converter: Callable[
+            [dict[str, Any]], lerobot.LeRobotConverter
+        ] = lerobot.LeRobotConverter,
+    ) -> list[dict[str, Any]]:
         """
         Import a LeRobot dataset into a FastLabel robotics project.
 
@@ -2267,46 +2270,85 @@ class Client:
 
         Requires: pip install fastlabel[robotics]
 
+        The dataset must contain meta/info.json with
+        features["observation.state"]["names"] and features["action"]["names"];
+        telemetry values are selected by feature name. A dataset without them
+        raises FastLabelInvalidException before any episode is imported.
+
         project is slug of your project (Required).
         lerobot_data_path is the path to the LeRobot dataset directory (Required).
         episode_indices is a list of episode indices to import.
             If None, all episodes are imported (Optional).
+        converter is a LeRobotConverter subclass (or any callable taking the
+            parsed meta/info.json dict and returning a LeRobotConverter). The SDK
+            constructs it with the dataset metadata. Override its hooks to control
+            telemetry values (build_observation_state / build_action /
+            build_telemetry_frame), video selection (select_cameras), task
+            keyword args (build_task_kwargs) and episode selection
+            (select_episodes). Defaults to LeRobotConverter, which keeps every
+            value, camera and episode.
         """
         data_path = Path(lerobot_data_path)
+        conv = converter(lerobot.load_info(data_path))
         episode_map = lerobot.build_episode_map(data_path)
         if episode_indices is None:
-            episode_indices = sorted(episode_map.keys())
+            episode_indices = conv.select_episodes(
+                {index: info["length"] for index, info in episode_map.items()}
+            )
 
         results = []
         for episode_index in episode_indices:
-            episode_name = lerobot.format_episode_name(episode_index)
-            self.create_robotics_task(project=project, name=episode_name)
-
-            zip_path = lerobot.create_episode_zip(
-                lerobot_data_path=data_path,
-                episode_index=episode_index,
-                episode_map=episode_map,
-            )
+            episode_name = None
+            # Build the ZIP before creating the task so a telemetry/video failure
+            # does not leave an orphan task. A per-episode FastLabelException is
+            # recorded and the remaining episodes still run; unexpected errors
+            # (e.g. connection errors) propagate so the caller can react.
             try:
-                result = self.import_robotics_contents_file(
-                    project=project, file_path=zip_path
+                episode_name = conv.build_episode_name(episode_index)
+                raw_frames = lerobot.get_episode_raw_frames(
+                    data_path, episode_index, episode_map
                 )
+                task_kwargs = (
+                    conv.build_task_kwargs(
+                        episode_index=episode_index,
+                        episode_name=episode_name,
+                        frames=raw_frames,
+                    )
+                    or {}
+                )
+                with tempfile.TemporaryDirectory() as episode_dir:
+                    zip_path = lerobot.create_episode_zip(
+                        lerobot_data_path=data_path,
+                        episode_index=episode_index,
+                        episode_name=episode_name,
+                        converter=conv,
+                        episode_map=episode_map,
+                        raw_frames=raw_frames,
+                        output_dir=Path(episode_dir),
+                    )
+                    self.create_robotics_task(
+                        project=project, name=episode_name, **task_kwargs
+                    )
+                    result = self.import_robotics_contents_file(
+                        project=project, file_path=zip_path
+                    )
                 results.append(
-                    {"episode": episode_name, "success": True, "result": result}
+                    {
+                        "episode_index": episode_index,
+                        "episode": episode_name,
+                        "success": True,
+                        "result": result,
+                    }
                 )
             except FastLabelException as e:
                 results.append(
                     {
+                        "episode_index": episode_index,
                         "episode": episode_name,
                         "success": False,
                         "result": {"error": str(e)},
                     }
                 )
-            finally:
-                zip_file = Path(zip_path)
-                tmp_dir = zip_file.parent
-                if tmp_dir.exists():
-                    shutil.rmtree(tmp_dir)
 
         return results
 
