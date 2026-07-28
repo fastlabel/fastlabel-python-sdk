@@ -2261,6 +2261,8 @@ results = client.import_lerobot(
 
 > **Note:** Only LeRobot dataset v3 is supported. v2 datasets need to be converted to v3 before importing.
 
+> **Note:** The dataset must contain `meta/info.json` with `features["observation.state"]["names"]` and `features["action"]["names"]`. Telemetry values are selected by feature name, so a dataset without them fails before any episode is imported.
+
 ##### Customize the import with a converter
 
 By default, each frame's full `observation.state` and `action` are written to the telemetry JSON and every camera is uploaded. To control this, subclass `LeRobotConverter` and pass the class (the SDK constructs it with the parsed `meta/info.json`, so you can select by feature name):

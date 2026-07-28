@@ -86,7 +86,7 @@ def get_camera_dirs(lerobot_data_path: Path) -> list[Camera]:
         parts = obs_dir.name.split(".")
         if parts[0] != "observation":
             raise FastLabelInvalidException(
-                f"Unexpected camera dir name: {obs_dir.name}"
+                f"Unexpected camera dir name: {obs_dir.name}", 422
             )
 
         content_name = "_".join(parts[1:])

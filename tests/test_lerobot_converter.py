@@ -71,6 +71,23 @@ class TestDefaults:
         )
 
 
+class TestDataMismatch:
+    """A column missing from the parquet, or fewer values than meta/info.json
+    declares, is a dataset-wide defect: the original KeyError / IndexError
+    propagates (import_lerobot does not catch it) with an explanatory message.
+    """
+
+    def test_missing_column_raises_key_error(self):
+        frame = {k: v for k, v in FRAME.items() if k != "action"}
+        with pytest.raises(KeyError, match="declared in meta/info.json"):
+            LeRobotConverter(META).build_action(frame)
+
+    def test_too_few_values_raises_index_error(self):
+        frame = FRAME | {"observation.state": [10.0, 20.0]}
+        with pytest.raises(IndexError, match="declares at least 3 names"):
+            LeRobotConverter(META).build_observation_state(frame)
+
+
 class TestStaticNameSelection:
     def test_preserves_declared_order(self):
         class Sel(LeRobotConverter):

@@ -2270,6 +2270,11 @@ class Client:
 
         Requires: pip install fastlabel[robotics]
 
+        The dataset must contain meta/info.json with
+        features["observation.state"]["names"] and features["action"]["names"];
+        telemetry values are selected by feature name. A dataset without them
+        raises FastLabelInvalidException before any episode is imported.
+
         project is slug of your project (Required).
         lerobot_data_path is the path to the LeRobot dataset directory (Required).
         episode_indices is a list of episode indices to import.
@@ -2280,7 +2285,8 @@ class Client:
             telemetry values (build_observation_state / build_action /
             build_telemetry_frame), video selection (select_cameras), task
             keyword args (build_task_kwargs) and episode selection
-            (select_episodes). Defaults to LeRobotConverter (unchanged behaviour).
+            (select_episodes). Defaults to LeRobotConverter, which keeps every
+            value, camera and episode.
         """
         data_path = Path(lerobot_data_path)
         conv = converter(lerobot.load_info(data_path))

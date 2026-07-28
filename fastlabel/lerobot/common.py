@@ -23,8 +23,12 @@ class Camera(NamedTuple):
 def load_info(lerobot_data_path: Path) -> dict[str, Any]:
     """Load meta/info.json for a LeRobot dataset.
 
-    Returns the parsed dict, or {} when the file is absent (older datasets),
-    so name-based selection is opt-in and default behavior is unaffected.
+    Returns the parsed dict, or {} when the file is absent.
+
+    meta/info.json is required for import: ``LeRobotConverter`` selects
+    ``observation.state`` / ``action`` values by feature name, so a dataset
+    without the file (or without ``features[key]["names"]``) raises
+    ``FastLabelInvalidException`` before any episode is imported.
     """
     info_path = lerobot_data_path / "meta" / "info.json"
     if not info_path.exists():

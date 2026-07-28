@@ -27,8 +27,14 @@ class LeRobotConverter:
     (or a ``functools.partial`` / factory) to ``import_lerobot``; the SDK calls
     it with the parsed ``info.json`` as ``meta``.
 
-    Selection of ``observation.state`` / ``action`` values is name-based and
-    follows a 3-layer structure (requires ``meta/info.json``):
+    Selection of ``observation.state`` / ``action`` values is name-based, so the
+    dataset must provide ``meta/info.json`` with
+    ``features["observation.state"]["names"]`` and ``features["action"]["names"]``
+    — including for the default converter, which keeps every name. Otherwise
+    ``__init__`` raises ``FastLabelInvalidException`` (i.e. ``import_lerobot``
+    fails before importing any episode).
+
+    Name-based selection follows a 3-layer structure:
 
     1. Declare exact names via the ``OBSERVATION_STATE_NAMES`` / ``ACTION_NAMES``
        class variables (``None`` means keep everything).
@@ -92,13 +98,47 @@ class LeRobotConverter:
         return index
 
     # ---- telemetry hooks ----
+    # A missing column or a value array shorter than meta/info.json declares is a
+    # property of the dataset (or of a whole chunk), not of one episode, so the
+    # original KeyError / IndexError propagates and aborts the import; it is only
+    # re-raised with a message naming the mismatch.
     def build_observation_state(self, frame: Frame) -> list[Any]:
-        values = frame["observation.state"]
-        return [values[i] for i in self._state_index]
+        try:
+            values = frame["observation.state"]
+        except KeyError as e:
+            raise KeyError(self._missing_column("observation.state", frame)) from e
+        try:
+            return [values[i] for i in self._state_index]
+        except IndexError as e:
+            raise IndexError(
+                self._too_few_values("observation.state", values, self._state_index)
+            ) from e
 
     def build_action(self, frame: Frame) -> list[Any]:
-        values = frame["action"]
-        return [values[i] for i in self._action_index]
+        try:
+            values = frame["action"]
+        except KeyError as e:
+            raise KeyError(self._missing_column("action", frame)) from e
+        try:
+            return [values[i] for i in self._action_index]
+        except IndexError as e:
+            raise IndexError(
+                self._too_few_values("action", values, self._action_index)
+            ) from e
+
+    @staticmethod
+    def _missing_column(key: str, frame: Frame) -> str:
+        return (
+            f"'{key}' is declared in meta/info.json but missing from the episode "
+            f"data (columns: {sorted(frame)})."
+        )
+
+    @staticmethod
+    def _too_few_values(key: str, values: Any, index: list[int]) -> str:
+        return (
+            f"'{key}' has {len(values)} values in the episode data but "
+            f"meta/info.json declares at least {max(index) + 1} names."
+        )
 
     def build_telemetry_frame(self, frame: Frame) -> dict[str, Any]:
         """Build one telemetry frame written to the episode JSON.
