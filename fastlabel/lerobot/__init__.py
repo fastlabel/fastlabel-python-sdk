@@ -58,7 +58,10 @@ def get_episode_raw_frames(
     """
     ep_info = v3.resolve_episode(episode_index, episode_map)
     return v3.get_episode_raw_frames(
-        lerobot_data_path, episode_index, ep_info["chunk"], ep_info["file_stem"]
+        lerobot_data_path,
+        episode_index,
+        ep_info["data_chunk"],
+        ep_info["data_file_stem"],
     )
 
 
@@ -100,6 +103,9 @@ def create_episode_zip(
     ]
     cameras = converter.select_cameras(v3.get_camera_dirs(lerobot_data_path))
     ep_info = v3.resolve_episode(episode_index, episode_map)
+    # fps converts each camera's from_timestamp (meta/episodes) into a frame
+    # offset within its consolidated video file.
+    fps = load_info(lerobot_data_path).get("fps")
     return v3._assemble_episode_zip(
-        ep_info, episode_name, cameras, telemetry_frames, output_dir
+        ep_info, episode_name, cameras, telemetry_frames, output_dir, fps
     )

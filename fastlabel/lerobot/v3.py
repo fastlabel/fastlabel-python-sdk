@@ -1,4 +1,5 @@
 import json
+import logging
 import shutil
 import tempfile
 from pathlib import Path
@@ -9,14 +10,31 @@ import cv2
 from fastlabel.exceptions import FastLabelInvalidException
 from fastlabel.lerobot.common import Camera
 
+logger = logging.getLogger(__name__)
 
-class EpisodeInfo(TypedDict):
-    """Per-episode location within the v3 layout."""
+
+class VideoInfo(TypedDict):
+    """Per-episode location of one camera's segment within a consolidated
+    video file."""
 
     chunk: str
     file_stem: str
-    frame_offset: int
+    from_timestamp: float
+    to_timestamp: float
+
+
+class EpisodeInfo(TypedDict):
+    """Per-episode location within the v3 layout (from meta/episodes).
+
+    Data and video files are consolidated independently in v3, so each camera
+    carries its own chunk/file location under ``videos`` (keyed by the video
+    feature key, e.g. ``observation.images.top``).
+    """
+
+    data_chunk: str
+    data_file_stem: str
     length: int
+    videos: dict[str, VideoInfo]
 
 
 # episode_index -> EpisodeInfo
@@ -25,39 +43,61 @@ EpisodeMap = dict[int, EpisodeInfo]
 Frame = dict[str, Any]
 
 
+def _chunk_name(chunk_index: int) -> str:
+    return f"chunk-{chunk_index:03d}"
+
+
+def _file_stem(file_index: int) -> str:
+    return f"file-{file_index:03d}"
+
+
 def _build_episode_map(lerobot_data_path: Path) -> EpisodeMap:
     """Build a mapping of episode_index -> EpisodeInfo.
 
-    Reads all data parquet files across all chunks and computes per-episode
-    frame offsets within each file (needed for video segment extraction).
+    Reads meta/episodes/chunk-XXX/file-YYY.parquet, which holds each episode's
+    location: ``data/chunk_index``, ``data/file_index``, ``length`` and, per
+    camera, ``videos/{key}/chunk_index``, ``videos/{key}/file_index``,
+    ``videos/{key}/from_timestamp``, ``videos/{key}/to_timestamp``.
 
-    v3 layout: data/chunk-XXX/file-YYY.parquet
+    Video locations cannot be derived from the data file layout: data and
+    video files are consolidated independently (different size limits), so
+    their chunk/file indices generally differ.
     """
     import pandas as pd
 
-    data_dir = lerobot_data_path / "data"
+    episodes_dir = lerobot_data_path / "meta" / "episodes"
+    parquet_files = sorted(episodes_dir.glob("chunk-*/file-*.parquet"))
+    if not parquet_files:
+        raise FastLabelInvalidException(
+            f"Episode metadata not found: {episodes_dir}/chunk-*/file-*.parquet",
+            422,
+        )
+
     episode_map: EpisodeMap = {}
-
-    for chunk_dir in sorted(data_dir.iterdir()):
-        if not chunk_dir.is_dir() or not chunk_dir.name.startswith("chunk-"):
-            continue
-        chunk_name = chunk_dir.name
-
-        for parquet_file in sorted(chunk_dir.glob("file-*.parquet")):
-            file_stem = parquet_file.stem
-            df = pd.read_parquet(parquet_file)
-
-            frame_offset = 0
-            for ep_idx in sorted(df["episode_index"].unique()):
-                ep_df = df[df["episode_index"] == ep_idx]
-                length = len(ep_df)
-                episode_map[int(ep_idx)] = {
-                    "chunk": chunk_name,
-                    "file_stem": file_stem,
-                    "frame_offset": frame_offset,
-                    "length": length,
+    for parquet_file in parquet_files:
+        df = pd.read_parquet(parquet_file)
+        video_keys = [
+            column.split("/")[1]
+            for column in df.columns
+            if column.startswith("videos/") and column.endswith("/chunk_index")
+        ]
+        for _, row in df.iterrows():
+            videos: dict[str, VideoInfo] = {}
+            for key in video_keys:
+                if pd.isna(row[f"videos/{key}/chunk_index"]):
+                    continue
+                videos[key] = {
+                    "chunk": _chunk_name(int(row[f"videos/{key}/chunk_index"])),
+                    "file_stem": _file_stem(int(row[f"videos/{key}/file_index"])),
+                    "from_timestamp": float(row[f"videos/{key}/from_timestamp"]),
+                    "to_timestamp": float(row[f"videos/{key}/to_timestamp"]),
                 }
-                frame_offset += length
+            episode_map[int(row["episode_index"])] = {
+                "data_chunk": _chunk_name(int(row["data/chunk_index"])),
+                "data_file_stem": _file_stem(int(row["data/file_index"])),
+                "length": int(row["length"]),
+                "videos": videos,
+            }
 
     return episode_map
 
@@ -160,29 +200,49 @@ def _assemble_episode_zip(
     cameras: list[Camera],
     telemetry_frames: list[dict[str, Any]],
     output_dir: Path,
+    fps: float | None,
 ) -> str:
     """Stage selected video segments + telemetry JSON, then archive as a ZIP.
 
     ``telemetry_frames`` is the list of frame dicts written to the episode JSON.
+    ``fps`` (from meta/info.json) converts each camera's ``from_timestamp``
+    into a frame offset within its consolidated video file; it may be None only
+    when no camera segment is extracted. A camera whose video file is missing
+    is skipped with a warning (the ZIP still ships the telemetry JSON).
     The staging directory is removed automatically; the ZIP is written under
     ``output_dir`` (owned by the caller) and its path returned.
     """
-    chunk = ep_info["chunk"]
-    file_stem = ep_info["file_stem"]
-    frame_offset = ep_info["frame_offset"]
     length = ep_info["length"]
 
     with tempfile.TemporaryDirectory() as staging:
         content_dir = Path(staging)
 
         # Extract video segments
-        # v3: videos/{key}/chunk-XXX/file-YYY.mp4
+        # v3: videos/{key}/chunk-XXX/file-YYY.mp4, located per camera via
+        # meta/episodes (video files are consolidated independently of data).
         for camera in cameras:
-            video_path = camera.path / chunk / f"{file_stem}.mp4"
-            if not video_path.exists():
+            video_info = ep_info["videos"].get(camera.key)
+            if video_info is None:
                 continue
+            video_path = (
+                camera.path / video_info["chunk"] / f"{video_info['file_stem']}.mp4"
+            )
+            if not video_path.exists():
+                logger.warning(
+                    "Video file not found, skipping camera %s: %s",
+                    camera.key,
+                    video_path,
+                )
+                continue
+            if fps is None:
+                raise FastLabelInvalidException(
+                    "'fps' not found in meta/info.json "
+                    "(required to locate episode video segments).",
+                    422,
+                )
             output_path = content_dir / f"{camera.content_name}.mp4"
-            _extract_video_segment(video_path, frame_offset, length, output_path)
+            start_frame = round(video_info["from_timestamp"] * fps)
+            _extract_video_segment(video_path, start_frame, length, output_path)
 
         json_path = content_dir / f"{episode_name}.json"
         json_path.write_text(json.dumps(telemetry_frames, ensure_ascii=False))
