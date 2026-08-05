@@ -59,40 +59,107 @@ def v3_dataset(tmp_path):
     (meta_dir / "info.json").write_text(
         json.dumps(
             {
+                "fps": 10,
                 "features": {
                     "observation.state": {"names": ["s0", "s1"]},
                     "action": {"names": ["a0", "a1"]},
-                }
+                },
             }
         )
+    )
+
+    episodes_dir = meta_dir / "episodes" / "chunk-000"
+    episodes_dir.mkdir(parents=True)
+    _write_parquet(
+        episodes_dir / "file-000.parquet",
+        [
+            {
+                "episode_index": 0,
+                "data/chunk_index": 0,
+                "data/file_index": 0,
+                "length": 3,
+            },
+            {
+                "episode_index": 1,
+                "data/chunk_index": 0,
+                "data/file_index": 0,
+                "length": 3,
+            },
+            {
+                "episode_index": 2,
+                "data/chunk_index": 1,
+                "data/file_index": 0,
+                "length": 2,
+            },
+        ],
     )
 
     return tmp_path
 
 
 class TestBuildEpisodeMap:
-    def test_returns_offsets_per_episode(self, v3_dataset):
+    def test_returns_locations_per_episode(self, v3_dataset):
         result = v3._build_episode_map(v3_dataset)
 
         assert set(result.keys()) == {0, 1, 2}
         assert result[0] == {
-            "chunk": "chunk-000",
-            "file_stem": "file-000",
-            "frame_offset": 0,
+            "data_chunk": "chunk-000",
+            "data_file_stem": "file-000",
             "length": 3,
+            "videos": {},
         }
         assert result[1] == {
-            "chunk": "chunk-000",
-            "file_stem": "file-000",
-            "frame_offset": 3,
+            "data_chunk": "chunk-000",
+            "data_file_stem": "file-000",
             "length": 3,
+            "videos": {},
         }
         assert result[2] == {
-            "chunk": "chunk-001",
-            "file_stem": "file-000",
-            "frame_offset": 0,
+            "data_chunk": "chunk-001",
+            "data_file_stem": "file-000",
             "length": 2,
+            "videos": {},
         }
+
+    def test_reads_per_camera_video_locations(self, v3_dataset):
+        # Video files are consolidated independently of data files, so the
+        # video chunk/file indices may differ from the data ones.
+        _write_parquet(
+            v3_dataset / "meta" / "episodes" / "chunk-000" / "file-000.parquet",
+            [
+                {
+                    "episode_index": 0,
+                    "data/chunk_index": 0,
+                    "data/file_index": 0,
+                    "length": 3,
+                    "videos/observation.images.top/chunk_index": 1,
+                    "videos/observation.images.top/file_index": 2,
+                    "videos/observation.images.top/from_timestamp": 1.5,
+                    "videos/observation.images.top/to_timestamp": 1.8,
+                },
+            ],
+        )
+
+        result = v3._build_episode_map(v3_dataset)
+
+        assert result[0]["videos"] == {
+            "observation.images.top": {
+                "chunk": "chunk-001",
+                "file_stem": "file-002",
+                "from_timestamp": 1.5,
+                "to_timestamp": 1.8,
+            }
+        }
+
+    def test_missing_episode_metadata_raises(self, v3_dataset):
+        import shutil
+
+        from fastlabel.exceptions import FastLabelInvalidException
+
+        shutil.rmtree(v3_dataset / "meta" / "episodes")
+
+        with pytest.raises(FastLabelInvalidException):
+            v3._build_episode_map(v3_dataset)
 
     def test_get_episode_indices_sorted(self, v3_dataset):
         assert v3.get_episode_indices(v3_dataset) == [0, 1, 2]
@@ -131,7 +198,10 @@ class TestCreateEpisodeZip:
         out.mkdir()
         episode_map = v3._build_episode_map(v3_dataset)
         raw_frames = v3.get_episode_raw_frames(
-            v3_dataset, 1, episode_map[1]["chunk"], episode_map[1]["file_stem"]
+            v3_dataset,
+            1,
+            episode_map[1]["data_chunk"],
+            episode_map[1]["data_file_stem"],
         )
         zip_path = create_episode_zip(
             v3_dataset,
