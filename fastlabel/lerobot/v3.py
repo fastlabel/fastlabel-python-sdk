@@ -207,11 +207,19 @@ def _assemble_episode_zip(
     ``telemetry_frames`` is the list of frame dicts written to the episode JSON.
     ``fps`` (from meta/info.json) converts each camera's ``from_timestamp``
     into a frame offset within its consolidated video file; it may be None only
-    when no camera segment is extracted. A camera whose video file is missing
-    is skipped with a warning (the ZIP still ships the telemetry JSON).
+    when no selected camera has a video segment (otherwise raises before any
+    staging). A camera whose video file is missing is skipped with a warning
+    (the ZIP still ships the telemetry JSON).
     The staging directory is removed automatically; the ZIP is written under
     ``output_dir`` (owned by the caller) and its path returned.
     """
+    if fps is None and any(camera.key in ep_info["videos"] for camera in cameras):
+        raise FastLabelInvalidException(
+            "'fps' not found in meta/info.json "
+            "(required to locate episode video segments).",
+            422,
+        )
+
     length = ep_info["length"]
 
     with tempfile.TemporaryDirectory() as staging:
@@ -234,12 +242,6 @@ def _assemble_episode_zip(
                     video_path,
                 )
                 continue
-            if fps is None:
-                raise FastLabelInvalidException(
-                    "'fps' not found in meta/info.json "
-                    "(required to locate episode video segments).",
-                    422,
-                )
             output_path = content_dir / f"{camera.content_name}.mp4"
             start_frame = round(video_info["from_timestamp"] * fps)
             _extract_video_segment(video_path, start_frame, length, output_path)
