@@ -5483,6 +5483,130 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
+    def create_task_comment(
+        self,
+        project: str,
+        task_id: str,
+        content_id: str,
+        points: list,
+        text: str,
+        type: str = "text",
+        scale: float = 0,
+        frame: int = 0,
+        is_internally_published: bool = True,
+        status: str = None,
+        priority: int = None,
+        is_resolved: bool = False,
+        task_annotation_id: str = None,
+        issue_category_id: str = None,
+        color: str = None,
+    ) -> dict:
+        """
+        Create a comment on a task. The comment author is recorded as
+        "via API" (not attributed to a specific user).
+
+        project is slug of your project (Required).
+        task_id is the task id the comment belongs to (Required).
+        content_id is the content (image/frame) id the comment is anchored to (Required).
+            Must be a content of the given task.
+        points is the comment position as a numeric array (Required).
+        text is the comment body text (Required).
+        type can be 'text', 'navigation', 'free_hand', 'eraser' (default: 'text').
+        scale is the canvas scale (Optional).
+        frame is the frame index for sequential/video (Optional).
+        is_internally_published toggles internal visibility (default: True).
+        status can be 'none', 'todo', 'in_progress', 'done' (Optional).
+        priority is one of 0(none)/10(low)/20(medium)/30(high) (Optional).
+        is_resolved marks the comment resolved (Optional).
+        task_annotation_id anchors the comment to an annotation of the task (Optional).
+        issue_category_id sets the issue category (Optional).
+        color is a hex color like #ffffff (Optional).
+        """
+        endpoint = "comments"
+        payload = {
+            "project": project,
+            "taskId": task_id,
+            "contentId": content_id,
+            "points": points,
+            "text": text,
+            "type": type,
+            "isResolved": is_resolved,
+            "scale": scale,
+            "frame": frame,
+            "isInternallyPublished": is_internally_published,
+        }
+        if status is not None:
+            payload["status"] = status
+        if priority is not None:
+            payload["priority"] = priority
+        if task_annotation_id is not None:
+            payload["taskAnnotationId"] = task_annotation_id
+        if issue_category_id is not None:
+            payload["issueCategoryId"] = issue_category_id
+        if color is not None:
+            payload["color"] = color
+        return self.api.post_request(endpoint, payload=payload)
+
+    def update_task_comment(
+        self,
+        comment_id: str,
+        is_resolved: bool = None,
+        points: list = None,
+        frame: int = None,
+        is_internally_published: bool = None,
+        status: str = None,
+        priority: int = None,
+        task_annotation_id: str = None,
+        issue_category_id: str = None,
+        threads: list = None,
+    ) -> dict:
+        """
+        Update a comment.
+
+        comment_id is the id of the comment to update (Required).
+        is_resolved marks the comment resolved (Optional).
+        points is the comment position as a numeric array (Optional).
+        frame is the frame index for sequential/video (Optional).
+        is_internally_published toggles internal visibility (Optional).
+        status can be 'none', 'todo', 'in_progress', 'done' (Optional).
+        priority is one of 0(none)/10(low)/20(medium)/30(high) (Optional).
+        task_annotation_id anchors the comment to an annotation (Optional).
+        issue_category_id sets the issue category (Optional).
+        threads updates existing thread bodies (Optional).
+            e.g.) [{"id": "THREAD_ID", "text": "updated text"}]
+        Only the provided fields are updated; omitted fields are left unchanged.
+        """
+        endpoint = "comments/" + comment_id
+        payload = {}
+        if is_resolved is not None:
+            payload["isResolved"] = is_resolved
+        if points is not None:
+            payload["points"] = points
+        if frame is not None:
+            payload["frame"] = frame
+        if is_internally_published is not None:
+            payload["isInternallyPublished"] = is_internally_published
+        if status is not None:
+            payload["status"] = status
+        if priority is not None:
+            payload["priority"] = priority
+        if task_annotation_id is not None:
+            payload["taskAnnotationId"] = task_annotation_id
+        if issue_category_id is not None:
+            payload["issueCategoryId"] = issue_category_id
+        if threads is not None:
+            payload["threads"] = threads
+        return self.api.put_request(endpoint, payload=payload)
+
+    def delete_task_comment(self, comment_id: str) -> None:
+        """
+        Delete a comment.
+
+        comment_id is the id of the comment to delete (Required).
+        """
+        endpoint = "comments/" + comment_id
+        self.api.delete_request(endpoint)
+
     def get_project_comments(
         self,
         project: str,
