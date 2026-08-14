@@ -5501,27 +5501,6 @@ class Client:
         issue_category_id: str = None,
         color: str = None,
     ) -> dict:
-        """
-        Create a comment on a task. The comment author is recorded as
-        "via API" (not attributed to a specific user).
-
-        project is slug of your project (Required).
-        task_id is the task id the comment belongs to (Required).
-        content_id is the content (image/frame) id the comment is anchored to (Required).
-            Must be a content of the given task.
-        points is the comment position as a numeric array (Required).
-        text is the comment body text (Required).
-        type can be 'text', 'navigation', 'free_hand', 'eraser' (default: 'text').
-        scale is the canvas scale (Optional).
-        frame is the frame index for sequential/video (Optional).
-        is_internally_published toggles internal visibility (default: True).
-        status can be 'none', 'todo', 'in_progress', 'done' (Optional).
-        priority is one of 0(none)/10(low)/20(medium)/30(high) (Optional).
-        is_resolved marks the comment resolved (Optional).
-        task_annotation_id anchors the comment to an annotation of the task (Optional).
-        issue_category_id sets the issue category (Optional).
-        color is a hex color like #ffffff (Optional).
-        """
         endpoint = "comments"
         payload = {
             "project": project,
@@ -5560,22 +5539,6 @@ class Client:
         issue_category_id: str = None,
         threads: list = None,
     ) -> dict:
-        """
-        Update a comment.
-
-        comment_id is the id of the comment to update (Required).
-        is_resolved marks the comment resolved (Optional).
-        points is the comment position as a numeric array (Optional).
-        frame is the frame index for sequential/video (Optional).
-        is_internally_published toggles internal visibility (Optional).
-        status can be 'none', 'todo', 'in_progress', 'done' (Optional).
-        priority is one of 0(none)/10(low)/20(medium)/30(high) (Optional).
-        task_annotation_id anchors the comment to an annotation (Optional).
-        issue_category_id sets the issue category (Optional).
-        threads updates existing thread bodies (Optional).
-            e.g.) [{"id": "THREAD_ID", "text": "updated text"}]
-        Only the provided fields are updated; omitted fields are left unchanged.
-        """
         endpoint = "comments/" + comment_id
         payload = {}
         if is_resolved is not None:
