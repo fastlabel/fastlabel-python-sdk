@@ -5485,7 +5485,6 @@ class Client:
 
     def create_task_comment(
         self,
-        project: str,
         task_id: str,
         points: list,
         text: str,
@@ -5497,18 +5496,18 @@ class Client:
         priority: int = None,
         is_resolved: bool = False,
         task_annotation_id: str = None,
-        issue_category_id: str = None,
         color: str = None,
     ) -> dict:
         """
         Create a comment on a task. The author is recorded as "via API".
+
+        The task is resolved by task_id alone (project is not required).
 
         content_id is optional: if omitted and the task has a single content,
         it is used automatically. Required for tasks with multiple contents.
         """
         endpoint = "comments"
         payload = {
-            "project": project,
             "taskId": task_id,
             "points": points,
             "text": text,
@@ -5525,8 +5524,6 @@ class Client:
             payload["priority"] = priority
         if task_annotation_id is not None:
             payload["taskAnnotationId"] = task_annotation_id
-        if issue_category_id is not None:
-            payload["issueCategoryId"] = issue_category_id
         if color is not None:
             payload["color"] = color
         return self.api.post_request(endpoint, payload=payload)
@@ -5540,7 +5537,6 @@ class Client:
         status: str = None,
         priority: int = None,
         task_annotation_id: str = None,
-        issue_category_id: str = None,
         threads: list = None,
     ) -> dict:
         endpoint = "comments/" + comment_id
@@ -5557,8 +5553,6 @@ class Client:
             payload["priority"] = priority
         if task_annotation_id is not None:
             payload["taskAnnotationId"] = task_annotation_id
-        if issue_category_id is not None:
-            payload["issueCategoryId"] = issue_category_id
         if threads is not None:
             payload["threads"] = threads
         return self.api.put_request(endpoint, payload=payload)
