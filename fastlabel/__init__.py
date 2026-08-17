@@ -5487,13 +5487,12 @@ class Client:
         self,
         project: str,
         task_id: str,
-        content_id: str,
         points: list,
         text: str,
+        content_id: str = None,
         type: str = "text",
         scale: float = 0,
         frame: int = 0,
-        is_internally_published: bool = True,
         status: str = None,
         priority: int = None,
         is_resolved: bool = False,
@@ -5501,19 +5500,25 @@ class Client:
         issue_category_id: str = None,
         color: str = None,
     ) -> dict:
+        """
+        Create a comment on a task. The author is recorded as "via API".
+
+        content_id is optional: if omitted and the task has a single content,
+        it is used automatically. Required for tasks with multiple contents.
+        """
         endpoint = "comments"
         payload = {
             "project": project,
             "taskId": task_id,
-            "contentId": content_id,
             "points": points,
             "text": text,
             "type": type,
             "isResolved": is_resolved,
             "scale": scale,
             "frame": frame,
-            "isInternallyPublished": is_internally_published,
         }
+        if content_id is not None:
+            payload["contentId"] = content_id
         if status is not None:
             payload["status"] = status
         if priority is not None:
@@ -5532,7 +5537,6 @@ class Client:
         is_resolved: bool = None,
         points: list = None,
         frame: int = None,
-        is_internally_published: bool = None,
         status: str = None,
         priority: int = None,
         task_annotation_id: str = None,
@@ -5547,8 +5551,6 @@ class Client:
             payload["points"] = points
         if frame is not None:
             payload["frame"] = frame
-        if is_internally_published is not None:
-            payload["isInternallyPublished"] = is_internally_published
         if status is not None:
             payload["status"] = status
         if priority is not None:
