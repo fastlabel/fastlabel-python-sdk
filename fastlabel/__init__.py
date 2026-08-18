@@ -5485,9 +5485,9 @@ class Client:
 
     def create_task_comment(
         self,
-        task_id: str,
-        points: list,
-        text: str,
+        task_id: str = None,
+        points: list = None,
+        text: str = None,
         content_id: str = None,
         type: str = "text",
         scale: float = 0,
@@ -5497,15 +5497,22 @@ class Client:
         is_resolved: bool = False,
         task_annotation_id: str = None,
         color: str = None,
+        comment_id: str = None,
     ) -> dict:
         """
-        Create a comment on a task. The author is recorded as "via API".
+        Create a comment, or add a thread (message/reply) to an existing comment.
+        The author is recorded as "via API".
 
-        The task is resolved by task_id alone (project is not required).
-
-        content_id is optional: if omitted and the task has a single content,
-        it is used automatically. Required for tasks with multiple contents.
+        - task_id を指定: 新規コメントを作成（comment + 最初の thread）。
+          task は task_id のみで解決（project 不要）。content_id は省略可
+          （単一 content は自動採用、複数 content は必須）。
+        - comment_id を指定: 既存コメントに発言(thread)を追加（text のみ使用）。
         """
+        # comment_id 指定時は既存コメントへの発言(thread)追加に分岐
+        if comment_id is not None:
+            return self.api.post_request(
+                "comments/" + comment_id + "/threads", payload={"text": text}
+            )
         endpoint = "comments"
         payload = {
             "taskId": task_id,
@@ -5528,43 +5535,23 @@ class Client:
             payload["color"] = color
         return self.api.post_request(endpoint, payload=payload)
 
-    def update_task_comment(
-        self,
-        comment_id: str,
-        is_resolved: bool = None,
-        points: list = None,
-        frame: int = None,
-        status: str = None,
-        priority: int = None,
-        task_annotation_id: str = None,
-        threads: list = None,
-    ) -> dict:
-        endpoint = "comments/" + comment_id
-        payload = {}
-        if is_resolved is not None:
-            payload["isResolved"] = is_resolved
-        if points is not None:
-            payload["points"] = points
-        if frame is not None:
-            payload["frame"] = frame
-        if status is not None:
-            payload["status"] = status
-        if priority is not None:
-            payload["priority"] = priority
-        if task_annotation_id is not None:
-            payload["taskAnnotationId"] = task_annotation_id
-        if threads is not None:
-            payload["threads"] = threads
-        return self.api.put_request(endpoint, payload=payload)
-
-    def delete_task_comment(self, comment_id: str) -> None:
+    def update_task_comment(self, thread_id: str, text: str) -> dict:
         """
-        Delete a comment.
+        Update the body text of a comment thread (message) by its id.
 
-        comment_id is the id of the comment to delete (Required).
+        コメントの外形（frame/points/status など）は本 API では更新しない。
         """
-        endpoint = "comments/" + comment_id
-        self.api.delete_request(endpoint)
+        endpoint = "comments/threads/" + thread_id
+        return self.api.put_request(endpoint, payload={"text": text})
+
+    def delete_task_comment(self, thread_id: str) -> None:
+        """
+        Delete a comment thread (message) by its id.
+
+        コメントの最後の1件を消すと、空の入れ物を残さないよう
+        コメント本体もカスケード削除される。
+        """
+        self.api.delete_request("comments/threads/" + thread_id)
 
     def get_project_comments(
         self,
