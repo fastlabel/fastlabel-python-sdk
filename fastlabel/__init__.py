@@ -5483,6 +5483,65 @@ class Client:
             params["limit"] = limit
         return self.api.get_request(endpoint, params=params)
 
+    def create_task_comment(
+        self,
+        task_id: str = None,
+        points: list = None,
+        text: str = None,
+        content_id: str = None,
+        type: str = "text",
+        scale: float = 0,
+        frame: int = 0,
+        status: str = None,
+        priority: int = None,
+        is_resolved: bool = False,
+        task_annotation_id: str = None,
+        color: str = None,
+        comment_id: str = None,
+    ) -> dict:
+        """
+        Create a comment, or add a thread (message/reply) to an existing comment.
+        The author is recorded as "via API".
+        """
+        if comment_id is not None:
+            return self.api.post_request(
+                "comments/" + comment_id + "/threads", payload={"text": text}
+            )
+        endpoint = "comments"
+        payload = {
+            "taskId": task_id,
+            "points": points,
+            "text": text,
+            "type": type,
+            "isResolved": is_resolved,
+            "scale": scale,
+            "frame": frame,
+        }
+        if content_id is not None:
+            payload["contentId"] = content_id
+        if status is not None:
+            payload["status"] = status
+        if priority is not None:
+            payload["priority"] = priority
+        if task_annotation_id is not None:
+            payload["taskAnnotationId"] = task_annotation_id
+        if color is not None:
+            payload["color"] = color
+        return self.api.post_request(endpoint, payload=payload)
+
+    def update_task_comment(self, thread_id: str, text: str) -> dict:
+        """
+        Update the body text of a comment thread (message) by its id.
+        """
+        endpoint = "comments/threads/" + thread_id
+        return self.api.put_request(endpoint, payload={"text": text})
+
+    def delete_task_comment(self, thread_id: str) -> None:
+        """
+        Delete a comment thread (message) by its id.
+        """
+        self.api.delete_request("comments/threads/" + thread_id)
+
     def get_project_comments(
         self,
         project: str,

@@ -2967,6 +2967,82 @@ Example of a comment thread object
 }
 ```
 
+### Create Task Comment
+
+Create a comment on a task (creates a comment together with its first thread). The author is recorded as "via API".
+
+```python
+comment = client.create_task_comment(
+    task_id="YOUR_TASK_ID",
+    points=[185.98, 86.55],
+    text="comment text",
+    frame=1,
+)
+```
+
+#### Parameters
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| task_id | str | Yes | Task ID the comment belongs to (the task is resolved by task_id alone) |
+| points | list | Yes | Comment position as a numeric array |
+| text | str | Yes | Comment body text |
+| content_id | str | No | Content ID. If omitted and the task has a single content it is auto-selected; required for multi-content tasks |
+| type | str | No | Comment type. Only `text` is supported (default: `text`) |
+| scale | float | No | Canvas scale |
+| frame | int | No | Frame index for sequential/video (1-indexed) |
+| status | str | No | Comment status |
+| priority | int | No | Comment priority |
+| is_resolved | bool | No | Whether the comment is resolved |
+| task_annotation_id | str | No | Annotation ID to anchor the comment to |
+| color | str | No | Hex color like `#ffffff` |
+
+The response has the same shape as a comment object in [Get Task Comments](#get-task-comments).
+
+### Add a Comment Thread (Reply)
+
+Add a thread (reply) to an existing comment. The author is recorded as "via API".
+
+```python
+comment = client.create_task_comment(comment_id="YOUR_COMMENT_ID", text="reply text")
+```
+
+#### Parameters
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| comment_id | str | Yes | Parent comment ID |
+| text | str | Yes | Thread body text |
+
+### Update a Comment Thread
+
+Update the body text of a single thread (message) by its thread ID.
+
+```python
+comment = client.update_task_comment(thread_id="YOUR_THREAD_ID", text="updated text")
+```
+
+#### Parameters
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| thread_id | str | Yes | Thread ID to update |
+| text | str | Yes | New body text |
+
+### Delete a Comment Thread
+
+Delete a single thread (message) by its thread ID. When the deleted thread is the comment's last remaining thread, the comment itself is also removed.
+
+```python
+client.delete_task_comment(thread_id="YOUR_THREAD_ID")
+```
+
+#### Parameters
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| thread_id | str | Yes | Thread ID to delete |
+
 ## Project
 
 ### Create Project
