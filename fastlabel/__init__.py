@@ -5502,13 +5502,7 @@ class Client:
         """
         Create a comment, or add a thread (message/reply) to an existing comment.
         The author is recorded as "via API".
-
-        - task_id を指定: 新規コメントを作成（comment + 最初の thread）。
-          task は task_id のみで解決（project 不要）。content_id は省略可
-          （単一 content は自動採用、複数 content は必須）。
-        - comment_id を指定: 既存コメントに発言(thread)を追加（text のみ使用）。
         """
-        # comment_id 指定時は既存コメントへの発言(thread)追加に分岐
         if comment_id is not None:
             return self.api.post_request(
                 "comments/" + comment_id + "/threads", payload={"text": text}
@@ -5538,8 +5532,6 @@ class Client:
     def update_task_comment(self, thread_id: str, text: str) -> dict:
         """
         Update the body text of a comment thread (message) by its id.
-
-        コメントの外形（frame/points/status など）は本 API では更新しない。
         """
         endpoint = "comments/threads/" + thread_id
         return self.api.put_request(endpoint, payload={"text": text})
@@ -5547,9 +5539,6 @@ class Client:
     def delete_task_comment(self, thread_id: str) -> None:
         """
         Delete a comment thread (message) by its id.
-
-        コメントの最後の1件を消すと、空の入れ物を残さないよう
-        コメント本体もカスケード削除される。
         """
         self.api.delete_request("comments/threads/" + thread_id)
 
