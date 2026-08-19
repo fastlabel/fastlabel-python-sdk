@@ -50,7 +50,9 @@ class _Unset:
         return "UNSET"
 
 
-_UNSET = _Unset()
+# Typed as Any so that the marker stays out of the public signatures that use it
+# as their default. Callers only ever pass an int or None.
+_UNSET: Any = _Unset()
 
 
 class Client:
@@ -4311,7 +4313,7 @@ class Client:
         color: str = None,
         order: int = None,
         attributes: list = [],
-        max_area_count: Union[int, None, _Unset] = _UNSET,
+        max_area_count: Optional[int] = _UNSET,
     ) -> str:
         """
         Create an annotation.
@@ -4365,7 +4367,7 @@ class Client:
         color: str = None,
         order: int = None,
         attributes: list = [],
-        max_area_count: Union[int, None, _Unset] = _UNSET,
+        max_area_count: Optional[int] = _UNSET,
     ) -> str:
         """
         Update an annotation.
