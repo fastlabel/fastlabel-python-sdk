@@ -4297,6 +4297,7 @@ class Client:
         color: str = None,
         order: int = None,
         attributes: list = [],
+        max_area_count: Optional[int] = 1,
     ) -> str:
         """
         Create an annotation.
@@ -4308,6 +4309,10 @@ class Client:
         title is a display name of value (Required).
         color is hex color code like #ffffff (Optional).
         attributes is a list of attribute (Optional).
+        max_area_count is the maximum number of separate regions a single
+        segmentation annotation may consist of, between 1 and 1000 (Optional).
+        It only applies to segmentation classes and defaults to 1, which
+        disallows disjoint regions. Set None to allow any number of regions.
         """
         endpoint = "annotations"
         payload = {
@@ -4315,6 +4320,7 @@ class Client:
             "type": type,
             "value": value,
             "title": title,
+            "maxAreaCount": max_area_count,
         }
         if color:
             payload["color"] = color
