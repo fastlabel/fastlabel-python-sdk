@@ -2668,8 +2668,8 @@ annotation_id = client.create_annotation(
 Create a new segmentation annotation that allows disjoint regions.
 
 `max_area_count` is the maximum number of separate regions a single segmentation annotation may
-consist of. It only applies to segmentation classes and defaults to `1`, which disallows disjoint
-regions. Set `None` to allow any number of regions.
+consist of, between 1 and 1000. It only applies to segmentation classes and defaults to `1`, which
+disallows disjoint regions. Set `None` to allow any number of regions.
 
 ```python
 annotation_id = client.create_annotation(
@@ -2844,7 +2844,8 @@ annotation_id = client.update_annotation(
 
 Update the maximum number of regions of a segmentation annotation.
 
-`max_area_count` is left unchanged when omitted. Set `None` to allow any number of regions.
+`max_area_count` accepts a value between 1 and 1000 and is left unchanged when omitted. Set `None`
+to allow any number of regions.
 
 ```python
 annotation_id = client.update_annotation(
