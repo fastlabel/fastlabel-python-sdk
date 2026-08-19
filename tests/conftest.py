@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 import pytest
 
+import fastlabel
+
 
 def _write_synthetic_video(
     path: Path,
@@ -46,5 +48,28 @@ def synthetic_video(tmp_path):
             fps=fps,
             fourcc_code=fourcc_code,
         )
+
+    return _factory
+
+
+@pytest.fixture
+def client(monkeypatch):
+    monkeypatch.setenv("FASTLABEL_ACCESS_TOKEN", "dummy-token")
+    return fastlabel.Client()
+
+
+@pytest.fixture
+def capture_request(monkeypatch):
+    """Replace an api.*_request method with a recorder and return the calls list."""
+
+    def _factory(client, method_name, return_value=None):
+        calls = []
+
+        def fake(endpoint, *args, **kwargs):
+            calls.append({"endpoint": endpoint, "args": args, "kwargs": kwargs})
+            return return_value
+
+        monkeypatch.setattr(client.api, method_name, fake)
+        return calls
 
     return _factory
