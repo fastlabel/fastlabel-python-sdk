@@ -31,20 +31,20 @@ def _capture(monkeypatch, client, method_name, return_value=None):
 # --- create_annotation -----------------------------------------------------
 
 
-def test_create_annotation_defaults_max_area_count_to_one(monkeypatch, client):
+def test_create_annotation_omits_max_area_count_by_default(monkeypatch, client):
     calls = _capture(monkeypatch, client, "post_request", return_value="anno-id")
 
     client.create_annotation(
         project="my-project", type="segmentation", value="cat", title="Cat"
     )
 
+    # The field is left out entirely so the API applies its own default of 1
     assert calls[0]["endpoint"] == "annotations"
     assert calls[0]["kwargs"]["payload"] == {
         "project": "my-project",
         "type": "segmentation",
         "value": "cat",
         "title": "Cat",
-        "maxAreaCount": 1,
     }
 
 

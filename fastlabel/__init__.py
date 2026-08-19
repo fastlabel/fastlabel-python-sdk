@@ -4311,7 +4311,7 @@ class Client:
         color: str = None,
         order: int = None,
         attributes: list = [],
-        max_area_count: Optional[int] = 1,
+        max_area_count: Union[int, None, _Unset] = _UNSET,
     ) -> str:
         """
         Create an annotation.
@@ -4325,8 +4325,9 @@ class Client:
         attributes is a list of attribute (Optional).
         max_area_count is the maximum number of separate regions a single
         segmentation annotation may consist of, between 1 and 1000 (Optional).
-        It only applies to segmentation classes and defaults to 1, which
-        disallows disjoint regions. Set None to allow any number of regions.
+        It only applies to segmentation classes. When omitted the API applies
+        its default of 1, which disallows disjoint regions. Set None to allow
+        any number of regions.
         """
         endpoint = "annotations"
         payload = {
@@ -4334,7 +4335,6 @@ class Client:
             "type": type,
             "value": value,
             "title": title,
-            "maxAreaCount": max_area_count,
         }
         if color:
             payload["color"] = color
@@ -4342,6 +4342,8 @@ class Client:
             payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
+        if not isinstance(max_area_count, _Unset):
+            payload["maxAreaCount"] = max_area_count
         return self.api.post_request(endpoint, payload=payload)
 
     def create_classification_annotation(self, project: str, attributes: list) -> str:
