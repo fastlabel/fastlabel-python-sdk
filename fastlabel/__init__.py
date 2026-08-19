@@ -39,6 +39,20 @@ logging.basicConfig(
 )
 
 
+class _Unset:
+    """Marker for arguments the caller did not pass.
+
+    Needed where None is a meaningful value that has to be sent to the API,
+    and therefore cannot double as "leave this field untouched".
+    """
+
+    def __repr__(self) -> str:
+        return "UNSET"
+
+
+_UNSET = _Unset()
+
+
 class Client:
     api = None
 
@@ -4349,6 +4363,7 @@ class Client:
         color: str = None,
         order: int = None,
         attributes: list = [],
+        max_area_count: Union[int, None, _Unset] = _UNSET,
     ) -> str:
         """
         Update an annotation.
@@ -4358,6 +4373,10 @@ class Client:
         title is a display name of value (Optional).
         color is hex color code like #ffffff (Optional).
         attributes is a list of attribute (Optional).
+        max_area_count is the maximum number of separate regions a single
+        segmentation annotation may consist of, between 1 and 1000 (Optional).
+        It only applies to segmentation classes and is left unchanged when
+        omitted. Set None to allow any number of regions.
         """
         endpoint = "annotations/" + annotation_id
         payload = {}
@@ -4371,6 +4390,8 @@ class Client:
             payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
+        if not isinstance(max_area_count, _Unset):
+            payload["maxAreaCount"] = max_area_count
         return self.api.put_request(endpoint, payload=payload)
 
     def update_classification_annotation(

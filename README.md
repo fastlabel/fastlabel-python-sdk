@@ -2842,6 +2842,15 @@ annotation_id = client.update_annotation(
     annotation_id="YOUR_ANNOTATION_ID", value="cat2", title="Cat2", color="#FF0000", attributes=attributes)
 ```
 
+Update the maximum number of regions of a segmentation annotation.
+
+`max_area_count` is left unchanged when omitted. Set `None` to allow any number of regions.
+
+```python
+annotation_id = client.update_annotation(
+    annotation_id="YOUR_ANNOTATION_ID", max_area_count=None)
+```
+
 Update a classification annotation.
 
 ```python
