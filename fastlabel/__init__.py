@@ -4342,7 +4342,7 @@ class Client:
             payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
-        if not isinstance(max_area_count, _Unset):
+        if max_area_count is not _UNSET:
             payload["maxAreaCount"] = max_area_count
         return self.api.post_request(endpoint, payload=payload)
 
@@ -4392,7 +4392,7 @@ class Client:
             payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
-        if not isinstance(max_area_count, _Unset):
+        if max_area_count is not _UNSET:
             payload["maxAreaCount"] = max_area_count
         return self.api.put_request(endpoint, payload=payload)
 
