@@ -2665,6 +2665,17 @@ annotation_id = client.create_annotation(
     project="YOUR_PROJECT_SLUG", type="bbox", value="cat", title="Cat", color="#FF0000", attributes=attributes)
 ```
 
+Create a new segmentation annotation that allows disjoint regions.
+
+`max_area_count` is the maximum number of separate regions a single segmentation annotation may
+consist of, between 1 and 1000. It only applies to segmentation classes and defaults to `1`, which
+disallows disjoint regions. Set `None` to allow any number of regions.
+
+```python
+annotation_id = client.create_annotation(
+    project="YOUR_PROJECT_SLUG", type="segmentation", value="cat", title="Cat", max_area_count=None)
+```
+
 Create a new classification annotation.
 
 ```python
@@ -2829,6 +2840,16 @@ attributes = [
 ]
 annotation_id = client.update_annotation(
     annotation_id="YOUR_ANNOTATION_ID", value="cat2", title="Cat2", color="#FF0000", attributes=attributes)
+```
+
+Update the maximum number of regions of a segmentation annotation.
+
+`max_area_count` accepts a value between 1 and 1000 and is left unchanged when omitted. Set `None`
+to allow any number of regions.
+
+```python
+annotation_id = client.update_annotation(
+    annotation_id="YOUR_ANNOTATION_ID", max_area_count=None)
 ```
 
 Update a classification annotation.

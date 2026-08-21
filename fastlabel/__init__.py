@@ -39,6 +39,38 @@ logging.basicConfig(
 )
 
 
+class _Unset:
+    """Marker for arguments the caller did not pass.
+
+    Most optional arguments here have two states and None covers the second
+    one: the field is either sent or left out. maxAreaCount has three, because
+    the API represents "unlimited" as null rather than as 0, so null is itself
+    a value that has to reach the API -- left out, sent as null, sent as a
+    number. None is taken up by that null and cannot also mean "the caller
+    said nothing", so this marker carries that state instead and the argument
+    is read by identity rather than by truthiness.
+
+    A single shared instance, so that the identity checks that read this
+    marker still hold after it has been copied or serialised on its way
+    through caller code.
+    """
+
+    _instance: Optional["_Unset"] = None
+
+    def __new__(cls) -> "_Unset":
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __repr__(self) -> str:
+        return "UNSET"
+
+
+# Typed as Any so that the marker stays out of the public signatures that use it
+# as their default. Callers only ever pass an int or None.
+_UNSET: Any = _Unset()
+
+
 class Client:
     api = None
 
@@ -4297,6 +4329,7 @@ class Client:
         color: str = None,
         order: int = None,
         attributes: list = [],
+        max_area_count: Optional[int] = _UNSET,
     ) -> str:
         """
         Create an annotation.
@@ -4308,6 +4341,11 @@ class Client:
         title is a display name of value (Required).
         color is hex color code like #ffffff (Optional).
         attributes is a list of attribute (Optional).
+        max_area_count is the maximum number of separate regions a single
+        segmentation annotation may consist of, between 1 and 1000 (Optional).
+        It only applies to segmentation classes. When omitted the API applies
+        its default of 1, which disallows disjoint regions. Set None to allow
+        any number of regions.
         """
         endpoint = "annotations"
         payload = {
@@ -4322,6 +4360,13 @@ class Client:
             payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
+        # maxAreaCount represents "unlimited" as null rather than as 0, so
+        # passing None is itself a meaningful call and None cannot double as
+        # "not passed" the way it does for the other optional arguments. The
+        # three states are read by identity: left out keeps the API's default,
+        # None removes the limit, an int sets it.
+        if max_area_count is not _UNSET:
+            payload["maxAreaCount"] = max_area_count
         return self.api.post_request(endpoint, payload=payload)
 
     def create_classification_annotation(self, project: str, attributes: list) -> str:
@@ -4343,6 +4388,7 @@ class Client:
         color: str = None,
         order: int = None,
         attributes: list = [],
+        max_area_count: Optional[int] = _UNSET,
     ) -> str:
         """
         Update an annotation.
@@ -4352,6 +4398,10 @@ class Client:
         title is a display name of value (Optional).
         color is hex color code like #ffffff (Optional).
         attributes is a list of attribute (Optional).
+        max_area_count is the maximum number of separate regions a single
+        segmentation annotation may consist of, between 1 and 1000 (Optional).
+        It only applies to segmentation classes and is left unchanged when
+        omitted. Set None to allow any number of regions.
         """
         endpoint = "annotations/" + annotation_id
         payload = {}
@@ -4365,6 +4415,13 @@ class Client:
             payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
+        # maxAreaCount represents "unlimited" as null rather than as 0, so
+        # passing None is itself a meaningful call and None cannot double as
+        # "not passed" the way it does for the other optional arguments. The
+        # three states are read by identity: left out keeps the stored value,
+        # None removes the limit, an int sets it.
+        if max_area_count is not _UNSET:
+            payload["maxAreaCount"] = max_area_count
         return self.api.put_request(endpoint, payload=payload)
 
     def update_classification_annotation(
