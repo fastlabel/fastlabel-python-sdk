@@ -40,17 +40,19 @@ logging.basicConfig(
 
 
 class _Unset:
-    """呼び出し側が引数を渡さなかったことを表すマーカー。
+    """Marker for arguments the caller did not pass.
 
-    このモジュールの任意引数は大半が「送る / 送らない」の二値で、後者を None
-    が兼ねられる。一方、null 自体が API へ送る意味のある値になる引数 (領域数
-    上限 maxAreaCount は 0 ではなく null が「無制限」を表す) は「省略 / null /
-    値」の三値になる。この場合 None は API へ届ける null の側に取られるため
-    「呼び出し側が何も言わなかった」を表せず、その状態をこのマーカーが担う。
-    引数は真偽ではなく同一性 (``is``) で判定する。
+    Most optional arguments here have two states and None covers the second
+    one: the field is either sent or left out. maxAreaCount has three, because
+    the API represents "unlimited" as null rather than as 0, so null is itself
+    a value that has to reach the API -- left out, sent as null, sent as a
+    number. None is taken up by that null and cannot also mean "the caller
+    said nothing", so this marker carries that state instead and the argument
+    is read by identity rather than by truthiness.
 
-    インスタンスは 1 つだけ共有する。呼び出し側のコードで copy やシリアライズ
-    を経ても、このマーカーを読む同一性比較が壊れないようにするため。
+    A single shared instance, so that the identity checks that read this
+    marker still hold after it has been copied or serialised on its way
+    through caller code.
     """
 
     _instance: Optional["_Unset"] = None
@@ -64,8 +66,8 @@ class _Unset:
         return "UNSET"
 
 
-# 既定値としてこのマーカーを使う関数の公開シグネチャに内部クラスが露出しない
-# よう Any で注釈する。呼び出し側が実際に渡すのは int か None のみ。
+# Typed as Any so that the marker stays out of the public signatures that use it
+# as their default. Callers only ever pass an int or None.
 _UNSET: Any = _Unset()
 
 
@@ -4358,10 +4360,11 @@ class Client:
             payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
-        # maxAreaCount は API 側で「無制限」を null で表すため、None を渡すこと
-        # 自体が意味のある操作になる。他の任意引数のように None を「未指定」に
-        # 流用できず、省略 (API 既定値のまま) / None (無制限) / int (上限値) の
-        # 三値になるので、_UNSET との同一性比較で省略かどうかを見分ける。
+        # maxAreaCount represents "unlimited" as null rather than as 0, so
+        # passing None is itself a meaningful call and None cannot double as
+        # "not passed" the way it does for the other optional arguments. The
+        # three states are read by identity: left out keeps the API's default,
+        # None removes the limit, an int sets it.
         if max_area_count is not _UNSET:
             payload["maxAreaCount"] = max_area_count
         return self.api.post_request(endpoint, payload=payload)
@@ -4412,10 +4415,11 @@ class Client:
             payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
-        # maxAreaCount は API 側で「無制限」を null で表すため、None を渡すこと
-        # 自体が意味のある操作になる。他の任意引数のように None を「未指定」に
-        # 流用できず、省略 (保存済みの値のまま) / None (無制限) / int (上限値)
-        # の三値になるので、_UNSET との同一性比較で省略かどうかを見分ける。
+        # maxAreaCount represents "unlimited" as null rather than as 0, so
+        # passing None is itself a meaningful call and None cannot double as
+        # "not passed" the way it does for the other optional arguments. The
+        # three states are read by identity: left out keeps the stored value,
+        # None removes the limit, an int sets it.
         if max_area_count is not _UNSET:
             payload["maxAreaCount"] = max_area_count
         return self.api.put_request(endpoint, payload=payload)
