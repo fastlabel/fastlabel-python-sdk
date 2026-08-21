@@ -44,7 +44,18 @@ class _Unset:
 
     Needed where None is a meaningful value that has to be sent to the API,
     and therefore cannot double as "leave this field untouched".
+
+    A single shared instance, so that the identity checks that read this marker
+    still hold after it has been copied or serialised on its way through
+    caller code.
     """
+
+    _instance: Optional["_Unset"] = None
+
+    def __new__(cls) -> "_Unset":
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     def __repr__(self) -> str:
         return "UNSET"

@@ -5,6 +5,13 @@ endpoint and payload, with a focus on max_area_count. The HTTP layer
 (client.api.*_request) is stubbed so no real request is made.
 """
 
+import copy
+import pickle
+
+import pytest
+
+import fastlabel
+
 # --- create_annotation -----------------------------------------------------
 
 
@@ -81,3 +88,32 @@ def test_update_annotation_without_max_area_count_limit(client, capture_request)
 
     # None is sent as an explicit null, which means no limit on the server side
     assert calls[0]["kwargs"]["payload"] == {"maxAreaCount": None}
+
+
+# --- the "not passed" marker -----------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "round_trip",
+    [copy.deepcopy, lambda value: pickle.loads(pickle.dumps(value))],
+    ids=["deepcopy", "pickle"],
+)
+def test_create_annotation_keeps_marker_meaning_after_round_trip(
+    client, capture_request, round_trip
+):
+    calls = capture_request(client, "post_request", return_value="anno-id")
+
+    # Callers that collect keyword arguments and pass them around must still
+    # get "omitted" out of the default, which relies on the marker's identity
+    kwargs = round_trip(
+        {
+            "project": "my-project",
+            "type": "segmentation",
+            "value": "cat",
+            "title": "Cat",
+            "max_area_count": fastlabel._UNSET,
+        }
+    )
+    client.create_annotation(**kwargs)
+
+    assert "maxAreaCount" not in calls[0]["kwargs"]["payload"]
