@@ -42,8 +42,12 @@ logging.basicConfig(
 class _Unset:
     """Marker for arguments the caller did not pass.
 
-    Needed where None is a meaningful value that has to be sent to the API,
-    and therefore cannot double as "leave this field untouched".
+    Most optional arguments here have two states, and None covers the second
+    one: the field is either sent or left out. A few fields have three, because
+    null is one of the values the API acts on -- left out, sent as null, sent
+    as a value. For those, None is taken up by the null that has to reach the
+    API and cannot also mean "the caller said nothing", so this marker carries
+    that state instead and the argument is read by identity rather than truth.
 
     A single shared instance, so that the identity checks that read this marker
     still hold after it has been copied or serialised on its way through
@@ -4355,6 +4359,9 @@ class Client:
             payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
+        # Three states, so the argument is read by identity: left out keeps the
+        # API's own default, None removes the limit, an int sets it. None is a
+        # value the API acts on and cannot also mean "not passed".
         if max_area_count is not _UNSET:
             payload["maxAreaCount"] = max_area_count
         return self.api.post_request(endpoint, payload=payload)
@@ -4405,6 +4412,9 @@ class Client:
             payload["order"] = order
         if attributes:
             payload["attributes"] = attributes
+        # Three states, so the argument is read by identity: left out keeps the
+        # stored value, None removes the limit, an int sets it. None is a value
+        # the API acts on and cannot also mean "not passed".
         if max_area_count is not _UNSET:
             payload["maxAreaCount"] = max_area_count
         return self.api.put_request(endpoint, payload=payload)
