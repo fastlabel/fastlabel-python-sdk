@@ -9,30 +9,11 @@ import pytest
 
 import fastlabel
 
-
-@pytest.fixture
-def client(monkeypatch):
-    monkeypatch.setenv("FASTLABEL_ACCESS_TOKEN", "dummy-token")
-    return fastlabel.Client()
-
-
-def _capture(monkeypatch, client, method_name, return_value=None):
-    """Replace an api.*_request method with a recorder and return the calls list."""
-    calls = []
-
-    def fake(endpoint, *args, **kwargs):
-        calls.append({"endpoint": endpoint, "args": args, "kwargs": kwargs})
-        return return_value
-
-    monkeypatch.setattr(client.api, method_name, fake)
-    return calls
-
-
 # --- get_workspace_users ---------------------------------------------------
 
 
-def test_get_workspace_users_default(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "get_request", return_value=[])
+def test_get_workspace_users_default(client, capture_request):
+    calls = capture_request(client, "get_request", return_value=[])
 
     client.get_workspace_users()
 
@@ -41,8 +22,8 @@ def test_get_workspace_users_default(monkeypatch, client):
     assert calls[0]["kwargs"]["params"] == {"limit": 20}
 
 
-def test_get_workspace_users_with_params(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "get_request", return_value=[])
+def test_get_workspace_users_with_params(client, capture_request):
+    calls = capture_request(client, "get_request", return_value=[])
 
     client.get_workspace_users(keyword="john", offset=10, limit=50)
 
@@ -53,8 +34,8 @@ def test_get_workspace_users_with_params(monkeypatch, client):
     }
 
 
-def test_get_workspace_users_offset_zero_included(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "get_request", return_value=[])
+def test_get_workspace_users_offset_zero_included(client, capture_request):
+    calls = capture_request(client, "get_request", return_value=[])
 
     client.get_workspace_users(offset=0)
 
@@ -65,8 +46,8 @@ def test_get_workspace_users_offset_zero_included(monkeypatch, client):
 # --- create_workspace_user -------------------------------------------------
 
 
-def test_create_workspace_user_without_modules(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "post_request", return_value={})
+def test_create_workspace_user_without_modules(client, capture_request):
+    calls = capture_request(client, "post_request", return_value={})
 
     client.create_workspace_user(
         name="John Doe",
@@ -87,8 +68,8 @@ def test_create_workspace_user_without_modules(monkeypatch, client):
 # --- update_workspace_user -------------------------------------------------
 
 
-def test_update_workspace_user_role(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "put_request", return_value={})
+def test_update_workspace_user_role(client, capture_request):
+    calls = capture_request(client, "put_request", return_value={})
 
     client.update_workspace_user(email="john@example.com", role="owner")
 
@@ -102,9 +83,9 @@ def test_update_workspace_user_role(monkeypatch, client):
 # --- delete_workspace_user -------------------------------------------------
 
 
-def test_delete_workspace_user(monkeypatch, client):
+def test_delete_workspace_user(client, capture_request):
     # deletion is performed via PUT with role='none' (no DELETE endpoint)
-    calls = _capture(monkeypatch, client, "put_request", return_value=None)
+    calls = capture_request(client, "put_request", return_value=None)
 
     result = client.delete_workspace_user(email="john@example.com")
 
@@ -127,8 +108,10 @@ def test_delete_workspace_user(monkeypatch, client):
         ("modelDev", "function-resource-permissions/model-dev/internal-users"),
     ],
 )
-def test_create_module_permissions_single(monkeypatch, client, module, expected_path):
-    calls = _capture(monkeypatch, client, "post_request", return_value=module)
+def test_create_module_permissions_single(
+    client, capture_request, module, expected_path
+):
+    calls = capture_request(client, "post_request", return_value=module)
 
     # a single module string is accepted (not only a list)
     result = client.create_workspace_user_module_permissions(
@@ -141,8 +124,8 @@ def test_create_module_permissions_single(monkeypatch, client, module, expected_
     assert result == [module]
 
 
-def test_create_module_permissions_multiple(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "post_request", return_value="ok")
+def test_create_module_permissions_multiple(client, capture_request):
+    calls = capture_request(client, "post_request", return_value="ok")
 
     result = client.create_workspace_user_module_permissions(
         email="john@example.com", modules=["annotation", "dataset"]
@@ -156,8 +139,8 @@ def test_create_module_permissions_multiple(monkeypatch, client):
     assert result == ["ok", "ok"]
 
 
-def test_create_module_permissions_invalid_module(monkeypatch, client):
-    _capture(monkeypatch, client, "post_request", return_value=None)
+def test_create_module_permissions_invalid_module(client, capture_request):
+    capture_request(client, "post_request", return_value=None)
 
     with pytest.raises(fastlabel.exceptions.FastLabelInvalidException):
         client.create_workspace_user_module_permissions(
@@ -168,8 +151,8 @@ def test_create_module_permissions_invalid_module(monkeypatch, client):
 # --- delete_workspace_user_module_permissions ------------------------------
 
 
-def test_delete_module_permissions_single(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "delete_request", return_value=None)
+def test_delete_module_permissions_single(client, capture_request):
+    calls = capture_request(client, "delete_request", return_value=None)
 
     client.delete_workspace_user_module_permissions(
         email="john@example.com", modules="modelDev"
@@ -183,8 +166,8 @@ def test_delete_module_permissions_single(monkeypatch, client):
     }
 
 
-def test_delete_module_permissions_multiple(monkeypatch, client):
-    calls = _capture(monkeypatch, client, "delete_request", return_value=None)
+def test_delete_module_permissions_multiple(client, capture_request):
+    calls = capture_request(client, "delete_request", return_value=None)
 
     client.delete_workspace_user_module_permissions(
         email="john@example.com", modules=["annotation", "modelDev"]
@@ -197,8 +180,8 @@ def test_delete_module_permissions_multiple(monkeypatch, client):
     assert all(c["endpoint"] == "function-resource-permissions" for c in calls)
 
 
-def test_delete_module_permissions_invalid_module(monkeypatch, client):
-    _capture(monkeypatch, client, "delete_request", return_value=None)
+def test_delete_module_permissions_invalid_module(client, capture_request):
+    capture_request(client, "delete_request", return_value=None)
 
     with pytest.raises(fastlabel.exceptions.FastLabelInvalidException):
         client.delete_workspace_user_module_permissions(
