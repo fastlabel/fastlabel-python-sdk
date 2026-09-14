@@ -2915,6 +2915,7 @@ Example of a comment object
     "id": "YOUR_COMMENT_ID",
     "taskId": "YOUR_TASK_ID",
     "contentId": "YOUR_CONTENT_ID",
+    "contentName": "01.jpg",
     "type": "text",
     "isResolved": False,
     "points": [185.98, 86.55],
@@ -2970,6 +2971,7 @@ Example of a comment thread object
         "id": "YOUR_COMMENT_ID",
         "taskId": "YOUR_TASK_ID",
         "contentId": "YOUR_CONTENT_ID",
+        "contentName": "01.jpg",
         "type": "text",
         "isResolved": False,
         "points": [185.98, 86.55],
@@ -3001,6 +3003,20 @@ comment = client.create_task_comment(
 )
 ```
 
+For a task with multiple contents (e.g. sequential image), specify which frame
+the comment belongs to with `content_name`. The name is the file name returned
+as `contents[].name` by Get Tasks, and `contents` is not guaranteed to be
+ordered, so match on the name rather than on the array index.
+
+```python
+comment = client.create_task_comment(
+    task_id="YOUR_TASK_ID",
+    content_name="01.jpg",
+    points=[185.98, 86.55],
+    text="comment on frame 01.jpg",
+)
+```
+
 #### Parameters
 
 | Name | Type | Required | Description |
@@ -3008,7 +3024,8 @@ comment = client.create_task_comment(
 | task_id | str | Yes | Task ID the comment belongs to (the task is resolved by task_id alone) |
 | points | list | Yes | Comment position as a numeric array |
 | text | str | Yes | Comment body text |
-| content_id | str | No | Content ID. If omitted and the task has a single content it is auto-selected; required for multi-content tasks |
+| content_name | str | No | Frame file name (`contents[].name` from Get Tasks). Use this to target a frame of a multi-content task such as sequential image. Mutually exclusive with `content_id` |
+| content_id | str | No | Content ID. Mutually exclusive with `content_name`. If both are omitted and the task has a single content it is auto-selected; one of them is required for multi-content tasks |
 | type | str | No | Comment type. Only `text` is supported (default: `text`) |
 | scale | float | No | Canvas scale |
 | frame | int | No | Frame index for sequential/video (1-indexed) |
