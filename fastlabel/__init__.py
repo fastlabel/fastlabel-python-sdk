@@ -5545,6 +5545,7 @@ class Client:
         task_id: str = None,
         points: list = None,
         text: str = None,
+        content_name: str = None,
         content_id: str = None,
         type: str = "text",
         scale: float = 0,
@@ -5559,7 +5560,16 @@ class Client:
         """
         Create a comment, or add a thread (message/reply) to an existing comment.
         The author is recorded as "via API".
+
+        For a task with multiple contents (e.g. sequential image), specify the
+        frame with content_name, which is the file name returned as
+        contents[].name by get_tasks. content_id is also accepted, but the two
+        are mutually exclusive.
         """
+        if content_name is not None and content_id is not None:
+            raise FastLabelInvalidException(
+                "Specify either content_name or content_id, not both.", 422
+            )
         if comment_id is not None:
             return self.api.post_request(
                 "comments/" + comment_id + "/threads", payload={"text": text}
@@ -5574,6 +5584,8 @@ class Client:
             "scale": scale,
             "frame": frame,
         }
+        if content_name is not None:
+            payload["contentName"] = content_name
         if content_id is not None:
             payload["contentId"] = content_id
         if status is not None:
