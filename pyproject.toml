@@ -22,7 +22,9 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-robotics = ["pandas>=2.2.2", "pyarrow>=18.0.0"]
+# pyarrow 26 requires NumPy 2.0+, while this package still supports NumPy 1.26.
+# Remove the upper bound once NumPy 1.x support is dropped.
+robotics = ["pandas>=2.2.2", "pyarrow>=18.0.0,<26"]
 dev = ["pytest>=7.0.0"]
 
 [tool.setuptools]
