@@ -12,3 +12,17 @@ class TestIsVideoSupportedCodec:
         video_path = synthetic_video(name="sample.mp4", fourcc_code="mp4v")
 
         assert utils.is_video_supported_codec(str(video_path)) is False
+
+
+class TestIsMultiImageSupportedExt:
+    def test_gif_returns_true(self):
+        assert utils.is_multi_image_supported_ext("sample.gif") is True
+
+    def test_uppercase_gif_returns_true(self):
+        assert utils.is_multi_image_supported_ext("SAMPLE.GIF") is True
+
+    def test_jpg_returns_true(self):
+        assert utils.is_multi_image_supported_ext("sample.jpg") is True
+
+    def test_bmp_returns_false(self):
+        assert utils.is_multi_image_supported_ext("sample.bmp") is False

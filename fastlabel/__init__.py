@@ -1313,6 +1313,7 @@ class Client:
         project is slug of your project (Required).
         name is an unique identifier of task in your project (Required).
         folder_path is a path to data folder. Files should be under the folder.
+        Supported extensions of files are png, jpg, jpeg, gif (Required).
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
@@ -1341,9 +1342,9 @@ class Client:
         contents = []
         contents_size = 0
         for file_path in file_paths:
-            if not utils.is_image_supported_ext(file_path):
+            if not utils.is_multi_image_supported_ext(file_path):
                 raise FastLabelInvalidException(
-                    "Supported extensions are png, jpg, jpeg.", 422
+                    "Supported extensions are png, jpg, jpeg, gif.", 422
                 )
 
             if not utils.is_image_supported_size(file_path):
