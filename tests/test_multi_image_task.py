@@ -3,6 +3,8 @@
 The HTTP layer (client.api.post_request) is stubbed so no real request is made.
 """
 
+import glob
+
 import pytest
 
 from fastlabel.exceptions import FastLabelInvalidException
@@ -36,3 +38,22 @@ def test_create_multi_image_classification_task_rejects_unsupported_ext(
         )
 
     assert calls == []
+
+
+def test_create_multi_image_classification_task_sends_contents_in_name_order(
+    client, capture_request, tmp_path, monkeypatch
+):
+    (tmp_path / "1_front.gif").write_bytes(b"GIF89a")
+    (tmp_path / "2_last.jpg").write_bytes(b"jpg")
+    original_glob = glob.glob
+    monkeypatch.setattr(
+        glob, "glob", lambda pattern: list(reversed(sorted(original_glob(pattern))))
+    )
+    calls = capture_request(client, "post_request", return_value="task-id")
+
+    client.create_multi_image_classification_task(
+        project="my-project", name="sample", folder_path=str(tmp_path)
+    )
+
+    names = [c["name"] for c in calls[0]["kwargs"]["payload"]["contents"]]
+    assert names == ["1_front.gif", "2_last.jpg"]

@@ -1336,7 +1336,7 @@ class Client:
         endpoint = "tasks/multi-image/classification"
         if not os.path.isdir(folder_path):
             raise FastLabelInvalidException("Folder does not exist.", 422)
-        file_paths = glob.glob(os.path.join(folder_path, "*"))
+        file_paths = sorted(glob.glob(os.path.join(folder_path, "*")))
         if not file_paths:
             raise FastLabelInvalidException("Folder does not have any file.", 422)
         contents = []
