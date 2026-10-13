@@ -1312,8 +1312,8 @@ class Client:
 
         project is slug of your project (Required).
         name is an unique identifier of task in your project (Required).
-        folder_path is a path to data folder. Files should be under the folder.
-        Supported extensions of files are png, jpg, jpeg, gif (Required).
+        folder_path is a path to data folder. Files should be under the folder (Required).
+        Supported extensions of files are png, jpg, jpeg, gif.
         status can be 'registered', 'completed', 'skipped', 'reviewed', 'sent_back',
         'approved', 'declined' (Optional).
         external_status can be 'registered', 'completed', 'skipped', 'reviewed',
