@@ -2449,13 +2449,14 @@ task_id = client.update_task(
 
 Add or remove tags of many tasks at once. Tags not specified are kept, and task status is not changed.
 Tag names that do not exist in the project are created when adding, and ignored when removing.
-Task ids are sent in batches of 5000 internally. Both return the number of tasks.
+Task ids are sent in batches of 5000 internally. Up to 20 tags can be specified, each up to 140 characters.
+Both return the number of tasks whose tags were actually added or removed. Tasks that already had the tags (add) or did not have them (remove) are not counted, so sending the same request again returns 0.
 
 ```python
 task_count = client.add_task_tags(
     project="YOUR_PROJECT_SLUG",
     task_ids=["YOUR_TASK_ID_1", "YOUR_TASK_ID_2"],
-    tags=["tag1", "tag2"], # up to 20 tags
+    tags=["tag1", "tag2"],
 )
 
 task_count = client.remove_task_tags(

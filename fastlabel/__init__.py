@@ -3263,16 +3263,19 @@ class Client:
 
     def add_task_tags(self, project: str, task_ids: List[str], tags: List[str]) -> int:
         """
-        Add tags to tasks at once, and returns the number of tasks.
+        Add tags to tasks at once, and returns the number of tasks the tags were
+        actually added to. Tasks that already had all the tags are not counted,
+        so sending the same request again returns 0.
         Tags already attached to the tasks and tags not specified are kept.
         Tag names that do not exist in the project are created.
 
         project is slug of your project (Required).
         task_ids is a list of task ids. All tasks must belong to the project (Required).
-        tags is a list of tag names to add (up to 20) (Required).
+        tags is a list of tag names to add (up to 20, each up to 140 characters) (Required).
 
         Task ids are sent in batches of 5000. If a batch fails, the earlier batches
-        have already been applied. Sending the same request again is safe.
+        have already been applied. Sending the same request again is safe, and the
+        returned number then counts only the tasks updated by that call.
         """
         return self.__update_task_tags("tasks/tags/add", project, task_ids, tags)
 
@@ -3280,16 +3283,19 @@ class Client:
         self, project: str, task_ids: List[str], tags: List[str]
     ) -> int:
         """
-        Remove tags from tasks at once, and returns the number of tasks.
+        Remove tags from tasks at once, and returns the number of tasks the tags were
+        actually removed from. Tasks that had none of the tags are not counted,
+        so sending the same request again returns 0.
         Only the specified tags are detached. The tags themselves are not deleted.
         Tag names that do not exist in the project are ignored.
 
         project is slug of your project (Required).
         task_ids is a list of task ids. All tasks must belong to the project (Required).
-        tags is a list of tag names to remove (up to 20) (Required).
+        tags is a list of tag names to remove (up to 20, each up to 140 characters) (Required).
 
         Task ids are sent in batches of 5000. If a batch fails, the earlier batches
-        have already been applied. Sending the same request again is safe.
+        have already been applied. Sending the same request again is safe, and the
+        returned number then counts only the tasks updated by that call.
         """
         return self.__update_task_tags("tasks/tags/remove", project, task_ids, tags)
 
@@ -3311,7 +3317,7 @@ class Client:
             self.api.post_request(
                 endpoint,
                 payload={"project": project, "taskIds": chunk, "tags": tags},
-            )["taskCount"]
+            )["updatedTaskCount"]
             for chunk in chunks
         )
 
