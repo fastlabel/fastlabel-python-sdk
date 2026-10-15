@@ -186,6 +186,9 @@ KEYPOINT_MIN_STROKE_WIDTH = 2
 POSE_ESTIMATION_MIN_STROKE_WIDTH = 7
 SEPARATOER = "@@@@@"
 
+# Maximum number of task ids the API accepts in one tag add/remove request.
+TASK_TAGS_UPDATE_TASK_IDS_LIMIT = 5000
+
 EXPORT_IMAGE_WITH_ANNOTATIONS_SUPPORTED_IMAGE_TYPES = (
     ".jpeg",
     ".jpg",
