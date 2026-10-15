@@ -38,20 +38,26 @@ def test_sends_task_ids_and_tags(client, capture_request, method_name, endpoint)
     ]
 
 
-def test_splits_task_ids_over_the_limit_and_sums_task_counts(
-    client, capture_request, monkeypatch
+def test_splits_task_ids_over_the_limit_and_sums_updated_task_counts(
+    client, monkeypatch
 ):
     monkeypatch.setattr(const, "TASK_TAGS_UPDATE_TASK_IDS_LIMIT", 2)
-    calls = capture_request(
-        client, "post_request", return_value={"updatedTaskCount": 2}
-    )
+    # t2 already has the tag, so the first batch updates only t1.
+    updated_task_counts = iter([1, 1])
+    sent_task_ids = []
+
+    def fake_post_request(endpoint, payload):
+        sent_task_ids.append(payload["taskIds"])
+        return {"updatedTaskCount": next(updated_task_counts)}
+
+    monkeypatch.setattr(client.api, "post_request", fake_post_request)
 
     task_count = client.add_task_tags(
         project="my-project", task_ids=["t1", "t2", "t3", "t1"], tags=["a"]
     )
 
-    assert [c["kwargs"]["payload"]["taskIds"] for c in calls] == [["t1", "t2"], ["t3"]]
-    assert task_count == 4
+    assert sent_task_ids == [["t1", "t2"], ["t3"]]
+    assert task_count == 2
 
 
 @pytest.mark.parametrize(
