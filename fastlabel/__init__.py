@@ -3260,6 +3260,68 @@ class Client:
         endpoint = "tasks/" + task_id + "/task-annotations"
         self.api.delete_request(endpoint)
 
+    # Task Tags
+
+    def add_task_tags(self, project: str, task_ids: List[str], tags: List[str]) -> int:
+        """
+        Add tags to tasks at once, and returns the number of tasks the tags were
+        actually added to. Tasks that already had all the tags are not counted,
+        so sending the same request again returns 0.
+        Tags already attached to the tasks and tags not specified are kept.
+        Tag names that do not exist in the project are created.
+
+        project is slug of your project (Required).
+        task_ids is a list of task ids. All tasks must belong to the project (Required).
+        tags is a list of tag names to add (up to 20, each up to 140 characters) (Required).
+
+        Task ids are sent in batches of 5000. If a batch fails, the earlier batches
+        have already been applied. Sending the same request again is safe, and the
+        returned number then counts only the tasks updated by that call.
+        """
+        return self.__update_task_tags("tasks/tags/add", project, task_ids, tags)
+
+    def remove_task_tags(
+        self, project: str, task_ids: List[str], tags: List[str]
+    ) -> int:
+        """
+        Remove tags from tasks at once, and returns the number of tasks the tags were
+        actually removed from. Tasks that had none of the tags are not counted,
+        so sending the same request again returns 0.
+        Only the specified tags are detached. The tags themselves are not deleted.
+        Tag names that do not exist in the project are ignored.
+
+        project is slug of your project (Required).
+        task_ids is a list of task ids. All tasks must belong to the project (Required).
+        tags is a list of tag names to remove (up to 20, each up to 140 characters) (Required).
+
+        Task ids are sent in batches of 5000. If a batch fails, the earlier batches
+        have already been applied. Sending the same request again is safe, and the
+        returned number then counts only the tasks updated by that call.
+        """
+        return self.__update_task_tags("tasks/tags/remove", project, task_ids, tags)
+
+    def __update_task_tags(
+        self, endpoint: str, project: str, task_ids: List[str], tags: List[str]
+    ) -> int:
+        unique_task_ids = list(dict.fromkeys(task_ids))
+        if not unique_task_ids:
+            raise FastLabelInvalidException("Task ids must not be empty.", 422)
+        if not tags:
+            raise FastLabelInvalidException("Tags must not be empty.", 422)
+        chunks = [
+            unique_task_ids[i : i + const.TASK_TAGS_UPDATE_TASK_IDS_LIMIT]
+            for i in range(
+                0, len(unique_task_ids), const.TASK_TAGS_UPDATE_TASK_IDS_LIMIT
+            )
+        ]
+        return sum(
+            self.api.post_request(
+                endpoint,
+                payload={"project": project, "taskIds": chunk, "tags": tags},
+            )["updatedTaskCount"]
+            for chunk in chunks
+        )
+
     # Integrate Task
 
     def find_integrated_image_task_by_prefix(
