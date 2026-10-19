@@ -22,6 +22,10 @@ def is_image_supported_ext(file_path: str) -> bool:
     return file_path.lower().endswith((".png", ".jpg", ".jpeg"))
 
 
+def is_multi_image_supported_ext(file_path: str) -> bool:
+    return file_path.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))
+
+
 def is_video_supported_codec(file_path: str) -> bool:
     return get_video_fourcc(file_path) in const.SUPPORTED_FOURCC
 

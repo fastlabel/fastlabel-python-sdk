@@ -624,6 +624,7 @@ task = client.create_multi_image_classification_task(
 
 ##### Limitation
 
+- Supported extensions are png, jpg, jpeg and gif.
 - You can upload up to a size of 20 MB.
 - You can upload up to a total size of 2 GB.
 - You can upload up to 6 files in total.
